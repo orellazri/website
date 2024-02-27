@@ -24,3 +24,8 @@ name = "blog"
 title = "blog"
 url = "/posts"
 
+[[menu.main]]
+identifier = "projects"
+name = "projects"
+title = "projects"
+url = "/projects"
