@@ -11,5 +11,5 @@ hugo server -D
 Crate post:
 
 ```bash
-hugo new posts/YYY-MM-DD-title.md
+hugo new posts/(date +%Y-%m-%d)-title.md
 ```
