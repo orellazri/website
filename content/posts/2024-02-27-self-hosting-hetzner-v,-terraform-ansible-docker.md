@@ -1,5 +1,5 @@
 ---
-title: Self Hosting On a Hetzner VM: Terraform, Ansible, Docker
+title: "Self Hosting On a Hetzner VM: Terraform, Ansible, Docker"
 tags:
   - selfhosting
   - devops
