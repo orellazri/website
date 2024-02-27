@@ -1,0 +1,26 @@
+baseURL = "/"
+languageCode = "en-us"
+theme = "terminal"
+
+title = "Orel's Website"
+
+[params]
+centerTheme = true
+showPostContent = true
+
+[params.logo]
+logoText = "Orel's Website"
+
+[menu]
+[[menu.main]]
+identifier = "about"
+name = "about"
+title = "about"
+url = "/"
+
+[[menu.main]]
+identifier = "blog"
+name = "blog"
+title = "blog"
+url = "/posts"
+
