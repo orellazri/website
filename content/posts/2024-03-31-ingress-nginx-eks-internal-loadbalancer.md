@@ -5,8 +5,6 @@ date: 2024-03-31
 slug: ingress-nginx-eks-internal-loadbalancer
 ---
 
-## Introduction
-
 In this post, we will deploy Ingress Nginx on EKS with an internal load balancer and HTTPS. This setup is useful when you want to expose your services an internal network (e.g. your work VPN) and secure the communication with HTTPS.
 
 The TLS termination will be done by the NLB, so the traffic between the client and the load balancer will be encrypted.
