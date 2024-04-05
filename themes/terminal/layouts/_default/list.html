@@ -39,7 +39,7 @@
       {{ else if .Description }}
       {{ .Description | markdownify }}
       {{ else }}
-      {{ .Summary }}
+      {{ printf "%.*s" 210 .Summary | .RenderString }}...
       {{ end }}
     </div>
 
