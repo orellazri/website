@@ -46,9 +46,7 @@ jobs:
 
       - name: Build
         run: |
-          hugo \
-            --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+          hugo --minify
 
       - name: Setup Pages
         id: pages

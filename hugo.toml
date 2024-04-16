@@ -1,4 +1,5 @@
-baseURL = "/"
+baseURL = ""
+relativeURLs = "True"
 languageCode = "en-us"
 theme = "terminal"
 
