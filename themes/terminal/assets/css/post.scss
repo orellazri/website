@@ -42,21 +42,9 @@
   }
 
   &-title {
-    $border: 2px dotted $accent;
     position: relative;
     color: $accent;
     margin: 0 0 15px;
-    padding-bottom: 15px;
-    border-bottom: $border;
-
-    &:after {
-      content: '';
-      position: absolute;
-      bottom: 2px;
-      display: block;
-      width: 100%;
-      border-bottom: $border;
-    }
 
     a {
       text-decoration: none;
