@@ -1,0 +1,25 @@
+/* Override this file to customise the theme's CSS for your site */
+@font-face {
+  font-family: "Iosevka";
+  src: url("/fonts/iosevka-regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Iosevka";
+  src: url("/fonts/iosevka-bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: "Iosevka";
+  src: url("/fonts/iosevka-italic.woff2") format("woff2");
+  font-weight: normal;
+  font-style: italic;
+}
+
+:root {
+    --font-monospace: "Iosevka", "Fira Mono", monospace;
+}
