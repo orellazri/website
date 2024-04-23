@@ -8,7 +8,7 @@ Run locally:
 hugo server -D
 ```
 
-Crate post:
+Create post:
 
 ```bash
 hugo new posts/(date +%Y-%m-%d)-title.md
