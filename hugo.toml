@@ -1,8 +1,9 @@
-baseURL = ""
-relativeURLs = "True"
+baseURL = "https://orellazri.com"
+relativeURLs = false
 languageCode = "en-us"
 title = "Orel's Website"
 theme = "risotto"
+enableRobotsTXT = true
 
 [params.theme]
 palette = "base16-dark"
