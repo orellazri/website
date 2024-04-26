@@ -16,6 +16,13 @@
             {{ if .Date }}{{ .Date.Format "2006-01-02" }}{{ end }}
         </p>
     {{ end }}
+    {{ if .Params.tags }}
+    <p>
+        {{ range .Params.tags }}
+        <a href="{{ (urlize (printf " tags/%s/" .)) | absLangURL }}">#{{ . }}</a>
+        {{ end }}
+    </p>
+    {{ end }}
 
     {{ if and (.Params.toc) (.TableOfContents) }}
 	    <hr>
