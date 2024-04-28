@@ -14,6 +14,23 @@ At the core of this approach is the idea of storing application configuration va
 
 These key-value pairs will then be used to update the relevant ConfigMap file in the GitOps repository.
 
+Example of a configuration yaml file:
+
+```yaml
+foo: bar
+```
+
+Example of the resulting ConfigMap in the GitOps repository (after the data has been updated):
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application-cm
+data:
+  foo: bar
+```
+
 ## Benefits of Managing Configurations Alongside Code
 
 The beauty of this approach is that it puts the power in the hands of developers. They can make changes to application-specific configurations directly in the repository without needing approval from DevOps teams. This speeds up the development cycle and allows teams to respond quickly to evolving requirements.
