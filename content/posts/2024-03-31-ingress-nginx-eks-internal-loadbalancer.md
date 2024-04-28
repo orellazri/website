@@ -1,6 +1,6 @@
 ---
 title: Deploying Ingress Nginx on EKS With an Internal Load Balancer and HTTPS
-tags: [kubernetes, devops]
+tags: [devops, kubernetes]
 date: 2024-03-31
 slug: ingress-nginx-eks-internal-loadbalancer
 toc: true

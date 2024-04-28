@@ -1,6 +1,6 @@
 ---
 title: "Self Hosting On a Hetzner VM: Terraform, Ansible, Docker"
-tags: [selfhosting, devops]
+tags: [devops, selfhosting]
 date: 2024-02-27
 slug: self-hosting-hetzner-vm-terraform-ansible-docker
 toc: true
