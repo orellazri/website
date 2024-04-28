@@ -1,6 +1,6 @@
 ---
 title: Application Specific Configuration with GitOps Deployments
-tags: [devops kubernetes]
+tags: [devops, kubernetes]
 date: 2024-04-28
 slug: application-specific-configuration-gitops
 toc: true
