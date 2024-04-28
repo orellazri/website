@@ -19,7 +19,7 @@
     {{ if .Params.tags }}
     <p>
         {{ range .Params.tags }}
-        <a href="{{ (urlize (printf " tags/%s/" .)) | absLangURL }}">#{{ . }}</a>
+            <a href="{{ (urlize (printf " tags/%s/" .)) | absLangURL }}">#{{ . }}</a>
         {{ end }}
     </p>
     {{ end }}
