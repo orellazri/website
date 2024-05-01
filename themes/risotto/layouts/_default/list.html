@@ -13,4 +13,13 @@
 
 {{define "aside" }}
     {{ if .Params.description }}<p>{{ .Params.description }}</p>{{ end }}
+
+    <div>
+        <h2>Tags</h2>
+        <ul>
+        {{ range .Site.Taxonomies.tags }}
+            <li><a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a></li>
+        {{ end }}
+        </ul>
+    </div>
 {{ end }}
