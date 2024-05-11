@@ -207,7 +207,7 @@ The functions are defined with the same type `T` that the service struct accepts
 
 ### Controller
 
-As for the controller, we will define a generic controller that will contain the serivce:
+As for the controller, we will define a generic controller that will contain the service:
 
 ```go
 package controllers
