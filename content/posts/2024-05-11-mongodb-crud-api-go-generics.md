@@ -212,12 +212,6 @@ As for the controller, we will define a generic controller that will contain the
 ```go
 package controllers
 
-import (
-	"git.amobee.com/octo/project-planner/internal/services"
-	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/mongo"
-)
-
 type CrudController[T any] struct {
 	crudService *services.CrudService[T]
 }
