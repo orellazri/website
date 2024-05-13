@@ -4,7 +4,7 @@ title: Index
 
 # Welcome
 
-I'm Orel Lazri, a software engineer with a passion for Open Source software, Linux, Homelabs, exploring new technologies, and of course, a huge fan of Arctic Monkeys.
+I'm Orel Lazri, a software engineer with a passion for open source software, Linux, homelabs, exploring new technologies, and of course, a huge fan of Arctic Monkeys.
 
 I'm currently working as a Senior DevOps Engineer at [Nexxen](https://nexxen.com).
 
