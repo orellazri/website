@@ -3,7 +3,6 @@ title: Application Specific Configuration with GitOps Deployments
 tags: [devops, kubernetes]
 date: 2024-04-28
 slug: application-specific-configuration-gitops
-toc: true
 ---
 
 In today's fast-paced software development landscape, staying agile and efficient is crucial. One area where efficiency matters greatly is in deploying application configurations. Developers often need to make changes to configuration values based on different environments, like production, staging, or development.

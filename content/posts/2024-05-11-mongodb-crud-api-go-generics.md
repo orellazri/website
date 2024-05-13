@@ -1,11 +1,8 @@
 ---
 title: Implementing a MongoDB CRUD API Using Go Generics
-tags:
-  - go
-  - coding
+tags: [go, coding]
 date: 2024-05-11
 slug: mongodb-crud-api-go-generics
-toc: true
 ---
 
 I had to write a simple CRUD REST API for a project I'm working on that contains quite a bit of database models in MongoDB. I started writing a controller and a service for each model, but I quickly realized that I was writing the same code over and over again.

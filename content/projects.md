@@ -1,5 +1,6 @@
 ---
 title: Projects
+disableShare: true
 ---
 
 Below are some useful open source projects I have worked on.

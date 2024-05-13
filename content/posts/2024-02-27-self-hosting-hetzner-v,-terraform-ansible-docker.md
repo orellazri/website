@@ -3,7 +3,6 @@ title: "Self Hosting On a Hetzner VM: Terraform, Ansible, Docker"
 tags: [devops, selfhosting]
 date: 2024-02-27
 slug: self-hosting-hetzner-vm-terraform-ansible-docker
-toc: true
 ---
 
 I started my self-hosting journey a few years back with a single desktop machine serving as both my NAS and the host for all the services I was running.
