@@ -292,18 +292,12 @@ In the main file, where we start our HTTP server and connect to the database, we
 
 ```go
 func main() {
-  // Database connection
-  // -- snip --
-
-	// Echo server
-  // -- snip --
-
+	// -- snip --
 
 	// Controllers
 	apiGroup := e.Group("/api")
 	controllers.NewCrudController[models.Post](apiGroup.Group("/posts"), db, "posts")
 	// as many controllers as you want...
-
 
 	// -- snip --
 }
