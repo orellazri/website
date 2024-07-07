@@ -45,7 +45,7 @@ provision:
 
       git clone https://github.com/libbpf/libbpf --depth 1 /tmp/libbpf
       pushd /tmp/libbpf/src
-      make -j $(nproc) install
+      make install
       popd
 ```
 
