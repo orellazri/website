@@ -42,11 +42,7 @@ provision:
       apt-get install -y linux-tools-common linux-tools-$(uname -r) 
       apt-get install -y bpfcc-tools
       apt-get install -y python3-pip
-
-      git clone https://github.com/libbpf/libbpf --depth 1 /tmp/libbpf
-      pushd /tmp/libbpf/src
-      make install
-      popd
+      apt-get install -y libbpf-dev
 ```
 
 This YAML files contains the VM configuration. In my case, I pointed it to use an Ubuntu 24.04 image, and I installed the necessary tools for eBPF development in the provision script.
