@@ -27,6 +27,8 @@ Amazon EKS is a managed Kubernetes service that makes it easy to run Kubernetes 
 
 First, let's set up our main Terraform configuration file. This file will define the AWS provider and some default tags for our resources.
 
+Create a `main.tf` file, and inside it, add the following configuration:
+
 ```hcl
 terraform {
   required_providers {
@@ -65,6 +67,8 @@ After creating this file, run `terraform init` to initialize the Terraform confi
 ## Networking Configuration
 
 Next, let's set up the networking infrastructure for our EKS cluster. This includes creating a VPC, subnets, internet gateway, NAT gateway, and route tables.
+
+Create a new file named `networking.tf` and add the following configuration:
 
 ```hcl
 resource "aws_vpc" "main" {
@@ -273,7 +277,7 @@ This configuration:
 
 ## Node Group Configuration
 
-Next, let's set up the EKS node group:
+Next, let's set up the EKS node group. Create a new file named `nodes.tf` and add the following configuration:
 
 ```hcl
 resource "aws_launch_template" "eks-with-disks" {
@@ -339,7 +343,7 @@ This configuration:
 
 ## IAM Permissions
 
-Finally, let's set up the necessary IAM roles and policies:
+Finally, let's set up the necessary IAM roles and policies. Create a new file named `permissions.tf` and add the following configuration:
 
 ```hcl
 resource "aws_iam_role" "cluster" {
