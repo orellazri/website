@@ -1,5 +1,6 @@
 .DS_Store
-.obsidian
+.obsidian/
+.vscode/
 public/
 resources/_gen/
 .hugo_build.lock
