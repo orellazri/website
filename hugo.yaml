@@ -1,32 +1,22 @@
 baseURL: https://orellazri.com
 relativeURLs: false
-languageCode: en-us
+languageCode: en
 title: Orel's Website
-theme: PaperMod
+theme: risotto
 enableRobotsTXT: true
 
 params:
-  ShowShareButtons: true
-  ShowCodeCopyButtons: false
-  ShowRssButtonInSectionTermList: true
-  comments: false
-  showtoc: true
-  tocopen: false
+  theme:
+    palette: base16-dark
 
-  homeInfoParams:
-    Title: "Welcome \U0001F44B"
-    Content: |
-      I'm Orel Lazri, a software engineer with a passion for open source software, Linux, homelabs, exploring new technologies, and of course, a huge fan of Arctic Monkeys.
-      <br /><br />
-      I'm currently working as a DevOps Lead at <a href="https://nexxen.com/" target="_blank">Nexxen</a>.
-      <br /><br />
-      I use my site as a method of blogging about my learnings, as well as sharing information about projects I have previously, or am currently, working on in my spare time.
+  socialLinks:
+    - title: github
+      url: https://github.com/orellazri
+      icon: fa-brands fa-github
 
-  socialIcons:
-    - name: github
-      url: "https://github.com/orellazri"
-    - name: linkedin
-      url: "https://www.linkedin.com/in/orellazri"
+    - title: linkedin
+      url: https://www.linkedin.com/in/orellazri
+      icon: fa-brands fa-linkedin
 
 menu:
   main:
@@ -40,7 +30,7 @@ menu:
       title: projects
       url: /projects
 
-pygmentsUseClasses: true
 markup:
-  highlight:
-    noClasses: false
+  goldmark:
+    renderer:
+      unsafe: true
