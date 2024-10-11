@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import siteConfig from '@/site-config'
+---
+
+<BaseLayout description={siteConfig.description}>
+  <article class="prose">
+    <h1 class="text-title">Welcome 👋🏻</h1>
+    <p>
+      I'm Orel Lazri, a software engineer with a passion for open source software, Linux, homelabs, exploring new
+      technologies, and of course, Arctic Monkeys 🐒.
+    </p>
+    <p>I'm currently working as a DevOps Lead at <a href="https://nexxen.com" target="_blank">Nexxen</a>.</p>
+    <p>
+      I use my site as a method of blogging about my learnings, as well as sharing information about projects I have
+      previously, or am currently, working on in my spare time.
+    </p>
+
+    <p class="flex gap-x-6 gap-y-2 flex-wrap">
+      {
+        siteConfig.socialLinks.map((link) => (
+          <a aria-label={link.text} href={link.href} target="_blank" class="prose-link">
+            <i class:list={[link.icon]} />
+            {link.text}
+          </a>
+        ))
+      }
+    </p>
+  </article>
+</BaseLayout>

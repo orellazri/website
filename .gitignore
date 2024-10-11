@@ -1,6 +1,6 @@
+dist
+node_modules
+.astro
 .DS_Store
-.obsidian/
-.vscode/
-public/
-resources/_gen/
-.hugo_build.lock
+.eslintcache
+*.log

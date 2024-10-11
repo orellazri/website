@@ -1,0 +1,19 @@
+---
+import { projectData } from './data'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import ListProjects from '@/components/ListProjects.vue'
+---
+
+<BaseLayout title="Projects" description="Some useful projects I have worked on">
+  <h1 class="mb-5 text-title">Projects</h1>
+  <h3 class="mb-10 text-subtitle">Some useful projects I have worked on</h3>
+  <div mb-16 sm:mb-24>
+    {
+      projectData.length > 0 && (
+        <div mb-10>
+          <ListProjects list={projectData} />
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
