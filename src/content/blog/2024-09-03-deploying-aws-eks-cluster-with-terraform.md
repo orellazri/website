@@ -232,7 +232,7 @@ This configuration sets up:
 - An Internet Gateway for public internet access
 - A NAT Gateway for outbound internet access from private subnets
 - Route tables for public and private subnets
-- A security group allowing HTTPS traffic from a specific CIDR range
+- A security group allowing outbound traffic
 
 ## EKS Cluster Configuration
 
