@@ -104,6 +104,6 @@ Each template can include documentation for optional and requires variables, sta
 The resulting documentation shows how to use each template, with practical examples and explanations.
 
 The output, when rendered by MkDocs, looks like this:
-![MkDocs Screenshot](../images/self-serve-gitlab-ci-cd-templates-mkdocs-screenshot.png)
+![MkDocs Screenshot](./images/self-serve-gitlab-ci-cd-templates-mkdocs-screenshot.png)
 
 By implementing generic templates in GitLab, we have empowered our developers to build and manage their own CI/CD pipelines. This self-serve system not only accelerates the development process but also ensures consistency and best practices across all projects.
