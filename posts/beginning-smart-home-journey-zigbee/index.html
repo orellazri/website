@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Beginning My Smart Home Journey with Zigbee
+        
+    </title>
+
+        
+            <meta property="og:title" content="Beginning My Smart Home Journey with Zigbee" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;beginning-smart-home-journey-zigbee&#x2F;&t=Beginning My Smart Home Journey with Zigbee">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=96a1b098f3496dfc8bcb"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Beginning My Smart Home Journey with Zigbee<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2025-01-19</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/smart-home/" class="post-tag">smart-home</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/beginning-smart-home-journey-zigbee/#what-is-zigbee">What is Zigbee?</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/beginning-smart-home-journey-zigbee/#what-do-i-need">What do I need?</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/beginning-smart-home-journey-zigbee/#getting-to-it">Getting to It</a>
+                            
+                                <ul>
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/beginning-smart-home-journey-zigbee/#integrating-with-apple-home">Integrating with Apple Home</a>
+                                        </li>
+
+                                        
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>In the last few weeks, I've been wanting to make my home smarter, in an efficient and secure way.</p>
+<p>I wanted to add smart devices that won't have access to my local network or to the internet, so I won't have to worry about separating my network and messing things up security-wise.</p>
+<p>That's where I stubmled upon Zigbee and got into this rabbit hole.</p>
+<h2 id="what-is-zigbee"><a class="zola-anchor" href="#what-is-zigbee" aria-label="Anchor link for: what-is-zigbee">What is Zigbee?</a></h2>
+<p>From Wikipedia:</p>
+<blockquote>
+<p>Zigbee is a ... specification for a suite of high-level communication protocols used to create personal area networks with small, low-power digital radios, such as for home automation, ... designed for small scale projects which need wireless connection. Hence, Zigbee is a low-power, low-data-rate, and close proximity (i.e., personal area) wireless ad hoc network.</p>
+</blockquote>
+<p>What that means for me is that my Zigbee-powered smart devices can be on a network of their own, with no access to the internet (since they don't receive IP addresses).</p>
+<h2 id="what-do-i-need"><a class="zola-anchor" href="#what-do-i-need" aria-label="Anchor link for: what-do-i-need">What do I need?</a></h2>
+<p>For this to work, I need:</p>
+<ul>
+<li>Zigbee-powered smart device (obviously)</li>
+<li>Zigbee coordinator</li>
+<li>Some computer/SoC to run my software on</li>
+</ul>
+<p>For the smart device, I started with a smart plug. For the coordinator, I bought a Sonoff ZBDongle-E which is a USB dongle with an antenna. For the computer, I have a small NUC that's running some of my services that need to run locally. A Raspberry Pi sort of device will also do the trick.</p>
+<p>As for the software, I chose to run <a href="https://www.zigbee2mqtt.io/">Zigbee2MQTT</a> which is a bridge that uses my USB dongle to connect to my Zigbee devices. Then, it can be added to Home Assistant/Homebridge/etc.</p>
+<h2 id="getting-to-it"><a class="zola-anchor" href="#getting-to-it" aria-label="Anchor link for: getting-to-it">Getting to It</a></h2>
+<p>First of all, my specific USB dongle needed to be flashed with a newer firmware version to support the Ember protocol which is the non-deprecated one. To do that, I used <a href="https://darkxst.github.io/silabs-firmware-builder/">Silabs Firmware Flasher</a> which can easily flash that firmware over the browser. The other alternative is to disassemble the dongle and do something a bit more tricky, which I haven't tried because the first way worked for me.</p>
+<p>After doing that, I deployed a simple Docker Compose stack with both Zigbee2MQTT and an MQTT broker (I'm using <a href="https://mosquitto.org/">Eclipse Mosquitto</a>:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">services</span><span>:
+</span><span>  </span><span style="color:#bf616a;">mqtt</span><span>:
+</span><span>    </span><span style="color:#bf616a;">image</span><span>: </span><span style="color:#a3be8c;">eclipse-mosquitto:2.0
+</span><span>    </span><span style="color:#bf616a;">container_name</span><span>: </span><span style="color:#a3be8c;">mqtt
+</span><span>    </span><span style="color:#bf616a;">restart</span><span>: </span><span style="color:#a3be8c;">unless-stopped
+</span><span>    </span><span style="color:#bf616a;">command</span><span>: </span><span style="color:#a3be8c;">mosquitto -c /mosquitto-no-auth.conf
+</span><span>    </span><span style="color:#bf616a;">volumes</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">/home/&lt;...&gt;/volumes/zigbee/mosquitto:/mosquitto
+</span><span>    </span><span style="color:#bf616a;">ports</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">1883:1883
+</span><span>
+</span><span>  </span><span style="color:#bf616a;">zigbee2mqtt</span><span>:
+</span><span>    </span><span style="color:#bf616a;">image</span><span>: </span><span style="color:#a3be8c;">koenkk/zigbee2mqtt
+</span><span>    </span><span style="color:#bf616a;">container_name</span><span>: </span><span style="color:#a3be8c;">zigbee2mqtt
+</span><span>    </span><span style="color:#bf616a;">restart</span><span>: </span><span style="color:#a3be8c;">unless-stopped
+</span><span>    </span><span style="color:#bf616a;">volumes</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">/home/&lt;...&gt;&gt;/volumes/zigbee/zigbee2mqtt:/app/data
+</span><span>      - </span><span style="color:#a3be8c;">/run/udev:/run/udev:ro
+</span><span>    </span><span style="color:#bf616a;">ports</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">8082:8080
+</span><span>    </span><span style="color:#bf616a;">environment</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">TZ=...
+</span><span>    </span><span style="color:#bf616a;">devices</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">/dev/serial/by-id/&lt;...&gt;:/dev/ttyUSB0
+</span></code></pre>
+<p>Note that you'll need to find your USB dongle's ID in <code>/dev/serial/by-id/...</code></p>
+<p>After doing that, navigate to Z2M's (short for Zigbee2MQTT) web UI and make sure everything works. You can then use it to scan for devices.</p>
+<h3 id="integrating-with-apple-home"><a class="zola-anchor" href="#integrating-with-apple-home" aria-label="Anchor link for: integrating-with-apple-home">Integrating with Apple Home</a></h3>
+<p>In my case, I preferred to use Apple HomeKit instead of Home Assistant, so I deployed Homebridge which is a very useful service that exposes many types of smart devices to Apple Home:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">homebridge</span><span>:
+</span><span style="color:#bf616a;">image</span><span>: </span><span style="color:#a3be8c;">homebridge/homebridge:latest
+</span><span style="color:#bf616a;">container_name</span><span>: </span><span style="color:#a3be8c;">homebridge
+</span><span style="color:#bf616a;">restart</span><span>: </span><span style="color:#a3be8c;">unless-stopped
+</span><span style="color:#bf616a;">network_mode</span><span>: </span><span style="color:#a3be8c;">host
+</span><span style="color:#bf616a;">volumes</span><span>:
+</span><span>  - </span><span style="color:#a3be8c;">/home/&lt;...&gt;/volumes/homebridge:/homebridge
+</span></code></pre>
+<p>I also used the <a href="https://z2m.dev/">homebridge-z2m</a> plugin inside Homebridge to integrate Zigbee2MQTT with Homebridge.</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>
