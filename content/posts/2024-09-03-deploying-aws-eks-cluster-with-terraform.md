@@ -28,7 +28,7 @@ First, let's set up our main Terraform configuration file. This file will define
 
 Create a `main.tf` file, and inside it, add the following configuration:
 
-```hcl
+```
 terraform {
   required_providers {
     aws = {
@@ -69,7 +69,7 @@ Next, let's set up the networking infrastructure for our EKS cluster. This inclu
 
 Create a new file named `networking.tf` and add the following configuration:
 
-```hcl
+```
 resource "aws_vpc" "main" {
   cidr_block = "10.43.0.0/22"
 
@@ -241,7 +241,7 @@ This configuration sets up:
 
 Now, let's define our EKS cluster back in the `main.tf` file:
 
-```hcl
+```
 resource "aws_eks_cluster" "cluster" {
   name     = "<CLUSTER_NAME>"
   role_arn = aws_iam_role.cluster.arn
@@ -278,7 +278,7 @@ This configuration:
 
 Next, let's set up the EKS node group. Create a new file named `nodes.tf` and add the following configuration:
 
-```hcl
+```
 resource "aws_launch_template" "eks-with-disks" {
   name = "eks-with-disks"
 
@@ -344,7 +344,7 @@ This configuration:
 
 Finally, let's set up the necessary IAM roles and policies. Create a new file named `permissions.tf` and add the following configuration:
 
-```hcl
+```
 resource "aws_iam_role" "cluster" {
   name = "<CLUSTER_NAME>-eks-cluster"
 

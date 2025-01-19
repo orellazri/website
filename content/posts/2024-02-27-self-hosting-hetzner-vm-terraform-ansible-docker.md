@@ -24,7 +24,7 @@ Then, go ahead and generate an API token (under Security), name it `terraform`, 
 
 Create a repository and inside a `terraform` directory. The `main.tf` file will look similar to this:
 
-```hcl
+```
 terraform {
   required_providers {
     hcloud = {
@@ -92,7 +92,7 @@ Make sure to change the values accordingly (such as the name and server type for
 
 The other files you'll need is `variables.tf`:
 
-```hcl
+```
 variable "hcloud_token" {}
 
 variable "ssh_public_key_path" {
