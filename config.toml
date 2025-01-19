@@ -14,10 +14,9 @@ theme = "auto"
 favicon = "favicon.svg"
 toc = true
 menu = [
-  { name = "home", url = "/", weight = 1 },
-  { name = "posts", url = "/posts", weight = 2 },
-  { name = "projects", url = "/projects", weight = 3 },
-  { name = "rss", url = "/atom.xml", weight = 4 },
+  { name = "posts", url = "/posts", weight = 1 },
+  { name = "projects", url = "/projects", weight = 2 },
+  { name = "rss", url = "/atom.xml", weight = 3 },
 ]
 socials = [
   { name = "github", url = "https://github.com/orellazri", icon = "github" },
