@@ -10,6 +10,8 @@ highlight_code = true
 
 [extra]
 theme = "auto"
+favicon = "favicon.svg"
+toc = true
 menu = [
   { name = "home", url = "/", weight = 1 },
   { name = "posts", url = "/posts", weight = 2 },
@@ -20,7 +22,6 @@ socials = [
   { name = "github", url = "https://github.com/orellazri", icon = "github" },
   { name = "linkedin", url = "https://linkedin.com/in/orellazri", icon = "linkedin" },
 ]
-toc = true
 
 [extra.analytics]
 enabled = true
