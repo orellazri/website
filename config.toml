@@ -1,4 +1,5 @@
 base_url = "https://orellazri.com"
+title = "Orel Lazri"
 compile_sass = true
 build_search_index = true
 generate_feeds = true
