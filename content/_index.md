@@ -3,7 +3,7 @@ title= "Orel Lazri"
 template = "homepage.html"
 +++
 
-I'm Orel Lazri, a software engineer with a passion for open source software, Linux, homelabs, exploring new technologies, and of course, Arctic Monkeys 🐒.
+Hi! I'm a software engineer with a passion for open source software, Linux, homelabs, exploring new technologies, and of course, Arctic Monkeys 🐒.
 
 I'm currently working as a Senior DevOps Engineer at [Wix](https://wix.com).
 
