@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Patching and Extending Helm Resources With Kustomize
+        
+    </title>
+
+        
+            <meta property="og:title" content="Patching and Extending Helm Resources With Kustomize" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;patching-helm-with-kustomize&#x2F;&t=Patching and Extending Helm Resources With Kustomize">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=2515849b198db1a80e5b"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Patching and Extending Helm Resources With Kustomize<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2024-05-24</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/devops/" class="post-tag">devops</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/patching-helm-with-kustomize/#what-is-kustomize">What is Kustomize?</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/patching-helm-with-kustomize/#example-scenario">Example Scenario</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/patching-helm-with-kustomize/#generating-helm-manifests-with-kustomize">Generating Helm Manifests with Kustomize</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/patching-helm-with-kustomize/#applying-patches-with-kustomize">Applying Patches with Kustomize</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/patching-helm-with-kustomize/#extending-with-kustomize">Extending with Kustomize</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/patching-helm-with-kustomize/#usage-with-argo-cd-gitops">Usage with Argo CD &amp; GitOps</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>Helm deployments are a great way to manage Kubernetes resources, but sometimes you need to customize or extend the resources that Helm generates. In this post, we'll look at how you can use Kustomize to patch and extend Helm resources.</p>
+<h2 id="what-is-kustomize"><a class="zola-anchor" href="#what-is-kustomize" aria-label="Anchor link for: what-is-kustomize">What is Kustomize?</a></h2>
+<p>Kustomize is a tool for customizing Kubernetes resources. It allows you to define a set of patches that can be applied to existing resources, and it provides a way to extend resources with additional configurations.</p>
+<h2 id="example-scenario"><a class="zola-anchor" href="#example-scenario" aria-label="Anchor link for: example-scenario">Example Scenario</a></h2>
+<p>When you deploy a Helm chart, it generates a set of Kubernetes resources based on the templates defined in the chart. If you need to make changes to these resources, you can use Kustomize to apply patches.</p>
+<p>For example, let's say you have a Helm chart that deploys a Deployment resource with the following configuration:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">apps/v1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">Deployment
+</span><span style="color:#bf616a;">metadata</span><span>:
+</span><span>  </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">my-deployment
+</span><span style="color:#bf616a;">spec</span><span>:
+</span><span>  </span><span style="color:#bf616a;">replicas</span><span>: </span><span style="color:#d08770;">3
+</span><span>  </span><span style="color:#65737e;"># -- snip --
+</span></code></pre>
+<p>If you want to change the number of replicas to 5, you can create a patch file like this:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">apps/v1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">Deployment
+</span><span style="color:#bf616a;">metadata</span><span>:
+</span><span>  </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">my-deployment
+</span><span style="color:#bf616a;">spec</span><span>:
+</span><span>  </span><span style="color:#bf616a;">replicas</span><span>: </span><span style="color:#d08770;">5
+</span></code></pre>
+<h2 id="generating-helm-manifests-with-kustomize"><a class="zola-anchor" href="#generating-helm-manifests-with-kustomize" aria-label="Anchor link for: generating-helm-manifests-with-kustomize">Generating Helm Manifests with Kustomize</a></h2>
+<p>How do you make sure that this patch is applied to the Deployment resource generated by the Helm chart? You can use Kustomize act as the generator for the Helm chart and apply the patch to the generated resources. That means that Kustomize will download the Helm chart into plain YAML files and patch them. Then, you can apply the patched resources to your cluster.</p>
+<p>Start by creating a <code>kustomization.yaml</code> file. Here is an example of a Bitnami Airflow deployment:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">kustomize.config.k8s.io/v1beta1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">Kustomization
+</span><span style="color:#bf616a;">namespace</span><span>: </span><span style="color:#a3be8c;">airflow
+</span><span style="color:#bf616a;">helmCharts</span><span>:
+</span><span>  - </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">airflow
+</span><span>    </span><span style="color:#bf616a;">repo</span><span>: </span><span style="color:#a3be8c;">https://charts.bitnami.com/bitnami
+</span><span>    </span><span style="color:#bf616a;">releaseName</span><span>: </span><span style="color:#a3be8c;">my-airflow
+</span><span>    </span><span style="color:#bf616a;">namespace</span><span>: </span><span style="color:#a3be8c;">airflow
+</span><span>    </span><span style="color:#bf616a;">version</span><span>: </span><span style="color:#d08770;">17.2.4
+</span><span>    </span><span style="color:#bf616a;">valuesFile</span><span>: </span><span style="color:#a3be8c;">values.yml
+</span></code></pre>
+<p>Currently, this file only specifies the Helm chart to use and the values file to apply. No patches or additional resources are defined yet.</p>
+<p>To generate the resources from the Helm chart, run the following command:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">kustomize</span><span> build</span><span style="color:#bf616a;"> --enable-helm
+</span></code></pre>
+<p>This tells Kustomize to download the Helm chart, generate the resources, and output them as plain YAML files. You can then apply these resources to your cluster.</p>
+<h2 id="applying-patches-with-kustomize"><a class="zola-anchor" href="#applying-patches-with-kustomize" aria-label="Anchor link for: applying-patches-with-kustomize">Applying Patches with Kustomize</a></h2>
+<p>Now that we've established that Kustomize can generate resources from a Helm chart, let's look at how you can apply patches to these resources.</p>
+<p>Create a patch file (<code>patch.yaml</code>) that changes the number of replicas in the Deployment resource (note that I'm using <code>my-airflow</code> just as an example of a resource, you should replace it with the actual name of the resource you want to patch):</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">apps/v1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">Deployment
+</span><span style="color:#bf616a;">metadata</span><span>:
+</span><span>  </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">my-airflow
+</span><span style="color:#bf616a;">spec</span><span>:
+</span><span>  </span><span style="color:#bf616a;">replicas</span><span>: </span><span style="color:#d08770;">5
+</span></code></pre>
+<p>Next, add the patch to the <code>kustomization.yaml</code> file, so it looks like this:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">kustomize.config.k8s.io/v1beta1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">Kustomization
+</span><span style="color:#bf616a;">namespace</span><span>: </span><span style="color:#a3be8c;">airflow
+</span><span style="color:#bf616a;">helmCharts</span><span>:
+</span><span>  - </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">airflow
+</span><span>    </span><span style="color:#bf616a;">repo</span><span>: </span><span style="color:#a3be8c;">https://charts.bitnami.com/bitnami
+</span><span>    </span><span style="color:#bf616a;">releaseName</span><span>: </span><span style="color:#a3be8c;">my-airflow
+</span><span>    </span><span style="color:#bf616a;">namespace</span><span>: </span><span style="color:#a3be8c;">airflow
+</span><span>    </span><span style="color:#bf616a;">version</span><span>: </span><span style="color:#d08770;">17.2.4
+</span><span>    </span><span style="color:#bf616a;">valuesFile</span><span>: </span><span style="color:#a3be8c;">values.yml
+</span><span style="color:#bf616a;">patches</span><span>:
+</span><span>  - </span><span style="color:#bf616a;">path</span><span>: </span><span style="color:#a3be8c;">patch.yaml
+</span></code></pre>
+<p>Now, when you run <code>kustomize build --enable-helm</code>, the patch will be applied to the resources generated by the Helm chart.</p>
+<h2 id="extending-with-kustomize"><a class="zola-anchor" href="#extending-with-kustomize" aria-label="Anchor link for: extending-with-kustomize">Extending with Kustomize</a></h2>
+<p>In addition to patching resources, you can treat the <code>kustomization.yaml</code> as you would normally, where you can treat it as a base and apply additional overlays, add more resources on top of the generated ones, add annotations, etc.</p>
+<h2 id="usage-with-argo-cd-gitops"><a class="zola-anchor" href="#usage-with-argo-cd-gitops" aria-label="Anchor link for: usage-with-argo-cd-gitops">Usage with Argo CD &amp; GitOps</a></h2>
+<p>If you're using Argo CD for GitOps, you can use kustomize with the <code>--enable-helm</code> flag to enable Kustomize to generate Helm manifests.</p>
+<p>We are currently using Argo CD Vault Plugin to deploy resources, so I modified our <code>ConfigManagementPlugin</code> to look like this:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">argoproj.io/v1alpha1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">ConfigManagementPlugin
+</span><span style="color:#bf616a;">metadata</span><span>:
+</span><span>  </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">argocd-vault-plugin-kustomize
+</span><span style="color:#bf616a;">spec</span><span>:
+</span><span>  </span><span style="color:#bf616a;">allowConcurrency</span><span>: </span><span style="color:#d08770;">true
+</span><span>
+</span><span>  </span><span style="color:#65737e;"># Note: this command is run _before_ anything is done, therefore the logic is to check
+</span><span>  </span><span style="color:#65737e;"># if this looks like a Kustomize bundle
+</span><span>  </span><span style="color:#bf616a;">discover</span><span>:
+</span><span>  </span><span style="color:#bf616a;">find</span><span>:
+</span><span>    </span><span style="color:#bf616a;">command</span><span>:
+</span><span>      - </span><span style="color:#a3be8c;">find
+</span><span>      - </span><span style="color:#d08770;">.
+</span><span>      - </span><span style="color:#a3be8c;">-name
+</span><span>      - </span><span style="color:#a3be8c;">kustomization.yaml
+</span><span>  </span><span style="color:#bf616a;">generate</span><span>:
+</span><span>  </span><span style="color:#bf616a;">command</span><span>:
+</span><span>    - </span><span style="color:#a3be8c;">sh
+</span><span>    - </span><span style="color:#a3be8c;">-c
+</span><span>    - &#39;</span><span style="color:#a3be8c;">kustomize build --enable-helm . | argocd-vault-plugin generate -s vault-configuration -</span><span>&#39;
+</span><span>  </span><span style="color:#bf616a;">lockRepo</span><span>: </span><span style="color:#d08770;">false
+</span></code></pre>
+<p>But depending on your setup, you might need to adjust this to fit your needs, or create a similar plugin yourself.</p>
+<p>I've also read that patching the <code>argocd-cm</code> ConfigMap resource and adding <code>kustomize.buildOptions: --enable-helm</code> might work, but I haven't tested it myself since we are using the above plugin for building the manifests.</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>
