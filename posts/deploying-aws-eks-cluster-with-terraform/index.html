@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Deploying an AWS EKS Cluster With Terraform
+        
+    </title>
+
+        
+            <meta property="og:title" content="Deploying an AWS EKS Cluster With Terraform" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=&#x2F;favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;deploying-aws-eks-cluster-with-terraform&#x2F;&t=Deploying an AWS EKS Cluster With Terraform">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=9d92c6a10bc0f9c365a0"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Deploying an AWS EKS Cluster With Terraform<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2024-09-03</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/devops/" class="post-tag">devops</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#table-of-contents">Table of Contents</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#introduction">Introduction</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#setting-up-the-terraform-configuration">Setting Up the Terraform Configuration</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#networking-configuration">Networking Configuration</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#eks-cluster-configuration">EKS Cluster Configuration</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#node-group-configuration">Node Group Configuration</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#iam-permissions">IAM Permissions</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#conclusion">Conclusion</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>In this post, we'll walk through the process of deploying an Amazon EKS (Elastic Kubernetes Service) cluster using Terraform. We'll cover everything from setting up the basic infrastructure to configuring the cluster and its node groups. Let's dive in!</p>
+<h2 id="table-of-contents"><a class="zola-anchor" href="#table-of-contents" aria-label="Anchor link for: table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#introduction">Introduction</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#setting-up-the-terraform-configuration">Setting Up the Terraform Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#networking-configuration">Networking Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#eks-cluster-configuration">EKS Cluster Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#node-group-configuration">Node Group Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#iam-permissions">IAM Permissions</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#conclusion">Conclusion</a></li>
+</ol>
+<h2 id="introduction"><a class="zola-anchor" href="#introduction" aria-label="Anchor link for: introduction">Introduction</a></h2>
+<p>Amazon EKS is a managed Kubernetes service that makes it easy to run Kubernetes on AWS without needing to install and operate your own Kubernetes control plane. In this guide, we'll use Terraform to automate the deployment of an EKS cluster, including all necessary networking and security configurations.</p>
+<h2 id="setting-up-the-terraform-configuration"><a class="zola-anchor" href="#setting-up-the-terraform-configuration" aria-label="Anchor link for: setting-up-the-terraform-configuration">Setting Up the Terraform Configuration</a></h2>
+<p>First, let's set up our main Terraform configuration file. This file will define the AWS provider and some default tags for our resources.</p>
+<p>Create a <code>main.tf</code> file, and inside it, add the following configuration:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>terraform {
+</span><span>  required_providers {
+</span><span>    aws = {
+</span><span>      source  = &quot;hashicorp/aws&quot;
+</span><span>      version = &quot;~&gt; 5.0&quot;
+</span><span>    }
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>provider &quot;aws&quot; {
+</span><span>  region = &quot;us-east-1&quot;
+</span><span>
+</span><span>  assume_role {
+</span><span>    role_arn = &quot;arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;ROLE&gt;&quot;
+</span><span>  }
+</span><span>
+</span><span>  default_tags {
+</span><span>    tags = {
+</span><span>      Managed-By  = &quot;Terraform&quot;
+</span><span>      EKS-Cluster = &quot;&lt;CLUSTER_NAME&gt;&quot;
+</span><span>    }
+</span><span>  }
+</span><span>}
+</span></code></pre>
+<p>In this configuration:</p>
+<ul>
+<li>We specify the AWS provider and its version.</li>
+<li>We set the AWS region to <code>us-east-1</code>.</li>
+<li>We use an IAM role for authentication (replace <code>&lt;ACCOUNT_ID&gt;</code> with your actual AWS account ID and <code>&lt;ROLE&gt;</code> with your actual role name).</li>
+<li>We define default tags that will be applied to all resources created by Terraform.</li>
+</ul>
+<p>After creating this file, run <code>terraform init</code> to initialize the Terraform configuration.</p>
+<h2 id="networking-configuration"><a class="zola-anchor" href="#networking-configuration" aria-label="Anchor link for: networking-configuration">Networking Configuration</a></h2>
+<p>Next, let's set up the networking infrastructure for our EKS cluster. This includes creating a VPC, subnets, internet gateway, NAT gateway, and route tables.</p>
+<p>Create a new file named <code>networking.tf</code> and add the following configuration:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>resource &quot;aws_vpc&quot; &quot;main&quot; {
+</span><span>  cidr_block = &quot;10.43.0.0/22&quot;
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-main-vpc&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_internet_gateway&quot; &quot;igw&quot; {
+</span><span>  vpc_id = aws_vpc.main.id
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-igw&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span># Create private and public subnets
+</span><span>resource &quot;aws_subnet&quot; &quot;private-us-east-1a&quot; {
+</span><span>  vpc_id            = aws_vpc.main.id
+</span><span>  cidr_block        = &quot;10.43.0.0/24&quot;
+</span><span>  availability_zone = &quot;us-east-1a&quot;
+</span><span>
+</span><span>  tags = {
+</span><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-private-us-east-1a&quot;
+</span><span>    &quot;kubernetes.io/role/internal-elb&quot;      = &quot;1&quot;
+</span><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;
+</span><span>    &quot;SubnetType&quot;                           = &quot;Private&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_subnet&quot; &quot;private-us-east-1b&quot; {
+</span><span>  vpc_id            = aws_vpc.main.id
+</span><span>  cidr_block        = &quot;10.43.1.0/24&quot;
+</span><span>  availability_zone = &quot;us-east-1b&quot;
+</span><span>
+</span><span>  tags = {
+</span><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-private-us-east-1b&quot;
+</span><span>    &quot;kubernetes.io/role/internal-elb&quot;      = &quot;1&quot;
+</span><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;
+</span><span>    &quot;SubnetType&quot;                           = &quot;Private&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_subnet&quot; &quot;public-us-east-1a&quot; {
+</span><span>  vpc_id                  = aws_vpc.main.id
+</span><span>  cidr_block              = &quot;10.43.2.0/24&quot;
+</span><span>  availability_zone       = &quot;us-east-1a&quot;
+</span><span>  map_public_ip_on_launch = true
+</span><span>
+</span><span>  tags = {
+</span><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-public-us-east-1a&quot;
+</span><span>    &quot;kubernetes.io/role/elb&quot;               = &quot;1&quot;
+</span><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_subnet&quot; &quot;public-us-east-1b&quot; {
+</span><span>  vpc_id                  = aws_vpc.main.id
+</span><span>  cidr_block              = &quot;10.43.3.0/24&quot;
+</span><span>  availability_zone       = &quot;us-east-1b&quot;
+</span><span>  map_public_ip_on_launch = true
+</span><span>
+</span><span>  tags = {
+</span><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-public-us-east-1b&quot;
+</span><span>    &quot;kubernetes.io/role/elb&quot;               = &quot;1&quot;
+</span><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span># Set up NAT gateway
+</span><span>resource &quot;aws_eip&quot; &quot;nat&quot; {
+</span><span>  domain = &quot;vpc&quot;
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-nat&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_nat_gateway&quot; &quot;nat&quot; {
+</span><span>  allocation_id = aws_eip.nat.id
+</span><span>  subnet_id     = aws_subnet.public-us-east-1a.id
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-nat&quot;
+</span><span>  }
+</span><span>
+</span><span>  depends_on = [aws_internet_gateway.igw]
+</span><span>}
+</span><span>
+</span><span># Create route tables
+</span><span>resource &quot;aws_route_table&quot; &quot;private&quot; {
+</span><span>  vpc_id = aws_vpc.main.id
+</span><span>
+</span><span>  route {
+</span><span>    cidr_block     = &quot;0.0.0.0/0&quot;
+</span><span>    nat_gateway_id = aws_nat_gateway.nat.id
+</span><span>  }
+</span><span>
+</span><span>  # ... (other routes)
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-private-route-table&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_route_table&quot; &quot;public&quot; {
+</span><span>  vpc_id = aws_vpc.main.id
+</span><span>
+</span><span>  route {
+</span><span>    cidr_block = &quot;0.0.0.0/0&quot;
+</span><span>    gateway_id = aws_internet_gateway.igw.id
+</span><span>  }
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-public-route-table&quot;
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span># Associate route tables with subnets
+</span><span>resource &quot;aws_route_table_association&quot; &quot;private-us-east-1a&quot; {
+</span><span>  subnet_id      = aws_subnet.private-us-east-1a.id
+</span><span>  route_table_id = aws_route_table.private.id
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_route_table_association&quot; &quot;private-us-east-1b&quot; {
+</span><span>  subnet_id      = aws_subnet.private-us-east-1b.id
+</span><span>  route_table_id = aws_route_table.private.id
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_route_table_association&quot; &quot;public-us-east-1a&quot; {
+</span><span>  subnet_id      = aws_subnet.public-us-east-1a.id
+</span><span>  route_table_id = aws_route_table.public.id
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_route_table_association&quot; &quot;public-us-east-1b&quot; {
+</span><span>  subnet_id      = aws_subnet.public-us-east-1b.id
+</span><span>  route_table_id = aws_route_table.public.id
+</span><span>}
+</span><span>
+</span><span># Create security group
+</span><span>resource &quot;aws_security_group&quot; &quot;internal&quot; {
+</span><span>  name_prefix = &quot;&lt;CLUSTER_NAME&gt;-internal-security-group&quot;
+</span><span>  description = &quot;Allow traffic within the internal network&quot;
+</span><span>  vpc_id      = aws_vpc.main.id
+</span><span>
+</span><span>  egress {
+</span><span>    from_port   = 0
+</span><span>    to_port     = 0
+</span><span>    protocol    = &quot;-1&quot;
+</span><span>    cidr_blocks = [&quot;0.0.0.0/0&quot;]
+</span><span>  }
+</span><span>
+</span><span>  tags = {
+</span><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-internal-security-group&quot;
+</span><span>  }
+</span><span>}
+</span></code></pre>
+<p>This configuration sets up:</p>
+<ul>
+<li>A VPC with a CIDR block of 10.43.0.0/22 (You can use any CIDR block you prefer)</li>
+<li>Public and private subnets in two availability zones</li>
+<li>An Internet Gateway for public internet access</li>
+<li>A NAT Gateway for outbound internet access from private subnets</li>
+<li>Route tables for public and private subnets</li>
+<li>A security group allowing outbound traffic</li>
+</ul>
+<h2 id="eks-cluster-configuration"><a class="zola-anchor" href="#eks-cluster-configuration" aria-label="Anchor link for: eks-cluster-configuration">EKS Cluster Configuration</a></h2>
+<p>Now, let's define our EKS cluster back in the <code>main.tf</code> file:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>resource &quot;aws_eks_cluster&quot; &quot;cluster&quot; {
+</span><span>  name     = &quot;&lt;CLUSTER_NAME&gt;&quot;
+</span><span>  role_arn = aws_iam_role.cluster.arn
+</span><span>
+</span><span>  vpc_config {
+</span><span>    subnet_ids = [
+</span><span>      aws_subnet.private-us-east-1a.id,
+</span><span>      aws_subnet.private-us-east-1b.id,
+</span><span>      aws_subnet.public-us-east-1a.id,
+</span><span>      aws_subnet.public-us-east-1b.id
+</span><span>    ]
+</span><span>    endpoint_private_access = true
+</span><span>    endpoint_public_access  = false
+</span><span>    security_group_ids      = [aws_security_group.internal.id]
+</span><span>  }
+</span><span>
+</span><span>  access_config {
+</span><span>    authentication_mode = &quot;API_AND_CONFIG_MAP&quot;
+</span><span>  }
+</span><span>
+</span><span>  depends_on = [aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPolicy]
+</span><span>}
+</span></code></pre>
+<p>This configuration:</p>
+<ul>
+<li>Creates an EKS cluster named <code>&lt;CLUSTER_NAME&gt;</code></li>
+<li>Uses both private and public subnets</li>
+<li>Enables private endpoint access and disables public endpoint access</li>
+<li>Uses the internal security group we created earlier</li>
+<li>Sets up API server authentication using both Kubernetes API and ConfigMap</li>
+</ul>
+<h2 id="node-group-configuration"><a class="zola-anchor" href="#node-group-configuration" aria-label="Anchor link for: node-group-configuration">Node Group Configuration</a></h2>
+<p>Next, let's set up the EKS node group. Create a new file named <code>nodes.tf</code> and add the following configuration:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>resource &quot;aws_launch_template&quot; &quot;eks-with-disks&quot; {
+</span><span>  name = &quot;eks-with-disks&quot;
+</span><span>
+</span><span>  key_name = &quot;&lt;KEY_PAIR_NAME&gt;&quot;
+</span><span>
+</span><span>  block_device_mappings {
+</span><span>    device_name = &quot;/dev/xvda&quot;
+</span><span>
+</span><span>    ebs {
+</span><span>      volume_size = 50
+</span><span>      volume_type = &quot;gp3&quot;
+</span><span>    }
+</span><span>  }
+</span><span>
+</span><span>  tag_specifications {
+</span><span>    resource_type = &quot;instance&quot;
+</span><span>
+</span><span>    tags = {
+</span><span>      Name = &quot;&lt;CLUSTER_NAME&gt;-node&quot;
+</span><span>    }
+</span><span>  }
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_eks_node_group&quot; &quot;private-nodes&quot; {
+</span><span>  cluster_name    = aws_eks_cluster.cluster.name
+</span><span>  node_group_name = &quot;&lt;CLUSTER_NAME&gt;-private-nodes&quot;
+</span><span>  node_role_arn   = aws_iam_role.nodes.arn
+</span><span>
+</span><span>  subnet_ids = [
+</span><span>    aws_subnet.private-us-east-1a.id,
+</span><span>    aws_subnet.private-us-east-1b.id
+</span><span>  ]
+</span><span>
+</span><span>  capacity_type  = &quot;ON_DEMAND&quot;
+</span><span>  instance_types = [&quot;t3a.large&quot;]
+</span><span>
+</span><span>  scaling_config {
+</span><span>    desired_size = 3
+</span><span>    max_size     = 3
+</span><span>    min_size     = 3
+</span><span>  }
+</span><span>
+</span><span>  launch_template {
+</span><span>    name    = aws_launch_template.eks-with-disks.name
+</span><span>    version = aws_launch_template.eks-with-disks.latest_version
+</span><span>  }
+</span><span>
+</span><span>  depends_on = [
+</span><span>    aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,
+</span><span>    aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
+</span><span>    aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly,
+</span><span>  ]
+</span><span>}
+</span></code></pre>
+<p>This configuration:</p>
+<ul>
+<li>Creates a launch template for EC2 instances with a 50GB gp3 EBS volume</li>
+<li>Sets up a node group with 3 t3a.large instances in the private subnets</li>
+<li>Uses On-Demand instances for the node group</li>
+</ul>
+<h2 id="iam-permissions"><a class="zola-anchor" href="#iam-permissions" aria-label="Anchor link for: iam-permissions">IAM Permissions</a></h2>
+<p>Finally, let's set up the necessary IAM roles and policies. Create a new file named <code>permissions.tf</code> and add the following configuration:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>resource &quot;aws_iam_role&quot; &quot;cluster&quot; {
+</span><span>  name = &quot;&lt;CLUSTER_NAME&gt;-eks-cluster&quot;
+</span><span>
+</span><span>  assume_role_policy = &lt;&lt;POLICY
+</span><span>{
+</span><span>  &quot;Version&quot;: &quot;2012-10-17&quot;,
+</span><span>  &quot;Statement&quot;: [
+</span><span>    {
+</span><span>      &quot;Effect&quot;: &quot;Allow&quot;,
+</span><span>      &quot;Principal&quot;: {
+</span><span>        &quot;Service&quot;: &quot;eks.amazonaws.com&quot;
+</span><span>      },
+</span><span>      &quot;Action&quot;: &quot;sts:AssumeRole&quot;
+</span><span>    }
+</span><span>  ]
+</span><span>}
+</span><span>POLICY
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;cluster-AmazonEKSClusterPolicy&quot; {
+</span><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKSClusterPolicy&quot;
+</span><span>  role       = aws_iam_role.cluster.name
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_role&quot; &quot;nodes&quot; {
+</span><span>  name = &quot;&lt;CLUSTER_NAME&gt;-eks-node-group-nodes&quot;
+</span><span>
+</span><span>  assume_role_policy = jsonencode({
+</span><span>    Statement = [{
+</span><span>      Action = &quot;sts:AssumeRole&quot;
+</span><span>      Effect = &quot;Allow&quot;
+</span><span>      Principal = {
+</span><span>        Service = &quot;ec2.amazonaws.com&quot;
+</span><span>      }
+</span><span>    }]
+</span><span>    Version = &quot;2012-10-17&quot;
+</span><span>  })
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEKSWorkerNodePolicy&quot; {
+</span><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy&quot;
+</span><span>  role       = aws_iam_role.nodes.name
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEKS_CNI_Policy&quot; {
+</span><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy&quot;
+</span><span>  role       = aws_iam_role.nodes.name
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEC2ContainerRegistryReadOnly&quot; {
+</span><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly&quot;
+</span><span>  role       = aws_iam_role.nodes.name
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_policy&quot; &quot;ebs_csi_driver&quot; {
+</span><span>  name        = &quot;ebs_csi_driver_policy&quot;
+</span><span>  description = &quot;Policy for EC2 Instances to access Elastic Block Store&quot;
+</span><span>
+</span><span>  policy = jsonencode({
+</span><span>    &quot;Version&quot; : &quot;2012-10-17&quot;,
+</span><span>    &quot;Statement&quot; : [
+</span><span>      {
+</span><span>        &quot;Effect&quot; : &quot;Allow&quot;,
+</span><span>        &quot;Action&quot; : [
+</span><span>          &quot;ec2:AttachVolume&quot;,
+</span><span>          &quot;ec2:CreateSnapshot&quot;,
+</span><span>          &quot;ec2:CreateTags&quot;,
+</span><span>          &quot;ec2:CreateVolume&quot;,
+</span><span>          &quot;ec2:DeleteSnapshot&quot;,
+</span><span>          &quot;ec2:DeleteTags&quot;,
+</span><span>          &quot;ec2:DeleteVolume&quot;,
+</span><span>          &quot;ec2:DescribeInstances&quot;,
+</span><span>          &quot;ec2:DescribeSnapshots&quot;,
+</span><span>          &quot;ec2:DescribeTags&quot;,
+</span><span>          &quot;ec2:DescribeVolumes&quot;,
+</span><span>          &quot;ec2:DetachVolume&quot;
+</span><span>        ],
+</span><span>        &quot;Resource&quot; : &quot;*&quot;
+</span><span>      }
+</span><span>    ]
+</span><span>  })
+</span><span>}
+</span><span>
+</span><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEBS_CSI_Driver&quot; {
+</span><span>  policy_arn = aws_iam_policy.ebs_csi_driver.arn
+</span><span>  role       = aws_iam_role.nodes.name
+</span><span>}
+</span></code></pre>
+<p>This configuration:</p>
+<ul>
+<li>Creates IAM roles for the EKS cluster and node group</li>
+<li>Attaches necessary policies to these roles, including the EKS cluster policy, worker node policy, CNI policy, and ECR read-only policy</li>
+<li>Creates a custom policy for the EBS CSI driver and attaches it to the node role</li>
+</ul>
+<h2 id="conclusion"><a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion">Conclusion</a></h2>
+<p>In this guide, we've walked through the process of deploying an Amazon EKS cluster using Terraform. We've covered setting up the basic infrastructure, configuring the EKS cluster, setting up node groups, and managing IAM permissions.</p>
+<p>By using Terraform, we can version control our infrastructure and easily replicate this setup across different environments. Remember to replace the placeholders in the configuration files with your actual values before running Terraform commands.</p>
+<p>Happy clustering!</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>

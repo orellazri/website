@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         eBPF Development on Apple Silicon Macs using Lima
+        
+    </title>
+
+        
+            <meta property="og:title" content="eBPF Development on Apple Silicon Macs using Lima" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=&#x2F;favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;ebpf-development-on-apple-silicon-macs-using-lima&#x2F;&t=eBPF Development on Apple Silicon Macs using Lima">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=9d92c6a10bc0f9c365a0"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        eBPF Development on Apple Silicon Macs using Lima<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2024-07-07</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/coding/" class="post-tag">coding</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/ebpf-development-on-apple-silicon-macs-using-lima/#the-issue">The issue</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/ebpf-development-on-apple-silicon-macs-using-lima/#lima">Lima</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>I've been working on a project that involves eBPF, and I've been doing all of my development on an Apple Silicon Mac. I wanted to share how I've set up my development environment.</p>
+<h2 id="the-issue"><a class="zola-anchor" href="#the-issue" aria-label="Anchor link for: the-issue">The issue</a></h2>
+<p>eBPF is a Linux kernel feature, and as such, it requires a Linux kernel to run. This means that you can't run eBPF programs on macOS directly, so you'll have to use a virtual machine. However, using a virtual machine on an Apple Silicon Mac is not as straightforward as on an Intel Mac.</p>
+<h2 id="lima"><a class="zola-anchor" href="#lima" aria-label="Anchor link for: lima">Lima</a></h2>
+<p><a href="https://lima-vm.io/">Lima</a> is a program that launches virtual machines with automatic file sharing and port forwarding (similar to WSL2 in Windows). It's a great tool for running Linux VMs on both Apple Silicon and Intel Macs, and is using QEMU under the hood.</p>
+<p>I used it since it supports configuration via a simple YAML file, which makes it easy to set up a VM with the necessary development environment for eBPF programming.</p>
+<p>To install Lima, run:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">brew</span><span> install lima
+</span></code></pre>
+<p>Then, in your project directory, create a YAML file (I called mine <code>lima.yaml</code>) with the following contents:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">images</span><span>:
+</span><span>  - </span><span style="color:#bf616a;">location</span><span>: &#39;</span><span style="color:#a3be8c;">https://cloud-images.ubuntu.com/releases/24.04/release-20240423/ubuntu-24.04-server-cloudimg-arm64.img</span><span>&#39;
+</span><span>    </span><span style="color:#bf616a;">arch</span><span>: </span><span style="color:#a3be8c;">aarch64
+</span><span>
+</span><span style="color:#bf616a;">mounts</span><span>:
+</span><span>  - </span><span style="color:#bf616a;">location</span><span>: &#39;</span><span style="color:#a3be8c;">~</span><span>&#39;
+</span><span>    </span><span style="color:#bf616a;">writable</span><span>: </span><span style="color:#d08770;">true
+</span><span>
+</span><span style="color:#bf616a;">provision</span><span>:
+</span><span>  - </span><span style="color:#bf616a;">mode</span><span>: </span><span style="color:#a3be8c;">system
+</span><span>    </span><span style="color:#bf616a;">script</span><span>: </span><span style="color:#b48ead;">|
+</span><span style="color:#a3be8c;">      apt-get install -y apt-transport-https ca-certificates curl clang llvm jq
+</span><span style="color:#a3be8c;">      apt-get install -y libelf-dev libpcap-dev libbfd-dev binutils-dev build-essential make
+</span><span style="color:#a3be8c;">      apt-get install -y linux-tools-common linux-tools-$(uname -r)
+</span><span style="color:#a3be8c;">      apt-get install -y bpfcc-tools
+</span><span style="color:#a3be8c;">      apt-get install -y python3-pip
+</span><span style="color:#a3be8c;">      apt-get install -y libbpf-dev
+</span></code></pre>
+<p>This YAML files contains the VM configuration. In my case, I pointed it to use an Ubuntu 24.04 image, and I installed the necessary tools for eBPF development in the provision script.</p>
+<p>To start the VM, run:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">limactl</span><span> start</span><span style="color:#bf616a;"> --name</span><span> ebpf lima.yaml
+</span></code></pre>
+<p>This will start a new VM with the name <code>ebpf</code> using the configuration in the <code>lima.yaml</code> file.</p>
+<p>To enter the VM, run:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">limactl</span><span> shell ebpf
+</span></code></pre>
+<p>And voila, you're now inside a Linux VM on your Apple Silicon Mac, ready to do eBPF development!</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>

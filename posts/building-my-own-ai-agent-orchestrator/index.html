@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Building My Own AI Agent Orchestrator
+        
+    </title>
+
+        
+            <meta property="og:title" content="Building My Own AI Agent Orchestrator" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=&#x2F;favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;building-my-own-ai-agent-orchestrator&#x2F;&t=Building My Own AI Agent Orchestrator">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=9d92c6a10bc0f9c365a0"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Building My Own AI Agent Orchestrator<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2025-06-17</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/coding/" class="post-tag">coding</a>, 
+                                
+                                    <a href="https://orellazri.com/tags/devops/" class="post-tag">devops</a>, 
+                                
+                                    <a href="https://orellazri.com/tags/ai/" class="post-tag">ai</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#the-vision-a-hands-off-ai-collaborator">The Vision: A Hands-Off AI Collaborator</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#the-high-level-architecture">The High-Level Architecture</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#the-implementation">The Implementation</a>
+                            
+                                <ul>
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#the-orchestrator">The Orchestrator</a>
+                                        </li>
+
+                                        
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#the-runtime">The Runtime</a>
+                                        </li>
+
+                                        
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#the-frontend">The Frontend</a>
+                                        </li>
+
+                                        
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#project-specific-context">Project-Specific Context</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#a-user-s-journey">A User&#x27;s Journey</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/building-my-own-ai-agent-orchestrator/#conclusion">Conclusion</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>AI assistants and AI-powered IDEs are great, but I wanted a solution that could handle complex tasks from start to finish, in the repositories across our organization, and that could run in the background. I wanted a tool that I could give a high-level goal to, like "refactor the auth service," and have it autonomously navigate my codebase, understand its nuances, and execute the task, seamlessly integrated with the company's self-hosted GitLab instance.</p>
+<h2 id="the-vision-a-hands-off-ai-collaborator"><a class="zola-anchor" href="#the-vision-a-hands-off-ai-collaborator" aria-label="Anchor link for: the-vision-a-hands-off-ai-collaborator">The Vision: A Hands-Off AI Collaborator</a></h2>
+<p>The goal was to create a system where I could delegate complex tasks to an AI agent. The agent needed to be able to check out the right code, have the right tools and credentials, and understand project-specific instructions to get the job done. I also needed a simple web interface to submit these tasks and monitor their progress.</p>
+<p>Tools like OpenAI Codex and Cursor Background Agents already exist, but they are only available with GitHub and come with limitations. In my case, we are using a self-hosted GitLab instance in our company, so we wanted seamless integration with our existing infrastructure, with a user-friendly wrapper and additional features.</p>
+<p>For the purposes of this post, I'll be referring to this system as "Agent", even though we have a different internal name for it.</p>
+<h2 id="the-high-level-architecture"><a class="zola-anchor" href="#the-high-level-architecture" aria-label="Anchor link for: the-high-level-architecture">The High-Level Architecture</a></h2>
+<p>I decided to split the system into the following primary components:</p>
+<ol>
+<li><strong>Backend Server:</strong> A Go application that manages tasks and orchestrates the AI agents.</li>
+<li><strong>Web Application:</strong> A React and TypeScript interface for creating and tracking tasks.</li>
+<li><strong>Runtime:</strong> A Docker image that contains the agent and all the tools it needs to execute the tasks.</li>
+</ol>
+<p>This separation of concerns keeps the architecture clean and scalable. The frontend is focused purely on user interaction, while the backend handles the heavy lifting of agent execution.</p>
+<pre class="mermaid">
+  sequenceDiagram
+participant Web App
+participant Kubernetes API
+participant Kubernetes Job
+participant Agent Runtime
+participant GitLab Repository
+
+    Web App->>Kubernetes API: Request job creation for code execution
+    Kubernetes API->>Kubernetes Job: Start job with Agent Runtime image
+    Kubernetes Job->>Agent Runtime: Initialize runtime environment
+
+    par Log streaming and runtime execution
+        Agent Runtime->>Web App: Stream job logs in real time
+    and
+        Agent Runtime->>GitLab Repository: Clone repository
+        loop Execute code tasks
+            Agent Runtime->>Agent Runtime: Execute code tasks
+        end
+        Agent Runtime->>GitLab Repository: Push changes
+    end
+
+    Agent Runtime->>Kubernetes API: Notify completion
+    Kubernetes API->>Kubernetes Job: Terminate job
+    Kubernetes API->>Web App: Job terminated, execution complete
+</pre>
+<h2 id="the-implementation"><a class="zola-anchor" href="#the-implementation" aria-label="Anchor link for: the-implementation">The Implementation</a></h2>
+<h3 id="the-orchestrator"><a class="zola-anchor" href="#the-orchestrator" aria-label="Anchor link for: the-orchestrator">The Orchestrator</a></h3>
+<p>The heart of the system is the Go backend. When a new task is submitted, the backend doesn't run the agent itself. Instead, it dynamically creates and dispatches a <strong>Kubernetes Job</strong>.</p>
+<p>I chose this approach for a few key advantages:</p>
+<ul>
+<li><strong>Isolation:</strong> Each agent runs in its own sandboxed container.</li>
+<li><strong>Scalability:</strong> Kubernetes can handle running multiple jobs in parallel.</li>
+<li><strong>Resilience:</strong> Kubernetes provides robust error handling and reporting.</li>
+<li><strong>Observability:</strong> Our Kubernetes clusters are already orchestrated with our observability stack, so we get metrics and logs collection out of the box.</li>
+</ul>
+<p>The Go server exposes a simple REST API, constructs the Kubernetes Job, injects the necessary context (prompt, Git info, API keys), and monitors the job's status.</p>
+<p>Each task has the following structure:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">type </span><span>Task </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>	</span><span style="color:#bf616a;">ID         </span><span style="color:#b48ead;">int       </span><span>`</span><span style="color:#a3be8c;">json:&quot;id&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">Prompt     </span><span style="color:#b48ead;">string    </span><span>`</span><span style="color:#a3be8c;">json:&quot;prompt&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">Repository </span><span style="color:#b48ead;">string    </span><span>`</span><span style="color:#a3be8c;">json:&quot;repository&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">Branch     </span><span style="color:#b48ead;">string    </span><span>`</span><span style="color:#a3be8c;">json:&quot;branch&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">Status     </span><span style="color:#b48ead;">string    </span><span>`</span><span style="color:#a3be8c;">json:&quot;status&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">JobName    </span><span style="color:#b48ead;">string    </span><span>`</span><span style="color:#a3be8c;">json:&quot;job_name&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">UniqueID   </span><span style="color:#b48ead;">string    </span><span>`</span><span style="color:#a3be8c;">json:&quot;unique_id&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">Duration   </span><span>*</span><span style="color:#b48ead;">int64    </span><span>`</span><span style="color:#a3be8c;">json:&quot;duration&quot;</span><span>`
+</span><span>	</span><span style="color:#bf616a;">CreatedAt  time</span><span>.</span><span style="color:#b48ead;">Time </span><span>`</span><span style="color:#a3be8c;">json:&quot;created_at&quot;</span><span>`
+</span><span>}
+</span></code></pre>
+<p>I used the <a href="https://github.com/kubernetes/client-go">kubernetes/client-go</a> library to interact with the Kubernetes API. This means loading the Kubernetes config from either the in-cluster config or from a file, creating new jobs, monitoring their status, etc.</p>
+<p>I keep track of the created tasks in an in-memory list wrapper with a <code>sync.Mutex</code> to ensure thread-safety, but this will later be replaced with a database.</p>
+<h3 id="the-runtime"><a class="zola-anchor" href="#the-runtime" aria-label="Anchor link for: the-runtime">The Runtime</a></h3>
+<p>The Kubernetes Job runs the specific runtime Docker image. This container is the environment where the AI agent lives. It's equipped with all the tools it needs:</p>
+<ul>
+<li>Git command-line tools.</li>
+<li>API credentials for services like GitLab, Jira, and Coda, and Anthropic.</li>
+<li>Claude Code and MCP servers.</li>
+</ul>
+<p>The user's prompt is passed directly as a command-line argument to the agent process inside the container.</p>
+<p>Following is a sample Dockerfile for the runtime:</p>
+<pre data-lang="dockerfile" style="background-color:#2b303b;color:#c0c5ce;" class="language-dockerfile "><code class="language-dockerfile" data-lang="dockerfile"><span style="color:#b48ead;">FROM</span><span> ubuntu:24.04
+</span><span>
+</span><span style="color:#b48ead;">RUN </span><span>apt-get update -y
+</span><span style="color:#b48ead;">RUN </span><span>apt-get install -y curl gnupg git sudo pipx
+</span><span style="color:#b48ead;">RUN </span><span>curl -fsSL https://deb.nodesource.com/setup_23.x | bash - &amp;&amp; apt-get install -y nodejs
+</span><span>
+</span><span style="color:#b48ead;">RUN </span><span>useradd -m -u 1001 -s /bin/bash agent
+</span><span style="color:#b48ead;">RUN </span><span>echo &quot;</span><span style="color:#a3be8c;">agent ALL=(ALL) NOPASSWD:ALL</span><span>&quot; | tee /etc/sudoers.d/agent
+</span><span style="color:#b48ead;">USER </span><span>agent
+</span><span>
+</span><span style="color:#b48ead;">ENV </span><span>PATH=&quot;</span><span style="color:#a3be8c;">/home/agent/.local/bin:/home/agent/.npm-global/bin:$PATH</span><span>&quot;
+</span><span>
+</span><span style="color:#b48ead;">RUN </span><span>mkdir -p ~/.npm-global
+</span><span style="color:#b48ead;">RUN </span><span>npm config set prefix &#39;</span><span style="color:#a3be8c;">~/.npm-global</span><span>&#39;
+</span><span style="color:#b48ead;">RUN </span><span>npm install -g @anthropic-ai/claude-code
+</span><span>
+</span><span style="color:#b48ead;">RUN </span><span>pipx install uv
+</span><span>
+</span><span style="color:#b48ead;">COPY</span><span> ./docker/entrypoint.sh /entrypoint.sh
+</span><span>
+</span><span style="color:#b48ead;">WORKDIR </span><span>/src
+</span><span>
+</span><span>ENTRYPOINT [&quot;</span><span style="color:#a3be8c;">/entrypoint.sh</span><span>&quot;]
+</span></code></pre>
+<p>And the entrypoint script:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#65737e;">#!/usr/bin/env bash
+</span><span style="color:#96b5b4;">set</span><span> -euo pipefail
+</span><span>
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-z </span><span>&quot;$</span><span style="color:#bf616a;">ANTHROPIC_API_KEY</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Error: ANTHROPIC_API_KEY environment variable is required</span><span>&quot;; </span><span style="color:#96b5b4;">exit</span><span> 1; </span><span style="color:#b48ead;">fi
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-z </span><span>&quot;$</span><span style="color:#bf616a;">GIT_REPO</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Error: GIT_REPO environment variable is required</span><span>&quot;; </span><span style="color:#96b5b4;">exit</span><span> 1; </span><span style="color:#b48ead;">fi
+</span><span style="color:#65737e;"># --- snip ---
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Setting up Claude configuration...</span><span>&quot;
+</span><span style="color:#bf616a;">mkdir -p ~</span><span>/.claude
+</span><span style="color:#96b5b4;">echo </span><span>&#39;</span><span style="color:#a3be8c;">{&quot;apiKeyHelper&quot;: &quot;~/.claude/anthropic_key.sh&quot;}</span><span>&#39; &gt; </span><span style="color:#bf616a;">~</span><span>/.claude/settings.json
+</span><span style="color:#bf616a;">cat </span><span>&gt; </span><span style="color:#bf616a;">~</span><span>/.claude/anthropic_key.sh &lt;&lt; </span><span style="color:#b48ead;">EOF
+</span><span style="color:#a3be8c;">echo &quot;</span><span>$</span><span style="color:#bf616a;">ANTHROPIC_API_KEY</span><span style="color:#a3be8c;">&quot;
+</span><span style="color:#b48ead;">EOF
+</span><span style="color:#bf616a;">chmod</span><span> +x </span><span style="color:#bf616a;">~</span><span>/.claude/anthropic_key.sh
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Creating MCP Servers file..</span><span>&quot;
+</span><span style="color:#bf616a;">cat </span><span>&gt; /tmp/mcp.json &lt;&lt; </span><span style="color:#b48ead;">EOF
+</span><span style="color:#a3be8c;">{
+</span><span style="color:#a3be8c;">    &quot;mcpServers&quot;: {
+</span><span style="color:#a3be8c;">      # --- snip ---
+</span><span style="color:#a3be8c;">    }
+</span><span style="color:#a3be8c;">}
+</span><span style="color:#b48ead;">EOF
+</span><span>
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Setting up git configuration...</span><span>&quot;
+</span><span style="color:#bf616a;">git</span><span> config</span><span style="color:#bf616a;"> --global</span><span> user.email ...
+</span><span style="color:#bf616a;">git</span><span> config</span><span style="color:#bf616a;"> --global</span><span> user.name ...
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Cloning repository...</span><span>&quot;
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-n </span><span>&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">GIT_BRANCH</span><span>:-</span><span style="color:#a3be8c;">}</span><span>&quot; </span><span style="color:#96b5b4;">] </span><span>&amp;&amp; </span><span style="color:#96b5b4;">[ </span><span>&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">GIT_BRANCH</span><span>:-</span><span style="color:#a3be8c;">}</span><span>&quot; != &quot;&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then
+</span><span>    </span><span style="color:#bf616a;">git</span><span> clone https://$</span><span style="color:#bf616a;">GITLAB_USER</span><span>:$</span><span style="color:#bf616a;">GITLAB_TOKEN</span><span>@gitlab.company.com/$</span><span style="color:#bf616a;">GIT_REPO</span><span>.git</span><span style="color:#bf616a;"> --depth</span><span> 1</span><span style="color:#bf616a;"> --branch </span><span>$</span><span style="color:#bf616a;">GIT_BRANCH
+</span><span style="color:#b48ead;">else
+</span><span>    </span><span style="color:#bf616a;">git</span><span> clone https://$</span><span style="color:#bf616a;">GITLAB_USER</span><span>:$</span><span style="color:#bf616a;">GITLAB_TOKEN</span><span>@gitlab.company.com/$</span><span style="color:#bf616a;">GIT_REPO</span><span>.git</span><span style="color:#bf616a;"> --depth</span><span> 1
+</span><span style="color:#b48ead;">fi
+</span><span>
+</span><span style="color:#96b5b4;">cd </span><span>$</span><span style="color:#bf616a;">repo_name
+</span><span>
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span>! </span><span style="color:#bf616a;">-f </span><span>&quot;</span><span style="color:#a3be8c;">CLAUDE.md</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Warning: CLAUDE.md file not found in repository</span><span>&quot;; </span><span style="color:#b48ead;">fi
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Running project setup script...</span><span>&quot;
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span>! </span><span style="color:#bf616a;">-f </span><span>&quot;</span><span style="color:#a3be8c;">agent-setup.sh</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Error: agent-setup.sh not found in repository</span><span>&quot;; </span><span style="color:#96b5b4;">exit</span><span> 1; </span><span style="color:#b48ead;">fi
+</span><span style="color:#bf616a;">bash</span><span> agent-setup.sh
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Creating branch </span><span>$</span><span style="color:#bf616a;">branch_name</span><span style="color:#a3be8c;">...</span><span>&quot;
+</span><span style="color:#bf616a;">git</span><span> checkout</span><span style="color:#bf616a;"> -b </span><span>$</span><span style="color:#bf616a;">branch_name
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Running claude with prompt: </span><span>$</span><span style="color:#bf616a;">prompt</span><span>&quot;
+</span><span style="color:#bf616a;">claude --dangerously-skip-permissions --mcp-config</span><span> /tmp/mcp.json</span><span style="color:#bf616a;"> --verbose --output-format</span><span> stream-json</span><span style="color:#bf616a;"> -p </span><span>&quot;$</span><span style="color:#bf616a;">prompt</span><span>&quot;
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Pushing changes...</span><span>&quot;
+</span><span style="color:#bf616a;">git</span><span> add</span><span style="color:#bf616a;"> -A
+</span><span style="color:#bf616a;">git</span><span> commit</span><span style="color:#bf616a;"> -m </span><span>&quot;$</span><span style="color:#bf616a;">title</span><span>&quot;
+</span><span style="color:#bf616a;">git</span><span> push origin $</span><span style="color:#bf616a;">branch_name
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Creating merge request...</span><span>&quot;
+</span><span>
+</span><span style="color:#65737e;"># Get the default branch (usually main or master)
+</span><span style="color:#bf616a;">default_branch</span><span>=$</span><span style="color:#a3be8c;">(</span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> remote show origin </span><span>| </span><span style="color:#bf616a;">grep </span><span>&quot;</span><span style="color:#a3be8c;">HEAD branch</span><span>&quot; | </span><span style="color:#bf616a;">cut -d</span><span>&#39; &#39;</span><span style="color:#bf616a;"> -f5</span><span style="color:#a3be8c;">)
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-z </span><span>&quot;$</span><span style="color:#bf616a;">default_branch</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then
+</span><span>    </span><span style="color:#bf616a;">default_branch</span><span>=&quot;</span><span style="color:#a3be8c;">main</span><span>&quot;
+</span><span style="color:#b48ead;">fi
+</span><span>
+</span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Creating merge request...</span><span>&quot;
+</span><span style="color:#bf616a;">mr_response</span><span>=$</span><span style="color:#a3be8c;">(</span><span style="color:#bf616a;">curl -s -X</span><span style="color:#a3be8c;"> POST \
+</span><span style="color:#bf616a;">  -H </span><span>&quot;</span><span style="color:#a3be8c;">PRIVATE-TOKEN: </span><span>$</span><span style="color:#bf616a;">GITLAB_TOKEN</span><span>&quot; </span><span style="color:#a3be8c;">\
+</span><span style="color:#bf616a;">  -H </span><span>&quot;</span><span style="color:#a3be8c;">Content-Type: application/json</span><span>&quot; </span><span style="color:#a3be8c;">\
+</span><span style="color:#bf616a;">  -d </span><span>&quot;</span><span style="color:#a3be8c;">{
+</span><span style="color:#a3be8c;">    </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">source_branch</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">: </span><span style="color:#96b5b4;">\&quot;</span><span>$</span><span style="color:#bf616a;">branch_name</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">,
+</span><span style="color:#a3be8c;">    </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">target_branch</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">: </span><span style="color:#96b5b4;">\&quot;</span><span>$</span><span style="color:#bf616a;">default_branch</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">,
+</span><span style="color:#a3be8c;">    </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">title</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">: </span><span style="color:#96b5b4;">\&quot;</span><span>$</span><span style="color:#bf616a;">title</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">,
+</span><span style="color:#a3be8c;">    </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">description</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">: </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">Automated changes generated by Agent</span><span style="color:#96b5b4;">\\</span><span style="color:#a3be8c;">n</span><span style="color:#96b5b4;">\\</span><span style="color:#a3be8c;">nPrompt: </span><span>$</span><span style="color:#bf616a;">prompt</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">,
+</span><span style="color:#a3be8c;">    </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">squash</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">: true,
+</span><span style="color:#a3be8c;">    </span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">remove_source_branch</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">: true
+</span><span style="color:#a3be8c;">  }</span><span>&quot; </span><span style="color:#a3be8c;">\
+</span><span style="color:#a3be8c;">  </span><span>&quot;</span><span style="color:#a3be8c;">https://gitlab.company.com/api/v4/projects/</span><span>$</span><span style="color:#a3be8c;">(</span><span style="color:#96b5b4;">echo </span><span>$</span><span style="color:#bf616a;">GIT_REPO </span><span>| </span><span style="color:#bf616a;">sed </span><span>&#39;</span><span style="color:#a3be8c;">s/\//%2F/g</span><span>&#39;</span><span style="color:#a3be8c;">)/merge_requests</span><span>&quot;</span><span style="color:#a3be8c;">)
+</span><span>
+</span><span>
+</span><span style="color:#bf616a;">mr_url</span><span>=$</span><span style="color:#a3be8c;">(</span><span style="color:#96b5b4;">echo </span><span>&quot;$</span><span style="color:#bf616a;">mr_response</span><span>&quot; | </span><span style="color:#bf616a;">grep -o </span><span>&#39;</span><span style="color:#a3be8c;">&quot;web_url&quot;:&quot;[^&quot;]*&quot;</span><span>&#39; | </span><span style="color:#bf616a;">cut -d</span><span>&#39;</span><span style="color:#a3be8c;">&quot;</span><span>&#39;</span><span style="color:#bf616a;"> -f4</span><span style="color:#a3be8c;">)
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-n </span><span>&quot;$</span><span style="color:#bf616a;">mr_url</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then
+</span><span>    </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Merge request created successfully: </span><span>$</span><span style="color:#bf616a;">mr_url</span><span>&quot;
+</span><span style="color:#b48ead;">else
+</span><span>    </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Failed to create merge request. Response: </span><span>$</span><span style="color:#bf616a;">mr_response</span><span>&quot;
+</span><span>    </span><span style="color:#96b5b4;">exit</span><span> 1
+</span><span style="color:#b48ead;">fi
+</span></code></pre>
+<p>As you can see, the entrypoint script takes care of the following:</p>
+<ul>
+<li>Setting up the GitLab credentials.</li>
+<li>Setting up Claude Code &amp; MCP servers.</li>
+<li>Cloning the repository.</li>
+<li>Running the project-specific setup script. This is needed to install dependencies, run database migrations, or set up any other project-specific tooling.</li>
+<li>Creating a new branch.</li>
+<li>Running the agent with the prompt.</li>
+<li>Pushing the changes to the repository.</li>
+<li>Creating a merge request.</li>
+</ul>
+<h3 id="the-frontend"><a class="zola-anchor" href="#the-frontend" aria-label="Anchor link for: the-frontend">The Frontend</a></h3>
+<p>The frontend is a straightforward application built with Vite &amp; React. A form allows the users to input the three key pieces of information for a task:</p>
+<ol>
+<li><strong>Prompt:</strong> The high-level instruction for the agent.</li>
+<li><strong>Repository:</strong> The path to the Git repository.</li>
+<li><strong>Branch:</strong> The specific branch to check out (optional).</li>
+</ol>
+<p>Once a task is submitted, it appears in a table that shows its status and auto-refreshes. Clicking a task streams the logs directly from the Kubernetes pod, which is crucial for seeing what the agent is doing.</p>
+<h2 id="project-specific-context"><a class="zola-anchor" href="#project-specific-context" aria-label="Anchor link for: project-specific-context">Project-Specific Context</a></h2>
+<p>One of the most powerful features is how the system understands the context of a specific project. It does this by looking for two special files in the root of the target repository:</p>
+<ol>
+<li>
+<p><code>agent-setup.sh</code>: A shell script the agent executes first. I use this to install dependencies (e.g. <code>pnpm install</code>), run database migrations, or set up any other project-specific tooling.</p>
+</li>
+<li>
+<p><code>CLAUDE.md</code>: A Markdown file with instructions for the AI model itself—a "meta-prompt" that guides the agent. Here, I can specify which test commands to use, coding style guidelines, or things the agent <em>should not</em> do.</p>
+</li>
+</ol>
+<p>This mechanism makes the system incredibly flexible without requiring any changes to the orchestrator itself.</p>
+<h2 id="a-user-s-journey"><a class="zola-anchor" href="#a-user-s-journey" aria-label="Anchor link for: a-user-s-journey">A User's Journey</a></h2>
+<p>Let's walk through a typical use case.</p>
+<ol>
+<li><strong>The Request:</strong> I want to add a health check endpoint to my new web service.</li>
+<li><strong>The Setup:</strong> In the service's repository, I create a <code>CLAUDE.md</code> file for general-purpose project instructions that says, "This project uses Go. All new endpoints should be added in <code>server.go</code> and include a unit test."</li>
+<li><strong>The Submission:</strong> I go to the web UI and create a new task with the prompt, "Add a <code>/health</code> endpoint that returns a 200 OK status," along with the repository and branch.</li>
+<li><strong>The Orchestration:</strong> The Go backend creates a Kubernetes job.</li>
+<li><strong>The Execution:</strong> The agent starts, clones the repo, reads the <code>CLAUDE.md</code> file, and then edits <code>server.go</code> to add the endpoint and a corresponding test.</li>
+<li><strong>The Monitoring:</strong> On the UI, I can see the status change from <code>pending</code> to <code>running</code> and watch the logs.</li>
+<li><strong>The Completion:</strong> Once the agent commits and pushes the code, the job completes, and the UI updates to <code>completed</code>.</li>
+</ol>
+<h2 id="conclusion"><a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion">Conclusion</a></h2>
+<p>Building this AI agent orchestrator has been a fascinating project, combining Go, React, Kubernetes, and LLMs into a practical tool. Using Kubernetes for execution makes the system scalable and robust, and the project-specific context files make the agent highly adaptable.</p>
+<p>This project has shown immense value to the organization in both cost and time savings. It's sometimes best used as the first step toward implementing a complex feature, and at other times it manages to deliver the feature in a fraction of the time.</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>
