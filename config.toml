@@ -11,7 +11,7 @@ highlight_code = true
 
 [extra]
 theme = "auto"
-favicon = "favicon.svg"
+favicon = "/favicon.svg"
 toc = true
 menu = [
   { name = "posts", url = "/posts", weight = 1 },
