@@ -107,7 +107,7 @@ let results = stmt
     .collect::<Result<Vec<String>, _>>()?;
 ```
 
-We use the `embedding MATCH` clause to find the most similar vectors to the query embedding, and return the contents (the original text that was embedded). This then lets the LLM generate a response based on the context of the most similar chunks.
+I used the `embedding MATCH` clause to find the most similar vectors to the query embedding, and return the contents (the original text that was embedded). This then lets the LLM generate a response based on the context of the most similar chunks.
 
 For the actual text generation, I integrated with **Ollama**, which provides a simple API for running various models locally. I chose `gemma3:1b` because I wanted an extremely lightweight model to test things quickly.
 
