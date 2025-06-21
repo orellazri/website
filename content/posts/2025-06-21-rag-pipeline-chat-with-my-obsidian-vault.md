@@ -85,11 +85,31 @@ pub fn new(conn: &'a Connection, ollama: &'a Ollama) -> Result<Self> {
 
 The embedding process walks through all markdown files in the vault, checks if they've already been processed (to avoid redundant work), and generates 768-dimensional vectors using Ollama's [nomic-embed-text-v1.5](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5) model. Using a different model means that the embedding vector size will probably need to be changed.
 
-### Local AI Integration
-
-For the actual text generation, I integrated with **Ollama**, which provides a simple API for running various models locally. I chose `gemma3:1b` because I wanted an extremely lightweight model to test things quickly.
+### Third step: Querying the vector database
 
 In querying mode, a user enters a natural language query, and the system generates an embedding for it, then uses the vector database to find the most similar chunks. Finally, it uses the LLM to generate a response.
+
+The interesting part where we fetch the similar vectors from SQLite is this:
+
+```rust
+let mut stmt = self.conn.prepare(
+    "SELECT contents
+    FROM file_embeddings
+    WHERE embedding MATCH ?1
+    AND k = ?2
+    ORDER BY distance",
+)?;
+
+let results = stmt
+    .query_map((query_embedding[0].as_bytes(), k as i32), |row| {
+        Ok(row.get(0)?)
+    })?
+    .collect::<Result<Vec<String>, _>>()?;
+```
+
+We use the `embedding MATCH` clause to find the most similar vectors to the query embedding, and return the contents (the original text that was embedded). This then lets the LLM generate a response based on the context of the most similar chunks.
+
+For the actual text generation, I integrated with **Ollama**, which provides a simple API for running various models locally. I chose `gemma3:1b` because I wanted an extremely lightweight model to test things quickly.
 
 ```rust
 // Embed the query
