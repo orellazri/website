@@ -1,5 +1,5 @@
 +++
-title = "Fully Local Meeting Summaries"
+title = "Fully Local AI Meeting Summaries"
 date = "2025-07-26"
 
 [taxonomies]
