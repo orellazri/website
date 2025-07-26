@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Implementing a MongoDB CRUD API Using Go Generics
+        
+    </title>
+
+        
+            <meta property="og:title" content="Implementing a MongoDB CRUD API Using Go Generics" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=&#x2F;favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;mongodb-crud-api-go-generics&#x2F;&t=Implementing a MongoDB CRUD API Using Go Generics">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=3a69812dc9773e8d3635"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Implementing a MongoDB CRUD API Using Go Generics<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2024-05-11</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/coding/" class="post-tag">coding</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#go-generics-to-the-rescue">Go Generics to the Rescue</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#the-models">The Models</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#a-naive-approach">A Naive Approach</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#a-generic-approach">A Generic Approach</a>
+                            
+                                <ul>
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#service">Service</a>
+                                        </li>
+
+                                        
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#controller">Controller</a>
+                                        </li>
+
+                                        
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/mongodb-crud-api-go-generics/#tying-it-all-together">Tying It All Together</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>I had to write a simple CRUD REST API for a project I'm working on that contains quite a bit of database models in MongoDB. I started writing a controller and a service for each model, but I quickly realized that I was writing the same code over and over again.</p>
+<p>Surely there must be a better way to do this.</p>
+<h2 id="go-generics-to-the-rescue"><a class="zola-anchor" href="#go-generics-to-the-rescue" aria-label="Anchor link for: go-generics-to-the-rescue">Go Generics to the Rescue</a></h2>
+<p>Go 1.18 introduced <a href="https://go.dev/doc/tutorial/generics">generics</a>, which allows you to write functions and data structures that can work with any type.</p>
+<p>This is perfect for my use case. I can write a generic controller and service that can work with any model, as long as the input and output are the same as the model struct. This of course won't work for every use case, but for simple CRUD resources, it's perfect.</p>
+<h2 id="the-models"><a class="zola-anchor" href="#the-models" aria-label="Anchor link for: the-models">The Models</a></h2>
+<p>Let's start by defining a simple model named <code>Post</code> under <code>models/models.go</code>:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">package </span><span style="color:#bf616a;">models
+</span><span>
+</span><span style="color:#b48ead;">import </span><span>&quot;</span><span style="color:#a3be8c;">go.mongodb.org/mongo-driver/bson/primitive</span><span>&quot;
+</span><span>
+</span><span style="color:#b48ead;">type </span><span>Post </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>  </span><span style="color:#bf616a;">ID    primitive</span><span>.</span><span style="color:#b48ead;">ObjectID </span><span>`</span><span style="color:#a3be8c;">bson:&quot;_id,omitempty&quot; json:&quot;id,omitempty&quot;</span><span>`
+</span><span>  </span><span style="color:#bf616a;">Title </span><span style="color:#b48ead;">string             </span><span>`</span><span style="color:#a3be8c;">bson:&quot;title&quot; json:&quot;title&quot;</span><span>`
+</span><span>  </span><span style="color:#bf616a;">Body  </span><span style="color:#b48ead;">string             </span><span>`</span><span style="color:#a3be8c;">bson:&quot;body&quot; json:&quot;body&quot;</span><span>`
+</span><span>}
+</span></code></pre>
+<p>Note that each field has a <code>bson</code> tag for MongoDB and a <code>json</code> tag for the API.</p>
+<h2 id="a-naive-approach"><a class="zola-anchor" href="#a-naive-approach" aria-label="Anchor link for: a-naive-approach">A Naive Approach</a></h2>
+<p>Here's what a naive controller and service would look like for the <code>Post</code> model:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">package </span><span style="color:#bf616a;">controllers
+</span><span>
+</span><span style="color:#b48ead;">type </span><span>PostsController </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>  </span><span style="color:#bf616a;">service </span><span>*</span><span style="color:#bf616a;">services</span><span>.</span><span style="color:#b48ead;">PostsService
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span style="color:#8fa1b3;">NewPostsController</span><span>(</span><span style="color:#bf616a;">service </span><span>*</span><span style="color:#bf616a;">services</span><span>.</span><span style="color:#b48ead;">PostsService</span><span>) *</span><span style="color:#b48ead;">PostsController </span><span>{
+</span><span>  </span><span style="color:#b48ead;">return </span><span>&amp;</span><span style="color:#bf616a;">PostsController</span><span>{</span><span style="color:#bf616a;">service</span><span>}
+</span><span>}
+</span></code></pre>
+<p>And the service:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span>
+</span><span style="color:#b48ead;">type </span><span>PostsService </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>  </span><span style="color:#bf616a;">db </span><span>*</span><span style="color:#bf616a;">mongo</span><span>.</span><span style="color:#b48ead;">Database
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span style="color:#8fa1b3;">NewPostsService</span><span>(</span><span style="color:#bf616a;">db </span><span>*</span><span style="color:#bf616a;">mongo</span><span>.</span><span style="color:#b48ead;">Database</span><span>) *</span><span style="color:#b48ead;">PostsService </span><span>{
+</span><span>  </span><span style="color:#b48ead;">return </span><span>&amp;</span><span style="color:#bf616a;">PostsService</span><span>{</span><span style="color:#bf616a;">db</span><span>}
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">PostsService</span><span>) </span><span style="color:#8fa1b3;">List</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>) ([]</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#b48ead;">Post</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>  </span><span style="color:#65737e;">// -- snip --
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">PostsService</span><span>) </span><span style="color:#8fa1b3;">Create</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">post </span><span>*</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#b48ead;">Post</span><span>) (*</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#b48ead;">Post</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>  </span><span style="color:#65737e;">// -- snip --
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">PostsService</span><span>) </span><span style="color:#8fa1b3;">Get</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">id </span><span style="color:#b48ead;">string</span><span>) (*</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#b48ead;">Post</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>  </span><span style="color:#65737e;">// -- snip --
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">PostsService</span><span>) </span><span style="color:#8fa1b3;">Update</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">id </span><span style="color:#b48ead;">string</span><span>, </span><span style="color:#bf616a;">post </span><span>*</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#b48ead;">Post</span><span>) (*</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#b48ead;">Post</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>  </span><span style="color:#65737e;">// -- snip --
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">PostsService</span><span>) </span><span style="color:#8fa1b3;">Delete</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">id </span><span style="color:#b48ead;">string</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>  </span><span style="color:#65737e;">// -- snip --
+</span><span>}
+</span></code></pre>
+<p>We can clearly see how repetitive this code is. We can do better.</p>
+<h2 id="a-generic-approach"><a class="zola-anchor" href="#a-generic-approach" aria-label="Anchor link for: a-generic-approach">A Generic Approach</a></h2>
+<h3 id="service"><a class="zola-anchor" href="#service" aria-label="Anchor link for: service">Service</a></h3>
+<p>We'll start out by defining a generic service that can work with any model:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">package </span><span style="color:#bf616a;">services
+</span><span>
+</span><span style="color:#b48ead;">import </span><span>(
+</span><span>	&quot;</span><span style="color:#a3be8c;">context</span><span>&quot;
+</span><span>
+</span><span>	&quot;</span><span style="color:#a3be8c;">go.mongodb.org/mongo-driver/bson</span><span>&quot;
+</span><span>	&quot;</span><span style="color:#a3be8c;">go.mongodb.org/mongo-driver/bson/primitive</span><span>&quot;
+</span><span>	&quot;</span><span style="color:#a3be8c;">go.mongodb.org/mongo-driver/mongo</span><span>&quot;
+</span><span>)
+</span><span>
+</span><span style="color:#b48ead;">type </span><span>CrudService[</span><span style="color:#bf616a;">T any</span><span>] </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>	</span><span style="color:#bf616a;">db         </span><span>*</span><span style="color:#bf616a;">mongo</span><span>.</span><span style="color:#b48ead;">Database
+</span><span>	</span><span style="color:#bf616a;">collection </span><span style="color:#b48ead;">string
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span style="color:#bf616a;">NewCrudService</span><span>[</span><span style="color:#bf616a;">T any</span><span>](</span><span style="color:#bf616a;">db </span><span>*</span><span style="color:#bf616a;">mongo</span><span>.</span><span style="color:#bf616a;">Database</span><span>, </span><span style="color:#bf616a;">collection string</span><span>) *</span><span style="color:#bf616a;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>] {
+</span><span>	</span><span style="color:#b48ead;">return </span><span>&amp;</span><span style="color:#bf616a;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]{
+</span><span>		</span><span style="color:#bf616a;">db</span><span>,
+</span><span>		</span><span style="color:#bf616a;">collection</span><span>,
+</span><span>	}
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">List</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>) ([]</span><span style="color:#b48ead;">T</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>	</span><span style="color:#bf616a;">cursor</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">db</span><span>.</span><span style="color:#bf616a;">Collection</span><span>(</span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">collection</span><span>).</span><span style="color:#bf616a;">Find</span><span>(</span><span style="color:#bf616a;">ctx</span><span>, </span><span style="color:#bf616a;">bson</span><span>.</span><span style="color:#bf616a;">D</span><span>{})
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#d08770;">nil</span><span>, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#b48ead;">var </span><span style="color:#bf616a;">results </span><span>[]</span><span style="color:#b48ead;">T
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>= </span><span style="color:#bf616a;">cursor</span><span>.</span><span style="color:#bf616a;">All</span><span>(</span><span style="color:#bf616a;">ctx</span><span>, &amp;</span><span style="color:#bf616a;">results</span><span>); </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#d08770;">nil</span><span>, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">results</span><span>, </span><span style="color:#d08770;">nil
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Create</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">input </span><span style="color:#b48ead;">T</span><span>) (</span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#b48ead;">ObjectID</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>	</span><span style="color:#bf616a;">result</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">db</span><span>.</span><span style="color:#bf616a;">Collection</span><span>(</span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">collection</span><span>).</span><span style="color:#bf616a;">InsertOne</span><span>(</span><span style="color:#bf616a;">ctx</span><span>, </span><span style="color:#bf616a;">input</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectID</span><span>{}, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#bf616a;">resultId</span><span>, </span><span style="color:#bf616a;">ok </span><span>:= </span><span style="color:#bf616a;">result</span><span>.</span><span style="color:#bf616a;">InsertedID</span><span>.(</span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#b48ead;">ObjectID</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span>!</span><span style="color:#bf616a;">ok </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectID</span><span>{}, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">resultId</span><span>, </span><span style="color:#d08770;">nil
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Get</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">id </span><span style="color:#b48ead;">string</span><span>) (*</span><span style="color:#b48ead;">T</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>	</span><span style="color:#bf616a;">objectId</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectIDFromHex</span><span>(</span><span style="color:#bf616a;">id</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#d08770;">nil</span><span>, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#b48ead;">var </span><span style="color:#bf616a;">result </span><span style="color:#b48ead;">T
+</span><span>	</span><span style="color:#bf616a;">err </span><span>= </span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">db</span><span>.</span><span style="color:#bf616a;">Collection</span><span>(</span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">collection</span><span>).</span><span style="color:#bf616a;">FindOne</span><span>(</span><span style="color:#bf616a;">ctx</span><span>, </span><span style="color:#bf616a;">bson</span><span>.</span><span style="color:#bf616a;">M</span><span>{&quot;</span><span style="color:#a3be8c;">_id</span><span>&quot;: </span><span style="color:#bf616a;">objectId</span><span>}).</span><span style="color:#bf616a;">Decode</span><span>(&amp;</span><span style="color:#bf616a;">result</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#d08770;">nil</span><span>, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span>&amp;</span><span style="color:#bf616a;">result</span><span>, </span><span style="color:#d08770;">nil
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Update</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">id </span><span style="color:#b48ead;">string</span><span>, </span><span style="color:#bf616a;">input </span><span style="color:#b48ead;">T</span><span>) (</span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#b48ead;">ObjectID</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span><span>	</span><span style="color:#bf616a;">objectId</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectIDFromHex</span><span>(</span><span style="color:#bf616a;">id</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectID</span><span>{}, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#bf616a;">filter </span><span>:= </span><span style="color:#bf616a;">bson</span><span>.</span><span style="color:#bf616a;">M</span><span>{&quot;</span><span style="color:#a3be8c;">_id</span><span>&quot;: </span><span style="color:#bf616a;">objectId</span><span>}
+</span><span>	</span><span style="color:#bf616a;">update </span><span>:= </span><span style="color:#bf616a;">bson</span><span>.</span><span style="color:#bf616a;">M</span><span>{&quot;</span><span style="color:#a3be8c;">$set</span><span>&quot;: </span><span style="color:#bf616a;">input</span><span>}
+</span><span>	</span><span style="color:#bf616a;">_</span><span>, </span><span style="color:#bf616a;">err </span><span>= </span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">db</span><span>.</span><span style="color:#bf616a;">Collection</span><span>(</span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">collection</span><span>).</span><span style="color:#bf616a;">UpdateOne</span><span>(</span><span style="color:#bf616a;">ctx</span><span>, </span><span style="color:#bf616a;">filter</span><span>, </span><span style="color:#bf616a;">update</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectID</span><span>{}, </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">objectId</span><span>, </span><span style="color:#d08770;">nil
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Delete</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>, </span><span style="color:#bf616a;">id </span><span style="color:#b48ead;">string</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>	</span><span style="color:#bf616a;">objectId</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">primitive</span><span>.</span><span style="color:#bf616a;">ObjectIDFromHex</span><span>(</span><span style="color:#bf616a;">id</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#bf616a;">filter </span><span>:= </span><span style="color:#bf616a;">bson</span><span>.</span><span style="color:#bf616a;">M</span><span>{&quot;</span><span style="color:#a3be8c;">_id</span><span>&quot;: </span><span style="color:#bf616a;">objectId</span><span>}
+</span><span>	</span><span style="color:#bf616a;">_</span><span>, </span><span style="color:#bf616a;">err </span><span>= </span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">db</span><span>.</span><span style="color:#bf616a;">Collection</span><span>(</span><span style="color:#bf616a;">s</span><span>.</span><span style="color:#bf616a;">collection</span><span>).</span><span style="color:#bf616a;">DeleteOne</span><span>(</span><span style="color:#bf616a;">ctx</span><span>, </span><span style="color:#bf616a;">filter</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#d08770;">nil
+</span><span>}
+</span><span>
+</span></code></pre>
+<p>This service accepts the collection name as a parameter so it knows which collection to work with.</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">type </span><span>CrudService[</span><span style="color:#bf616a;">T any</span><span>] </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>	</span><span style="color:#bf616a;">db         </span><span>*</span><span style="color:#bf616a;">mongo</span><span>.</span><span style="color:#b48ead;">Database
+</span><span>	</span><span style="color:#bf616a;">collection </span><span style="color:#b48ead;">string
+</span><span>}
+</span></code></pre>
+<p>This is the generic service struct. It accepts a type <code>T</code> which can be any type (in our case, a <code>Post</code> model).</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">s </span><span>*</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">List</span><span>(</span><span style="color:#bf616a;">ctx context</span><span>.</span><span style="color:#b48ead;">Context</span><span>) ([]</span><span style="color:#b48ead;">T</span><span>, </span><span style="color:#b48ead;">error</span><span>) {
+</span></code></pre>
+<p>The functions are defined with the same type <code>T</code> that the service struct accepts, so in this context everywhere you see <code>T</code>, think of it as the <code>Post</code> model.</p>
+<h3 id="controller"><a class="zola-anchor" href="#controller" aria-label="Anchor link for: controller">Controller</a></h3>
+<p>As for the controller, we will define a generic controller that will contain the service:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">package </span><span style="color:#bf616a;">controllers
+</span><span>
+</span><span style="color:#b48ead;">type </span><span>CrudController[</span><span style="color:#bf616a;">T any</span><span>] </span><span style="color:#b48ead;">struct </span><span>{
+</span><span>	</span><span style="color:#bf616a;">crudService </span><span>*</span><span style="color:#bf616a;">services</span><span>.</span><span style="color:#b48ead;">CrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>]
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span style="color:#bf616a;">NewCrudController</span><span>[</span><span style="color:#bf616a;">T any</span><span>](</span><span style="color:#bf616a;">group </span><span>*</span><span style="color:#bf616a;">echo</span><span>.</span><span style="color:#bf616a;">Group</span><span>, </span><span style="color:#bf616a;">db </span><span>*</span><span style="color:#bf616a;">mongo</span><span>.</span><span style="color:#bf616a;">Database</span><span>, </span><span style="color:#bf616a;">collection string</span><span>) *</span><span style="color:#bf616a;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>] {
+</span><span>	</span><span style="color:#bf616a;">c </span><span>:= &amp;</span><span style="color:#bf616a;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>]{
+</span><span>		</span><span style="color:#bf616a;">services</span><span>.</span><span style="color:#bf616a;">NewCrudService</span><span>[</span><span style="color:#bf616a;">T</span><span>](</span><span style="color:#bf616a;">db</span><span>, </span><span style="color:#bf616a;">collection</span><span>),
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#bf616a;">group</span><span>.</span><span style="color:#bf616a;">GET</span><span>(&quot;&quot;, </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">List</span><span>)
+</span><span>	</span><span style="color:#bf616a;">group</span><span>.</span><span style="color:#bf616a;">POST</span><span>(&quot;&quot;, </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">Create</span><span>)
+</span><span>	</span><span style="color:#bf616a;">group</span><span>.</span><span style="color:#bf616a;">GET</span><span>(&quot;</span><span style="color:#a3be8c;">/:id</span><span>&quot;, </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">Get</span><span>)
+</span><span>	</span><span style="color:#bf616a;">group</span><span>.</span><span style="color:#bf616a;">PUT</span><span>(&quot;</span><span style="color:#a3be8c;">/:id</span><span>&quot;, </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">Update</span><span>)
+</span><span>	</span><span style="color:#bf616a;">group</span><span>.</span><span style="color:#bf616a;">DELETE</span><span>(&quot;</span><span style="color:#a3be8c;">/:id</span><span>&quot;, </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">Delete</span><span>)
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">c
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">c </span><span>*</span><span style="color:#b48ead;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">List</span><span>(</span><span style="color:#bf616a;">ctx echo</span><span>.</span><span style="color:#b48ead;">Context</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>	</span><span style="color:#bf616a;">results</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">crudService</span><span>.</span><span style="color:#bf616a;">List</span><span>(</span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Request</span><span>().</span><span style="color:#bf616a;">Context</span><span>())
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">JSON</span><span>(</span><span style="color:#d08770;">200</span><span>, </span><span style="color:#bf616a;">results</span><span>)
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">c </span><span>*</span><span style="color:#b48ead;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Create</span><span>(</span><span style="color:#bf616a;">ctx echo</span><span>.</span><span style="color:#b48ead;">Context</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>	</span><span style="color:#b48ead;">var </span><span style="color:#bf616a;">input </span><span style="color:#b48ead;">T
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Bind</span><span>(&amp;</span><span style="color:#bf616a;">input</span><span>); </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#bf616a;">result</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">crudService</span><span>.</span><span style="color:#bf616a;">Create</span><span>(</span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Request</span><span>().</span><span style="color:#bf616a;">Context</span><span>(), </span><span style="color:#bf616a;">input</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">JSON</span><span>(</span><span style="color:#d08770;">201</span><span>, </span><span style="color:#bf616a;">result</span><span>)
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">c </span><span>*</span><span style="color:#b48ead;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Get</span><span>(</span><span style="color:#bf616a;">ctx echo</span><span>.</span><span style="color:#b48ead;">Context</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>	</span><span style="color:#bf616a;">id </span><span>:= </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Param</span><span>(&quot;</span><span style="color:#a3be8c;">id</span><span>&quot;)
+</span><span>	</span><span style="color:#bf616a;">result</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">crudService</span><span>.</span><span style="color:#bf616a;">Get</span><span>(</span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Request</span><span>().</span><span style="color:#bf616a;">Context</span><span>(), </span><span style="color:#bf616a;">id</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">JSON</span><span>(</span><span style="color:#d08770;">200</span><span>, </span><span style="color:#bf616a;">result</span><span>)
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">c </span><span>*</span><span style="color:#b48ead;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Update</span><span>(</span><span style="color:#bf616a;">ctx echo</span><span>.</span><span style="color:#b48ead;">Context</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>	</span><span style="color:#bf616a;">id </span><span>:= </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Param</span><span>(&quot;</span><span style="color:#a3be8c;">id</span><span>&quot;)
+</span><span>	</span><span style="color:#b48ead;">var </span><span style="color:#bf616a;">input </span><span style="color:#b48ead;">T
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Bind</span><span>(&amp;</span><span style="color:#bf616a;">input</span><span>); </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>	</span><span style="color:#bf616a;">result</span><span>, </span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">crudService</span><span>.</span><span style="color:#bf616a;">Update</span><span>(</span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Request</span><span>().</span><span style="color:#bf616a;">Context</span><span>(), </span><span style="color:#bf616a;">id</span><span>, </span><span style="color:#bf616a;">input</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">JSON</span><span>(</span><span style="color:#d08770;">200</span><span>, </span><span style="color:#bf616a;">result</span><span>)
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">func </span><span>(</span><span style="color:#bf616a;">c </span><span>*</span><span style="color:#b48ead;">CrudController</span><span>[</span><span style="color:#bf616a;">T</span><span>]) </span><span style="color:#8fa1b3;">Delete</span><span>(</span><span style="color:#bf616a;">ctx echo</span><span>.</span><span style="color:#b48ead;">Context</span><span>) </span><span style="color:#b48ead;">error </span><span>{
+</span><span>	</span><span style="color:#bf616a;">id </span><span>:= </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Param</span><span>(&quot;</span><span style="color:#a3be8c;">id</span><span>&quot;)
+</span><span>	</span><span style="color:#bf616a;">err </span><span>:= </span><span style="color:#bf616a;">c</span><span>.</span><span style="color:#bf616a;">crudService</span><span>.</span><span style="color:#bf616a;">Delete</span><span>(</span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">Request</span><span>().</span><span style="color:#bf616a;">Context</span><span>(), </span><span style="color:#bf616a;">id</span><span>)
+</span><span>	</span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">err </span><span>!= </span><span style="color:#d08770;">nil </span><span>{
+</span><span>		</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">err
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">ctx</span><span>.</span><span style="color:#bf616a;">NoContent</span><span>(</span><span style="color:#d08770;">200</span><span>)
+</span><span>}
+</span></code></pre>
+<p>This controller registers the routes for the CRUD operations and calls the service methods. Note that I'm using Echo as my web framework of choice, but this will work with any other web framework or router.</p>
+<h2 id="tying-it-all-together"><a class="zola-anchor" href="#tying-it-all-together" aria-label="Anchor link for: tying-it-all-together">Tying It All Together</a></h2>
+<p>In the main file, where we start our HTTP server and connect to the database, we can now use the generic controller to create a controller for the <code>Post</code> model:</p>
+<pre data-lang="go" style="background-color:#2b303b;color:#c0c5ce;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#b48ead;">func </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>	</span><span style="color:#65737e;">// -- snip --
+</span><span>
+</span><span>	</span><span style="color:#65737e;">// Controllers
+</span><span>	</span><span style="color:#bf616a;">apiGroup </span><span>:= </span><span style="color:#bf616a;">e</span><span>.</span><span style="color:#bf616a;">Group</span><span>(&quot;</span><span style="color:#a3be8c;">/api</span><span>&quot;)
+</span><span>	</span><span style="color:#bf616a;">controllers</span><span>.</span><span style="color:#bf616a;">NewCrudController</span><span>[</span><span style="color:#bf616a;">models</span><span>.</span><span style="color:#bf616a;">Post</span><span>](</span><span style="color:#bf616a;">apiGroup</span><span>.</span><span style="color:#bf616a;">Group</span><span>(&quot;</span><span style="color:#a3be8c;">/posts</span><span>&quot;), </span><span style="color:#bf616a;">db</span><span>, &quot;</span><span style="color:#a3be8c;">posts</span><span>&quot;)
+</span><span>	</span><span style="color:#65737e;">// as many controllers as you want...
+</span><span>
+</span><span>	</span><span style="color:#65737e;">// -- snip --
+</span><span>}
+</span></code></pre>
+<p>Here you can see how scalable this approach is. You can create as many controllers as you want for different models, and you don't have to write any more service or controller code, unless you need to add custom logic.</p>
+<p>Generics are a powerful feature that can help you write more scalable and maintainable code. In this example, we used generics to create a generic CRUD service and controller that can work with any model. This approach is perfect for simple CRUD resources, but it might not work for more complex use cases.</p>
+<p>This is a simple example, and I can easily see use cases where the controller and service can be extended to handle more complex logic like pagination, filtering, and more.</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>
