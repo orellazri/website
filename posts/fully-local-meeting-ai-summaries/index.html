@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Fully Local AI Meeting Summaries
+        
+    </title>
+
+        
+            <meta property="og:title" content="Fully Local AI Meeting Summaries" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=&#x2F;favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;fully-local-meeting-ai-summaries&#x2F;&t=Fully Local AI Meeting Summaries">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=3a69812dc9773e8d3635"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Fully Local AI Meeting Summaries<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2025-07-26</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/coding/" class="post-tag">coding</a>, 
+                                
+                                    <a href="https://orellazri.com/tags/ai/" class="post-tag">ai</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/fully-local-meeting-ai-summaries/#the-problem">The Problem</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/fully-local-meeting-ai-summaries/#technical-architecture">Technical Architecture</a>
+                            
+                                <ul>
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/fully-local-meeting-ai-summaries/#transcription">Transcription</a>
+                                        </li>
+
+                                        
+                                    
+                                        <li>
+                                            <a href="https://orellazri.com/posts/fully-local-meeting-ai-summaries/#summarization">Summarization</a>
+                                        </li>
+
+                                        
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/fully-local-meeting-ai-summaries/#unix-philosophy-and-cli-design">Unix Philosophy and CLI Design</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>Remote work has transformed how we conduct meetings, but it's also created a new challenge: keeping track of everything discussed across countless video calls. While most platforms offer cloud recording, searching through hours of audio for that one key decision made three meetings ago remains a painful experience. This led me to build <a href="https://github.com/orellazri/essence"><strong>Essence</strong></a>, a fully local command-line tool that transcribes meeting audio and generates structured summaries without sending any data to external services.</p>
+<p>This project builds on my previous exploration of local AI with Rust - <a href="https://orellazri.com/posts/rag-pipeline-chat-with-my-obsidian-vault/">RAG Pipeline to Chat with My Obsidian Vault</a>, where I first dove into running AI models locally for privacy and performance.</p>
+<h2 id="the-problem"><a class="zola-anchor" href="#the-problem" aria-label="Anchor link for: the-problem">The Problem</a></h2>
+<p>Meeting recordings pile up quickly, but finding specific information requires listening through entire recordings. What I needed was something that could:</p>
+<ol>
+<li>Convert audio recordings to searchable text</li>
+<li>Generate concise summaries highlighting key decisions and action items</li>
+<li>Work entirely offline for privacy and speed</li>
+<li>Integrate seamlessly into my existing CLI-based workflow</li>
+</ol>
+<p>I did not want to use/pay for any cloud services that join the meetings for me (**<em>cough</em>** [Some Stupid Name] The Note Taker **<em>cough</em>**), and I wanted to use my own hardware.</p>
+<h2 id="technical-architecture"><a class="zola-anchor" href="#technical-architecture" aria-label="Anchor link for: technical-architecture">Technical Architecture</a></h2>
+<p>Essence is built in Rust and follows a modular design with two primary components: transcription and summarization. I'm using OpenAI's Whisper model running locally via the <code>whisper-rs</code> crate for speech recognition, and Ollama for local language model inference. Everything runs entirely on my machine - no data ever leaves my system, which you know I love.</p>
+<p>I achieved good results by using Apple's Metal acceleration for the Whisper model (<code>ggml-large-v3.bin</code>), and the <code>gemma3:27b</code> model from Ollama for summarization. On my M4 Pro, transcribing a and summarizing a 45-minute meeting took less than 8 minutes (your mileage may vary).</p>
+<h3 id="transcription"><a class="zola-anchor" href="#transcription" aria-label="Anchor link for: transcription">Transcription</a></h3>
+<p>The transcription module wraps Whisper's C++ implementation, handling the complex audio preprocessing required for speech recognition.</p>
+<p>We first have to read the <code>wav</code> audio file (using <code>hound</code>) into a vector of 16-bit integers.</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">let</span><span> samples: Vec&lt;</span><span style="color:#b48ead;">i16</span><span>&gt; = WavReader::open(audio_path)
+</span><span>    .</span><span style="color:#96b5b4;">map_err</span><span>(|</span><span style="color:#bf616a;">e</span><span>| Error::new(&amp;format!(&quot;</span><span style="color:#a3be8c;">Failed to open wav file: </span><span style="color:#d08770;">{}</span><span>&quot;, e)))?
+</span><span>    .into_samples::&lt;</span><span style="color:#b48ead;">i16</span><span>&gt;()
+</span><span>    .</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">x</span><span>| x.</span><span style="color:#96b5b4;">map_err</span><span>(|</span><span style="color:#bf616a;">e</span><span>| Error::new(&amp;format!(&quot;</span><span style="color:#a3be8c;">Failed to read wav file: </span><span style="color:#d08770;">{}</span><span>&quot;, e))))
+</span><span>    .collect::&lt;Result&lt;Vec&lt;</span><span style="color:#b48ead;">i16</span><span>&gt;, Error&gt;&gt;()?;
+</span></code></pre>
+<p>The Whisper model expects 16KHz mono f32 samples, meaning we have to do just a bit more work:</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">let mut</span><span> inter_samples = vec![Default::default(); samples.</span><span style="color:#96b5b4;">len</span><span>()];
+</span><span>whisper_rs::convert_integer_to_float_audio(&amp;samples, &amp;</span><span style="color:#b48ead;">mut</span><span> inter_samples)
+</span><span>    .</span><span style="color:#96b5b4;">map_err</span><span>(|</span><span style="color:#bf616a;">e</span><span>| Error::new(&amp;format!(&quot;</span><span style="color:#a3be8c;">Failed to convert audio data: </span><span style="color:#d08770;">{}</span><span>&quot;, e)))?;
+</span><span style="color:#b48ead;">let</span><span> samples = whisper_rs::convert_stereo_to_mono_audio(&amp;inter_samples)
+</span><span>    .</span><span style="color:#96b5b4;">map_err</span><span>(|</span><span style="color:#bf616a;">e</span><span>| Error::new(&amp;format!(&quot;</span><span style="color:#a3be8c;">Failed to convert audio data: </span><span style="color:#d08770;">{}</span><span>&quot;, e)))?;
+</span></code></pre>
+<p>After that's done, we can run the model and get back a vector of text segments. Et voila!</p>
+<h3 id="summarization"><a class="zola-anchor" href="#summarization" aria-label="Anchor link for: summarization">Summarization</a></h3>
+<p>The summarization component interfaces with Ollama to run large language models locally. The model parameters are tuned for consistent, focused output - low temperature reduces randomness while constrained sampling ensures the model stays on topic.</p>
+<p>The prompt engineering focuses on extracting actionable information:</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">get_prompt</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">text</span><span>: &amp;</span><span style="color:#b48ead;">str</span><span>) -&gt; String {
+</span><span>    format!(
+</span><span>        </span><span style="color:#b48ead;">r</span><span>#</span><span style="color:#a3be8c;">&quot;
+</span><span style="color:#a3be8c;">You are an AI assistant that summarizes meeting transcriptions. Your task is to:
+</span><span style="color:#a3be8c;">
+</span><span style="color:#a3be8c;">1. Extract the key topics and decisions discussed
+</span><span style="color:#a3be8c;">2. Identify action items and their owners (if mentioned)
+</span><span style="color:#a3be8c;">3. Note any important technical details or specifications
+</span><span style="color:#a3be8c;">4. Highlight any unresolved questions or issues
+</span><span style="color:#a3be8c;">5. Keep the summary concise but comprehensive
+</span><span style="color:#a3be8c;">
+</span><span style="color:#a3be8c;">Please provide a well-structured summary of the following meeting transcript:
+</span><span style="color:#a3be8c;">        </span><span style="color:#d08770;">{text}
+</span><span style="color:#a3be8c;">        </span><span>&quot;#
+</span><span>    )
+</span><span>}
+</span></code></pre>
+<h2 id="unix-philosophy-and-cli-design"><a class="zola-anchor" href="#unix-philosophy-and-cli-design" aria-label="Anchor link for: unix-philosophy-and-cli-design">Unix Philosophy and CLI Design</a></h2>
+<p>I designed Essence to follow Unix principles: do one thing well and play nicely with other tools. The CLI exposes two primary commands that can be chained together or used independently:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">essence</span><span> transcribe</span><span style="color:#bf616a;"> -i</span><span> audio.wav</span><span style="color:#bf616a;"> -l</span><span> en</span><span style="color:#bf616a;"> -m</span><span> ggml-large-v3.bin
+</span><span style="color:#bf616a;">essence</span><span> summarize</span><span style="color:#bf616a;"> -i</span><span> transcript.txt</span><span style="color:#bf616a;"> -m</span><span> gemma3:27b
+</span></code></pre>
+<p>Following Unix conventions, the tool outputs results to stdout and logs to stderr. This makes it perfect for scripting and automation. Here's a script that takes a locally recorded meeting video and produces a summary:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#65737e;">#!/bin/bash
+</span><span style="color:#65737e;"># extract_and_summarize.sh - Convert video to summary
+</span><span>
+</span><span style="color:#bf616a;">VIDEO_FILE</span><span>=&quot;$</span><span style="color:#bf616a;">1</span><span>&quot;
+</span><span style="color:#bf616a;">AUDIO_FILE</span><span>=&quot;</span><span style="color:#a3be8c;">meeting_audio.wav</span><span>&quot;
+</span><span style="color:#bf616a;">TRANSCRIPT_FILE</span><span>=&quot;</span><span style="color:#a3be8c;">transcript.txt</span><span>&quot;
+</span><span>
+</span><span style="color:#65737e;"># Extract audio from video
+</span><span style="color:#bf616a;">ffmpeg -i </span><span>&quot;$</span><span style="color:#bf616a;">VIDEO_FILE</span><span>&quot;</span><span style="color:#bf616a;"> -ar</span><span> 16000</span><span style="color:#bf616a;"> -ac</span><span> 1 &quot;$</span><span style="color:#bf616a;">AUDIO_FILE</span><span>&quot;</span><span style="color:#bf616a;"> -y
+</span><span>
+</span><span style="color:#65737e;"># Transcribe the audio
+</span><span style="color:#bf616a;">essence</span><span> transcribe</span><span style="color:#bf616a;"> -i </span><span>&quot;$</span><span style="color:#bf616a;">AUDIO_FILE</span><span>&quot;</span><span style="color:#bf616a;"> -l</span><span> en</span><span style="color:#bf616a;"> -m ~</span><span>/models/ggml-large-v3.bin &gt; &quot;$</span><span style="color:#bf616a;">TRANSCRIPT_FILE</span><span>&quot;
+</span><span>
+</span><span style="color:#65737e;"># Generate summary
+</span><span style="color:#bf616a;">essence</span><span> summarize</span><span style="color:#bf616a;"> -i </span><span>&quot;$</span><span style="color:#bf616a;">TRANSCRIPT_FILE</span><span>&quot;</span><span style="color:#bf616a;"> -m</span><span> gemma3:27b
+</span><span>
+</span><span style="color:#65737e;"># Cleanup
+</span><span style="color:#bf616a;">rm </span><span>&quot;$</span><span style="color:#bf616a;">AUDIO_FILE</span><span>&quot; &quot;$</span><span style="color:#bf616a;">TRANSCRIPT_FILE</span><span>&quot;
+</span></code></pre>
+<p>Now imagine running this script after each meeting, saving the result in your Obsidian vault, and then chatting with it using the <a href="https://orellazri.com/posts/rag-pipeline-chat-with-my-obsidian-vault/">fully-local RAG pipeline I previously built</a>.</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>

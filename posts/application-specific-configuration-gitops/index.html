@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base" content="https:&#x2F;&#x2F;orellazri.com">
+
+    
+
+    
+    
+    
+    <title>
+         Application Specific Configuration with GitOps Deployments
+        
+    </title>
+
+        
+            <meta property="og:title" content="Application Specific Configuration with GitOps Deployments" />
+        
+     
+
+     
+         
+     
+
+     
+         
+    
+
+    
+    
+        <link rel="icon" type="image/png" href=&#x2F;favicon.svg />
+    
+
+    
+    
+        <link href=https://orellazri.com/fonts.css rel="stylesheet" />
+    
+
+    
+    
+        
+
+        
+            
+            
+
+            <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="https://orellazri.com/js/count.js"></script>
+            <noscript>
+                
+                <img src="https://orellazri.goatcounter.com//count?p=&#x2F;posts&#x2F;application-specific-configuration-gitops&#x2F;&t=Application Specific Configuration with GitOps Deployments">
+            </noscript>
+        
+    
+
+    
+    
+
+    
+    
+        <script src=https://orellazri.com/js/toc.js></script>
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="Orel Lazri" href="https://orellazri.com/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://orellazri.com/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://orellazri.com/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://orellazri.com/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://orellazri.com/main.css />
+
+    
+
+    <script src=https://orellazri.com/js/mermaid.js></script>
+
+    <script defer src="https://orellazri.com/search_index.en.js?h=3a69812dc9773e8d3635"></script>
+        <script defer src="https://orellazri.com/js/searchElasticlunr.min.js?h=3626c0ef99daa745b31e"></script></head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+            <a href=https:&#x2F;&#x2F;orellazri.com>Orel Lazri</a>
+        
+
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;orellazri" class="social">
+                <img alt=github src=https://orellazri.com/social_icons/github.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;orellazri" class="social">
+                <img alt=linkedin src=https://orellazri.com/social_icons/linkedin.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+            <a href=https://orellazri.com/posts style="margin-left: 0.25em">posts</a>
+        
+            <a href=https://orellazri.com/projects style="margin-left: 0.25em">projects</a>
+        
+            <a href=https://orellazri.com/atom.xml style="margin-left: 0.25em">rss</a>
+        
+
+        
+        <button 
+            id="search-button"
+            class="search-button"
+            title="$SHORTCUT to open search"
+        >
+            <img 
+                src="https://orellazri.com/search.svg" 
+                alt="Search" 
+                class="search-icon"
+            >
+        </button>
+
+        <div id="searchModal" class="search-modal js" role="dialog" aria-labelledby="modalTitle">
+            <div id="modal-content">
+                <h1 id="modalTitle" class="page-header">Search</h1>
+                <div id="searchBar">
+                    <input 
+                        id="searchInput" 
+                        role="combobox" 
+                        autocomplete="off" 
+                        spellcheck="false" 
+                        aria-expanded="false" 
+                        aria-controls="results-container" 
+                        placeholder="Search..."
+                    />
+                    <button 
+                        id="clear-search" 
+                        class="clear-button"
+                        title="Clear search"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="results-container">
+                    <div id="results-info">
+                        <span id="zero_results" style="display: none;">No results</span>
+                        <span id="one_result" style="display: none;">1 result</span>
+                        <span id="many_results" style="display: none;">$NUMBER results</span>
+                    </div>
+                    <div id="results" role="listbox"></div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Application Specific Configuration with GitOps Deployments<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2024-04-28</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://orellazri.com/tags/devops/" class="post-tag">devops</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+        
+            <div class="toc-container">
+                <h1 class="toc-title">Table of Contents</h1>
+                <ul class="toc-list">
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/application-specific-configuration-gitops/#understanding-the-setup">Understanding the Setup</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/application-specific-configuration-gitops/#benefits-of-managing-configurations-alongside-code">Benefits of Managing Configurations Alongside Code</a>
+                            
+                        </li>
+                    
+                        <li>
+                            <a href="https://orellazri.com/posts/application-specific-configuration-gitops/#automating-configmap-patching">Automating ConfigMap Patching</a>
+                            
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+
+        <section class="body">
+            <p>In today's fast-paced software development landscape, staying agile and efficient is crucial. One area where efficiency matters greatly is in deploying application configurations. Developers often need to make changes to configuration values based on different environments, like production, staging, or development.</p>
+<h2 id="understanding-the-setup"><a class="zola-anchor" href="#understanding-the-setup" aria-label="Anchor link for: understanding-the-setup">Understanding the Setup</a></h2>
+<p>At the core of this approach is the idea of storing application configuration values directly within the application's repository. You create YAML files for each environment, like <code>prod.yml</code> or <code>sandbox.yml</code>, and populate them with the necessary key-value pairs for different configurations.</p>
+<p>These key-value pairs will then be used to update the relevant ConfigMap file in the GitOps repository.</p>
+<p>Example of a configuration yaml file:</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">foo</span><span>: </span><span style="color:#a3be8c;">bar
+</span></code></pre>
+<p>Example of the resulting ConfigMap in the GitOps repository (after the data has been updated):</p>
+<pre data-lang="yaml" style="background-color:#2b303b;color:#c0c5ce;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#bf616a;">apiVersion</span><span>: </span><span style="color:#a3be8c;">v1
+</span><span style="color:#bf616a;">kind</span><span>: </span><span style="color:#a3be8c;">ConfigMap
+</span><span style="color:#bf616a;">metadata</span><span>:
+</span><span>  </span><span style="color:#bf616a;">name</span><span>: </span><span style="color:#a3be8c;">application-cm
+</span><span style="color:#bf616a;">data</span><span>:
+</span><span>  </span><span style="color:#bf616a;">foo</span><span>: </span><span style="color:#a3be8c;">bar
+</span></code></pre>
+<h2 id="benefits-of-managing-configurations-alongside-code"><a class="zola-anchor" href="#benefits-of-managing-configurations-alongside-code" aria-label="Anchor link for: benefits-of-managing-configurations-alongside-code">Benefits of Managing Configurations Alongside Code</a></h2>
+<p>The beauty of this approach is that it puts the power in the hands of developers. They can make changes to application-specific configurations directly in the repository without needing approval from DevOps teams. This speeds up the development cycle and allows teams to respond quickly to evolving requirements.</p>
+<h2 id="automating-configmap-patching"><a class="zola-anchor" href="#automating-configmap-patching" aria-label="Anchor link for: automating-configmap-patching">Automating ConfigMap Patching</a></h2>
+<p>To automate this process, we can use a script that scans for YAML files within a <code>deployment-configs</code> directory in the application repository. If it finds any, it updates the corresponding <code>application_configmap.yml</code> file in the GitOps repository with the data from these YAML files. This means that any changes made to the YAML files in the application repository are automatically reflected in the GitOps repository, simplifying the deployment process significantly.</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#65737e;">#!/usr/bin/env bash
+</span><span>
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-d</span><span> deployment-configs </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then
+</span><span>    </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Found deployment-configs directory</span><span>&quot;
+</span><span>    </span><span style="color:#bf616a;">config_files</span><span>=$</span><span style="color:#a3be8c;">(</span><span style="color:#bf616a;">find</span><span style="color:#a3be8c;"> deployment-configs</span><span style="color:#bf616a;"> -maxdepth</span><span style="color:#a3be8c;"> 1</span><span style="color:#bf616a;"> -type</span><span style="color:#a3be8c;"> f </span><span style="color:#96b5b4;">\(</span><span style="color:#bf616a;"> -iname </span><span>&quot;$</span><span style="color:#bf616a;">ENV</span><span style="color:#a3be8c;">.yml</span><span>&quot;</span><span style="color:#bf616a;"> -o -iname </span><span>&quot;$</span><span style="color:#bf616a;">ENV</span><span style="color:#a3be8c;">.yaml</span><span>&quot; </span><span style="color:#96b5b4;">\)</span><span style="color:#a3be8c;">)
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">for</span><span> file </span><span style="color:#b48ead;">in </span><span style="color:#96b5b4;">\$</span><span>config_files; </span><span style="color:#b48ead;">do
+</span><span>        </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Found </span><span style="color:#96b5b4;">\$</span><span style="color:#a3be8c;">file</span><span>&quot;
+</span><span>
+</span><span>        </span><span style="color:#bf616a;">gitops_configmap_path</span><span>=&quot;</span><span style="color:#a3be8c;">gitops-deployments/.../envs/</span><span>$</span><span style="color:#bf616a;">ENV</span><span style="color:#a3be8c;">/application_configmap.yml</span><span>&quot;
+</span><span>        </span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#bf616a;">-f </span><span>&quot;</span><span style="color:#96b5b4;">\$</span><span style="color:#a3be8c;">gitops_configmap_path</span><span>&quot; </span><span style="color:#96b5b4;">]</span><span>; </span><span style="color:#b48ead;">then
+</span><span>            </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">Patching </span><span style="color:#96b5b4;">\$</span><span style="color:#a3be8c;">gitops_configmap_path</span><span>&quot;
+</span><span>            </span><span style="color:#bf616a;">yq -i </span><span>&quot;</span><span style="color:#a3be8c;">.data = load(</span><span style="color:#96b5b4;">\&quot;\$</span><span style="color:#a3be8c;">file</span><span style="color:#96b5b4;">\&quot;</span><span style="color:#a3be8c;">)</span><span>&quot; &quot;</span><span style="color:#96b5b4;">\$</span><span style="color:#a3be8c;">gitops_configmap_path</span><span>&quot;
+</span><span>        </span><span style="color:#b48ead;">fi
+</span><span>    </span><span style="color:#b48ead;">done
+</span><span style="color:#b48ead;">fi
+</span></code></pre>
+<p>This script assumes that <code>yq</code> is installed and that an environment variable named <code>ENV</code> exists and is set to the desired environment (e.g., <code>prod</code>, <code>staging</code>). This should be defined in the relevant CI step.</p>
+<p>This will effectily update the ConfigMap in the GitOps repository with the values from the YAML files in the application repository.</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>
