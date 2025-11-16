@@ -21,6 +21,7 @@ menu = [
 socials = [
   { name = "github", url = "https://github.com/orellazri", icon = "github" },
   { name = "linkedin", url = "https://linkedin.com/in/orellazri", icon = "linkedin" },
+  { name = "email", url = "mailto:hi@orellazri.com", icon = "email" },
 ]
 
 [extra.analytics]
