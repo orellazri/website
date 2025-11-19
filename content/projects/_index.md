@@ -1,5 +1,6 @@
 +++
 title = "Projects"
-sort_by = "weight"
-template = "cards.html"
+template = "prose.html"
 +++
+
+{{ collection(file="projects.toml") }}

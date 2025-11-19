@@ -1,0 +1,35 @@
+[[collection]]
+type = "card_simple"
+title = "Render Kit"
+link = "https://github.com/orellazri/renderkit"
+content = "A swiss army knife CLI tool for rendering templates"
+featured = false
+
+[[collection]]
+type = "card_simple"
+title = "Coda MCP"
+link = "https://github.com/orellazri/coda-mcp"
+content = "MCP Server for Coda"
+featured = false
+
+[[collection]]
+type = "card_simple"
+title = "Parcels"
+link = "https://github.com/orellazri/parcels"
+content = "Track your parcels through your email with AI"
+featured = false
+
+[[collection]]
+type = "card_simple"
+title = "GitHub Backup"
+link = "https://github.com/orellazri/github-backup"
+content = "Back up your GitHub repositories to a compressed tar archive"
+featured = false
+
+[[collection]]
+type = "card_simple"
+title = "Todoist Backup Exporter"
+link = "https://github.com/orellazri/todoist-backup-exporter"
+content = "Export your last Todoist backup archive"
+featured = false
+

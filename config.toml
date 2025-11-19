@@ -1,31 +1,49 @@
 base_url = "https://orellazri.com"
 title = "Orel Lazri"
+default_language = "en"
+
 compile_sass = true
-build_search_index = true
-generate_feeds = true
-theme = "apollo"
+minify_html = false
+build_search_index = false
+theme = "serene"
 taxonomies = [{ name = "tags" }]
+generate_feeds = true
+feed_filenames = ["atom.xml"]
 
 [markdown]
 highlight_code = true
+highlight_theme = "css"
+extra_syntaxes_and_themes = ["themes/serene/highlight_themes"]
+highlight_themes_css = [
+  { theme = "serene-light", filename = "hl-light.css" },
+  { theme = "serene-dark", filename = "hl-dark.css" },
+]
+render_emoji = false
+external_links_target_blank = false
+external_links_no_follow = true
+external_links_no_referrer = true
+smart_punctuation = false
+
+[slugify]
+paths = "on"
+taxonomies = "on"
+anchors = "on"
 
 [extra]
-theme = "auto"
-favicon = "/favicon.svg"
-toc = true
-menu = [
-  { name = "posts", url = "/posts", weight = 1 },
-  { name = "projects", url = "/projects", weight = 2 },
-  { name = "rss", url = "/atom.xml", weight = 3 },
+sections = [
+  { name = "posts", path = "/posts", is_external = false },
+  { name = "projects", url = "/projects", is_external = false },
+  { name = "rss", url = "/atom.xml", is_external = false },
 ]
-socials = [
-  { name = "github", url = "https://github.com/orellazri", icon = "github" },
-  { name = "linkedin", url = "https://linkedin.com/in/orellazri", icon = "linkedin" },
-  { name = "email", url = "mailto:hi@orellazri.com", icon = "email" },
-]
+blog_section_path = "/posts"
 
-[extra.analytics]
-enabled = true
+back_link_text = "Back" # Text of the back button
+force_theme = false # false | "light" | "dark"
 
-[extra.analytics.goatcounter]
-user = "orellazri"
+not_found_error_text = "404 Not Found"
+not_found_recover_text = "« back to home »"
+
+footer_copyright = ""
+footer_credits = false
+
+reaction = false
