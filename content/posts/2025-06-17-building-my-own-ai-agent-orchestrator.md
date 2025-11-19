@@ -4,6 +4,9 @@ date = "2025-06-17"
 
 [taxonomies]
 tags=["coding", "devops", "ai"]
+
+[extra]
+mermaid = true
 +++
 
 AI assistants and AI-powered IDEs are great, but I wanted a solution that could handle complex tasks from start to finish, in the repositories across our organization, and that could run in the background. I wanted a tool that I could give a high-level goal to, like "refactor the auth service," and have it autonomously navigate my codebase, understand its nuances, and execute the task, seamlessly integrated with the company's self-hosted GitLab instance.
