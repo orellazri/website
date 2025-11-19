@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Building My Own AI Agent Orchestrator</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #1c1c1c;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 60px;
+    --font-size: 16px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/hl-light.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post">
+  
+  <script>
+    const theme = sessionStorage.getItem('theme');
+    const match = window.matchMedia("(prefers-color-scheme: dark)").matches
+    if ((theme && theme == 'dark') || (!theme && match)) {
+      document.body.classList.add('dark');
+      const hl = document.querySelector('link#hl');
+      if (hl) hl.href = 'https://orellazri.com/hl-dark.css';
+    }
+  </script>
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#the-vision-a-hands-off-ai-collaborator">The Vision: A Hands-Off AI Collaborator</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#the-high-level-architecture">The High-Level Architecture</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#the-implementation">The Implementation</a>
+          
+          <ul>
+            
+            <li>
+              <a class="h3" href="#the-orchestrator">The Orchestrator</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#the-runtime">The Runtime</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#the-frontend">The Frontend</a>
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#project-specific-context">Project-Specific Context</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#a-user-s-journey">A User&#x27;s Journey</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#conclusion">Conclusion</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Building My Own AI Agent Orchestrator</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Jun 17, 2025</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/coding"><span>#</span>coding</a><a class="instant" href="https://orellazri.com/tags/devops"><span>#</span>devops</a><a class="instant" href="https://orellazri.com/tags/ai"><span>#</span>ai</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>AI assistants and AI-powered IDEs are great, but I wanted a solution that could handle complex tasks from start to finish, in the repositories across our organization, and that could run in the background. I wanted a tool that I could give a high-level goal to, like "refactor the auth service," and have it autonomously navigate my codebase, understand its nuances, and execute the task, seamlessly integrated with the company's self-hosted GitLab instance.</p>
+<h2 id="the-vision-a-hands-off-ai-collaborator">The Vision: A Hands-Off AI Collaborator<a class="zola-anchor" href="#the-vision-a-hands-off-ai-collaborator" aria-label="Anchor link for: the-vision-a-hands-off-ai-collaborator" style="visibility: hidden;"></a>
+</h2>
+<p>The goal was to create a system where I could delegate complex tasks to an AI agent. The agent needed to be able to check out the right code, have the right tools and credentials, and understand project-specific instructions to get the job done. I also needed a simple web interface to submit these tasks and monitor their progress.</p>
+<p>Tools like OpenAI Codex and Cursor Background Agents already exist, but they are only available with GitHub and come with limitations. In my case, we are using a self-hosted GitLab instance in our company, so we wanted seamless integration with our existing infrastructure, with a user-friendly wrapper and additional features.</p>
+<p>For the purposes of this post, I'll be referring to this system as "Agent", even though we have a different internal name for it.</p>
+<h2 id="the-high-level-architecture">The High-Level Architecture<a class="zola-anchor" href="#the-high-level-architecture" aria-label="Anchor link for: the-high-level-architecture" style="visibility: hidden;"></a>
+</h2>
+<p>I decided to split the system into the following primary components:</p>
+<ol>
+<li><strong>Backend Server:</strong> A Go application that manages tasks and orchestrates the AI agents.</li>
+<li><strong>Web Application:</strong> A React and TypeScript interface for creating and tracking tasks.</li>
+<li><strong>Runtime:</strong> A Docker image that contains the agent and all the tools it needs to execute the tasks.</li>
+</ol>
+<p>This separation of concerns keeps the architecture clean and scalable. The frontend is focused purely on user interaction, while the backend handles the heavy lifting of agent execution.</p>
+<pre class="mermaid">
+  sequenceDiagram
+participant Web App
+participant Kubernetes API
+participant Kubernetes Job
+participant Agent Runtime
+participant GitLab Repository
+
+    Web App-&gt;&gt;Kubernetes API: Request job creation for code execution
+    Kubernetes API-&gt;&gt;Kubernetes Job: Start job with Agent Runtime image
+    Kubernetes Job-&gt;&gt;Agent Runtime: Initialize runtime environment
+
+    par Log streaming and runtime execution
+        Agent Runtime-&gt;&gt;Web App: Stream job logs in real time
+    and
+        Agent Runtime-&gt;&gt;GitLab Repository: Clone repository
+        loop Execute code tasks
+            Agent Runtime-&gt;&gt;Agent Runtime: Execute code tasks
+        end
+        Agent Runtime-&gt;&gt;GitLab Repository: Push changes
+    end
+
+    Agent Runtime-&gt;&gt;Kubernetes API: Notify completion
+    Kubernetes API-&gt;&gt;Kubernetes Job: Terminate job
+    Kubernetes API-&gt;&gt;Web App: Job terminated, execution complete
+</pre><h2 id="the-implementation">The Implementation<a class="zola-anchor" href="#the-implementation" aria-label="Anchor link for: the-implementation" style="visibility: hidden;"></a>
+</h2>
+<h3 id="the-orchestrator">The Orchestrator<a class="zola-anchor" href="#the-orchestrator" aria-label="Anchor link for: the-orchestrator" style="visibility: hidden;"></a>
+</h3>
+<p>The heart of the system is the Go backend. When a new task is submitted, the backend doesn't run the agent itself. Instead, it dynamically creates and dispatches a <strong>Kubernetes Job</strong>.</p>
+<p>I chose this approach for a few key advantages:</p>
+<ul>
+<li><strong>Isolation:</strong> Each agent runs in its own sandboxed container.</li>
+<li><strong>Scalability:</strong> Kubernetes can handle running multiple jobs in parallel.</li>
+<li><strong>Resilience:</strong> Kubernetes provides robust error handling and reporting.</li>
+<li><strong>Observability:</strong> Our Kubernetes clusters are already orchestrated with our observability stack, so we get metrics and logs collection out of the box.</li>
+</ul>
+<p>The Go server exposes a simple REST API, constructs the Kubernetes Job, injects the necessary context (prompt, Git info, API keys), and monitors the job's status.</p>
+<p>Each task has the following structure:</p>
+<pre data-lang="go" class="language-go z-code"><code class="language-go" data-lang="go"><span class="z-source z-go"><span class="z-storage z-type z-keyword z-type z-go">type</span> <span class="z-entity z-name z-type z-go">Task</span> <span class="z-storage z-type z-keyword z-struct z-go">struct</span> <span class="z-meta z-type z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">ID</span>         <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">int</span></span>       <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;id&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">Prompt</span>     <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;prompt&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">Repository</span> <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;repository&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">Branch</span>     <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;branch&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">Status</span>     <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;status&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">JobName</span>    <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;job_name&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">UniqueID</span>   <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;unique_id&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">Duration</span>   <span class="z-keyword z-operator z-go">*</span><span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">int64</span></span>    <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;duration&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go">	<span class="z-variable z-other z-member z-declaration z-go">CreatedAt</span>  <span class="z-variable z-other z-go">time</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">Time</span> <span class="z-string z-quoted z-other z-go"><span class="z-punctuation z-definition z-string z-begin z-go">`</span>json:&quot;created_at&quot;<span class="z-punctuation z-definition z-string z-end z-go">`</span></span>
+</span></span><span class="z-source z-go"><span class="z-meta z-type z-go"><span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+</span></code></pre>
+<p>I used the <a rel="nofollow noreferrer" href="https://github.com/kubernetes/client-go">kubernetes/client-go</a> library to interact with the Kubernetes API. This means loading the Kubernetes config from either the in-cluster config or from a file, creating new jobs, monitoring their status, etc.</p>
+<p>I keep track of the created tasks in an in-memory list wrapper with a <code>sync.Mutex</code> to ensure thread-safety, but this will later be replaced with a database.</p>
+<h3 id="the-runtime">The Runtime<a class="zola-anchor" href="#the-runtime" aria-label="Anchor link for: the-runtime" style="visibility: hidden;"></a>
+</h3>
+<p>The Kubernetes Job runs the specific runtime Docker image. This container is the environment where the AI agent lives. It's equipped with all the tools it needs:</p>
+<ul>
+<li>Git command-line tools.</li>
+<li>API credentials for services like GitLab, Jira, and Coda, and Anthropic.</li>
+<li>Claude Code and MCP servers.</li>
+</ul>
+<p>The user's prompt is passed directly as a command-line argument to the agent process inside the container.</p>
+<p>Following is a sample Dockerfile for the runtime:</p>
+<pre data-lang="dockerfile" class="language-dockerfile z-code"><code class="language-dockerfile" data-lang="dockerfile"><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">FROM</span> ubuntu:<span class="z-entity z-name z-enum z-tag-digest">24.04</span>
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>apt-get update -y
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>apt-get install -y curl gnupg git sudo pipx
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>curl -fsSL https://deb.nodesource.com/setup_23.x | bash - &amp;&amp; apt-get install -y nodejs
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>useradd -m -u 1001 -s /bin/bash agent
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>echo <span class="z-string z-quoted z-double z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">&quot;</span>agent ALL=(ALL) NOPASSWD:ALL<span class="z-punctuation z-definition z-string z-end z-dockerfile">&quot;</span></span> | tee /etc/sudoers.d/agent
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">USER </span>agent
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">ENV </span>PATH=<span class="z-string z-quoted z-double z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">&quot;</span>/home/agent/.local/bin:/home/agent/.npm-global/bin:$PATH<span class="z-punctuation z-definition z-string z-end z-dockerfile">&quot;</span></span>
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>mkdir -p ~/.npm-global
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>npm config set prefix <span class="z-string z-quoted z-single z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">&#39;</span>~/.npm-global<span class="z-punctuation z-definition z-string z-end z-dockerfile">&#39;</span></span>
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>npm install -g @anthropic-ai/claude-code
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">RUN </span>pipx install uv
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">COPY</span> ./docker/entrypoint.sh /entrypoint.sh
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">WORKDIR </span>/src
+</span><span class="z-source z-dockerfile">
+</span><span class="z-source z-dockerfile"><span class="z-keyword z-operator z-dockerfile">ENTRYPOINT </span>[<span class="z-string z-quoted z-double z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">&quot;</span>/entrypoint.sh<span class="z-punctuation z-definition z-string z-end z-dockerfile">&quot;</span></span>]
+</span></code></pre>
+<p>And the entrypoint script:</p>
+<pre data-lang="bash" class="language-bash z-code"><code class="language-bash" data-lang="bash"><span class="z-source z-shell z-bash"><span class="z-comment z-line z-number-sign z-shell"><span class="z-punctuation z-definition z-comment z-begin z-shell">#</span></span><span class="z-comment z-line z-number-sign z-shell">!/usr/bin/env bash</span><span class="z-comment z-line z-number-sign z-shell">
+</span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-set z-shell">set</span></span><span class="z-meta z-function-call z-arguments z-shell"> -euo pipefail</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>z</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">ANTHROPIC_API_KEY</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Error: ANTHROPIC_API_KEY environment variable is required<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-exit z-shell">exit</span></span><span class="z-meta z-function-call z-arguments z-shell"> 1</span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>z</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GIT_REPO</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Error: GIT_REPO environment variable is required<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-exit z-shell">exit</span></span><span class="z-meta z-function-call z-arguments z-shell"> 1</span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span><span class="z-source z-shell z-bash"><span class="z-comment z-line z-number-sign z-shell"><span class="z-punctuation z-definition z-comment z-begin z-shell">#</span></span><span class="z-comment z-line z-number-sign z-shell"> --- snip ---</span><span class="z-comment z-line z-number-sign z-shell">
+</span></span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Setting up Claude configuration...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">mkdir</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>p</span> <span class="z-meta z-group z-expansion z-tilde"><span class="z-variable z-language z-tilde z-shell">~</span></span>/.claude</span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>{&quot;apiKeyHelper&quot;: &quot;~/.claude/anthropic_key.sh&quot;}<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span> <span class="z-keyword z-operator z-assignment z-redirection z-shell">&gt;</span> <span class="z-meta z-group z-expansion z-tilde"><span class="z-variable z-language z-tilde z-shell">~</span></span>/.claude/settings.json</span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">cat</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-keyword z-operator z-assignment z-redirection z-shell">&gt;</span> <span class="z-meta z-group z-expansion z-tilde"><span class="z-variable z-language z-tilde z-shell">~</span></span>/.claude/anthropic_key.sh <span class="z-string z-unquoted z-heredoc z-shell"><span class="z-keyword z-operator z-assignment z-redirection z-shell">&lt;&lt;</span> <span class="z-keyword z-control z-heredoc-token z-shell">EOF</span></span><span class="z-string z-unquoted z-heredoc z-shell">
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell">echo &quot;<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">ANTHROPIC_API_KEY</span></span>&quot;
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell"><span class="z-keyword z-control z-heredoc-token z-shell">EOF</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">chmod</span></span><span class="z-meta z-function-call z-arguments z-shell"> +x <span class="z-meta z-group z-expansion z-tilde"><span class="z-variable z-language z-tilde z-shell">~</span></span>/.claude/anthropic_key.sh</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Creating MCP Servers file..<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">cat</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-keyword z-operator z-assignment z-redirection z-shell">&gt;</span> /tmp/mcp.json <span class="z-string z-unquoted z-heredoc z-shell"><span class="z-keyword z-operator z-assignment z-redirection z-shell">&lt;&lt;</span> <span class="z-keyword z-control z-heredoc-token z-shell">EOF</span></span><span class="z-string z-unquoted z-heredoc z-shell">
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell">{
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell">    &quot;mcpServers&quot;: {
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell">      # --- snip ---
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell">    }
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell">}
+</span></span></span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-unquoted z-heredoc z-shell"><span class="z-keyword z-control z-heredoc-token z-shell">EOF</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Setting up git configuration...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> config<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>global</span> user.email ...</span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> config<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>global</span> user.name ...</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Cloning repository...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>n</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-expansion z-parameter z-begin z-shell">{</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-variable z-other z-readwrite z-shell">GIT_BRANCH</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-keyword z-operator z-assignment z-shell">:-</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-section z-expansion z-parameter z-end z-shell">}</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span> <span class="z-keyword z-operator z-logical z-and z-shell">&amp;&amp;</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-expansion z-parameter z-begin z-shell">{</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-variable z-other z-readwrite z-shell">GIT_BRANCH</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-keyword z-operator z-assignment z-shell">:-</span></span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-section z-expansion z-parameter z-end z-shell">}</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-keyword z-operator z-logical z-shell">!=</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span>
+</span><span class="z-source z-shell z-bash">    <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> clone https://<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GITLAB_USER</span></span>:<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GITLAB_TOKEN</span></span>@gitlab.company.com/<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GIT_REPO</span></span>.git<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>depth</span> 1<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>branch</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GIT_BRANCH</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-else z-shell">else</span>
+</span><span class="z-source z-shell z-bash">    <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> clone https://<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GITLAB_USER</span></span>:<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GITLAB_TOKEN</span></span>@gitlab.company.com/<span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GIT_REPO</span></span>.git<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>depth</span> 1</span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-cd z-shell">cd</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">repo_name</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-keyword z-operator z-logical z-shell">!</span> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>f</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>CLAUDE.md<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Warning: CLAUDE.md file not found in repository<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Running project setup script...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-keyword z-operator z-logical z-shell">!</span> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>f</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>agent-setup.sh<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Error: agent-setup.sh not found in repository<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-exit z-shell">exit</span></span><span class="z-meta z-function-call z-arguments z-shell"> 1</span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">bash</span></span><span class="z-meta z-function-call z-arguments z-shell"> agent-setup.sh</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Creating branch <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">branch_name</span></span>...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> checkout<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>b</span> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">branch_name</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Running claude with prompt: <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">prompt</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">claude</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>dangerously-skip-permissions</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>mcp-config</span> /tmp/mcp.json<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>verbose</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>output-format</span> stream-json<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>p</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">prompt</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Pushing changes...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> add<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>A</span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> commit<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>m</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">title</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> push origin <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">branch_name</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Creating merge request...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-comment z-line z-number-sign z-shell"><span class="z-punctuation z-definition z-comment z-begin z-shell">#</span></span><span class="z-comment z-line z-number-sign z-shell"> Get the default branch (usually main or master)</span><span class="z-comment z-line z-number-sign z-shell">
+</span></span><span class="z-source z-shell z-bash"><span class="z-variable z-other z-readwrite z-assignment z-shell">default_branch</span><span class="z-keyword z-operator z-assignment z-shell">=</span><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">git</span></span><span class="z-meta z-function-call z-arguments z-shell"> remote show origin</span> <span class="z-keyword z-operator z-logical z-pipe z-shell">|</span> <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">grep</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>HEAD branch<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span> <span class="z-keyword z-operator z-logical z-pipe z-shell">|</span> <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">cut</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span><span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span> <span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>f5</span></span><span class="z-punctuation z-section z-parens z-end z-shell">)</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>z</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">default_branch</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span>
+</span><span class="z-source z-shell z-bash">    <span class="z-variable z-other z-readwrite z-assignment z-shell">default_branch</span><span class="z-keyword z-operator z-assignment z-shell">=</span><span class="z-string z-unquoted z-shell"><span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>main<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Creating merge request...<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-variable z-other z-readwrite z-assignment z-shell">mr_response</span><span class="z-keyword z-operator z-assignment z-shell">=</span><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">curl</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>s</span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>X</span> POST <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">  -</span>H</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>PRIVATE-TOKEN: <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GITLAB_TOKEN</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">  -</span>H</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Content-Type: application/json<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">  -</span>d</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>{
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">    <span class="z-constant z-character z-escape z-shell">\&quot;</span>source_branch<span class="z-constant z-character z-escape z-shell">\&quot;</span>: <span class="z-constant z-character z-escape z-shell">\&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">branch_name</span></span><span class="z-constant z-character z-escape z-shell">\&quot;</span>,
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">    <span class="z-constant z-character z-escape z-shell">\&quot;</span>target_branch<span class="z-constant z-character z-escape z-shell">\&quot;</span>: <span class="z-constant z-character z-escape z-shell">\&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">default_branch</span></span><span class="z-constant z-character z-escape z-shell">\&quot;</span>,
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">    <span class="z-constant z-character z-escape z-shell">\&quot;</span>title<span class="z-constant z-character z-escape z-shell">\&quot;</span>: <span class="z-constant z-character z-escape z-shell">\&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">title</span></span><span class="z-constant z-character z-escape z-shell">\&quot;</span>,
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">    <span class="z-constant z-character z-escape z-shell">\&quot;</span>description<span class="z-constant z-character z-escape z-shell">\&quot;</span>: <span class="z-constant z-character z-escape z-shell">\&quot;</span>Automated changes generated by Agent<span class="z-constant z-character z-escape z-shell">\\</span>n<span class="z-constant z-character z-escape z-shell">\\</span>nPrompt: <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">prompt</span></span><span class="z-constant z-character z-escape z-shell">\&quot;</span>,
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">    <span class="z-constant z-character z-escape z-shell">\&quot;</span>squash<span class="z-constant z-character z-escape z-shell">\&quot;</span>: true,
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">    <span class="z-constant z-character z-escape z-shell">\&quot;</span>remove_source_branch<span class="z-constant z-character z-escape z-shell">\&quot;</span>: true
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell"><span class="z-string z-quoted z-double z-shell">  }<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-punctuation z-separator z-continuation z-line z-shell">\
+</span></span></span></span></span><span class="z-source z-shell z-bash"><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-meta z-function-call z-arguments z-shell">  <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>https://gitlab.company.com/api/v4/projects/<span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">GIT_REPO</span></span></span> <span class="z-keyword z-operator z-logical z-pipe z-shell">|</span> <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">sed</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>s/\//%2F/g<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span></span><span class="z-punctuation z-section z-parens z-end z-shell">)</span></span>/merge_requests<span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span><span class="z-punctuation z-section z-parens z-end z-shell">)</span></span></span>
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash">
+</span><span class="z-source z-shell z-bash"><span class="z-variable z-other z-readwrite z-assignment z-shell">mr_url</span><span class="z-keyword z-operator z-assignment z-shell">=</span><span class="z-string z-unquoted z-shell"><span class="z-meta z-group z-expansion z-command z-parens z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-punctuation z-section z-parens z-begin z-shell">(</span><span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">mr_response</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span> <span class="z-keyword z-operator z-logical z-pipe z-shell">|</span> <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">grep</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>o</span> <span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>&quot;web_url&quot;:&quot;[^&quot;]*&quot;<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span></span> <span class="z-keyword z-operator z-logical z-pipe z-shell">|</span> <span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">cut</span></span><span class="z-meta z-function-call z-arguments z-shell"><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>d</span><span class="z-string z-quoted z-single z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&#39;</span>&quot;<span class="z-punctuation z-definition z-string z-end z-shell">&#39;</span></span><span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>f4</span></span><span class="z-punctuation z-section z-parens z-end z-shell">)</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-if z-shell">if</span> <span class="z-support z-function z-test z-begin z-shell">[</span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell">-</span>n</span> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span><span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">mr_url</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span> <span class="z-support z-function z-test z-end z-shell">]</span></span><span class="z-keyword z-operator z-logical z-continue z-shell">;</span> <span class="z-keyword z-control z-conditional z-then z-shell">then</span>
+</span><span class="z-source z-shell z-bash">    <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Merge request created successfully: <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">mr_url</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-else z-shell">else</span>
+</span><span class="z-source z-shell z-bash">    <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-echo z-shell">echo</span></span><span class="z-meta z-function-call z-arguments z-shell"> <span class="z-string z-quoted z-double z-shell"><span class="z-punctuation z-definition z-string z-begin z-shell">&quot;</span>Failed to create merge request. Response: <span class="z-meta z-group z-expansion z-parameter z-shell"><span class="z-punctuation z-definition z-variable z-shell">$</span><span class="z-variable z-other z-readwrite z-shell">mr_response</span></span><span class="z-punctuation z-definition z-string z-end z-shell">&quot;</span></span></span>
+</span><span class="z-source z-shell z-bash">    <span class="z-meta z-function-call z-shell"><span class="z-support z-function z-exit z-shell">exit</span></span><span class="z-meta z-function-call z-arguments z-shell"> 1</span>
+</span><span class="z-source z-shell z-bash"><span class="z-keyword z-control z-conditional z-end z-shell">fi</span>
+</span></code></pre>
+<p>As you can see, the entrypoint script takes care of the following:</p>
+<ul>
+<li>Setting up the GitLab credentials.</li>
+<li>Setting up Claude Code &amp; MCP servers.</li>
+<li>Cloning the repository.</li>
+<li>Running the project-specific setup script. This is needed to install dependencies, run database migrations, or set up any other project-specific tooling.</li>
+<li>Creating a new branch.</li>
+<li>Running the agent with the prompt.</li>
+<li>Pushing the changes to the repository.</li>
+<li>Creating a merge request.</li>
+</ul>
+<h3 id="the-frontend">The Frontend<a class="zola-anchor" href="#the-frontend" aria-label="Anchor link for: the-frontend" style="visibility: hidden;"></a>
+</h3>
+<p>The frontend is a straightforward application built with Vite &amp; React. A form allows the users to input the three key pieces of information for a task:</p>
+<ol>
+<li><strong>Prompt:</strong> The high-level instruction for the agent.</li>
+<li><strong>Repository:</strong> The path to the Git repository.</li>
+<li><strong>Branch:</strong> The specific branch to check out (optional).</li>
+</ol>
+<p>Once a task is submitted, it appears in a table that shows its status and auto-refreshes. Clicking a task streams the logs directly from the Kubernetes pod, which is crucial for seeing what the agent is doing.</p>
+<h2 id="project-specific-context">Project-Specific Context<a class="zola-anchor" href="#project-specific-context" aria-label="Anchor link for: project-specific-context" style="visibility: hidden;"></a>
+</h2>
+<p>One of the most powerful features is how the system understands the context of a specific project. It does this by looking for two special files in the root of the target repository:</p>
+<ol>
+<li>
+<p><code>agent-setup.sh</code>: A shell script the agent executes first. I use this to install dependencies (e.g. <code>pnpm install</code>), run database migrations, or set up any other project-specific tooling.</p>
+</li>
+<li>
+<p><code>CLAUDE.md</code>: A Markdown file with instructions for the AI model itself—a "meta-prompt" that guides the agent. Here, I can specify which test commands to use, coding style guidelines, or things the agent <em>should not</em> do.</p>
+</li>
+</ol>
+<p>This mechanism makes the system incredibly flexible without requiring any changes to the orchestrator itself.</p>
+<h2 id="a-user-s-journey">A User's Journey<a class="zola-anchor" href="#a-user-s-journey" aria-label="Anchor link for: a-user-s-journey" style="visibility: hidden;"></a>
+</h2>
+<p>Let's walk through a typical use case.</p>
+<ol>
+<li><strong>The Request:</strong> I want to add a health check endpoint to my new web service.</li>
+<li><strong>The Setup:</strong> In the service's repository, I create a <code>CLAUDE.md</code> file for general-purpose project instructions that says, "This project uses Go. All new endpoints should be added in <code>server.go</code> and include a unit test."</li>
+<li><strong>The Submission:</strong> I go to the web UI and create a new task with the prompt, "Add a <code>/health</code> endpoint that returns a 200 OK status," along with the repository and branch.</li>
+<li><strong>The Orchestration:</strong> The Go backend creates a Kubernetes job.</li>
+<li><strong>The Execution:</strong> The agent starts, clones the repo, reads the <code>CLAUDE.md</code> file, and then edits <code>server.go</code> to add the endpoint and a corresponding test.</li>
+<li><strong>The Monitoring:</strong> On the UI, I can see the status change from <code>pending</code> to <code>running</code> and watch the logs.</li>
+<li><strong>The Completion:</strong> Once the agent commits and pushes the code, the job completes, and the UI updates to <code>completed</code>.</li>
+</ol>
+<h2 id="conclusion">Conclusion<a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion" style="visibility: hidden;"></a>
+</h2>
+<p>Building this AI agent orchestrator has been a fascinating project, combining Go, React, Kubernetes, and LLMs into a practical tool. Using Kubernetes for execution makes the system scalable and robust, and the project-specific context files make the agent highly adaptable.</p>
+<p>This project has shown immense value to the organization in both cost and time savings. It's sometimes best used as the first step toward implementing a complex feature, and at other times it manages to deliver the feature in a fraction of the time.</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+    
+    
+    <button id="theme-toggle" aria-label="theme switch">
+      <span class="moon-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.729 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27098 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60547 8.2379 4.938C5.71611 6.28423 4 8.9417 4 12Z" fill="currentColor"></path></svg>
+</span>
+      <span class="sun-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z" fill="currentColor"></path></svg>
+</span>
+    </button>
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>
