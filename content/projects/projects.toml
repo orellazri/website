@@ -21,6 +21,13 @@ featured = false
 
 [[collection]]
 type = "card_simple"
+title = "AI Conventional Commits"
+link = "https://github.com/orellazri/conventional-commits-ai"
+content = "Generate conventional commit messages with AI"
+featured = false
+
+[[collection]]
+type = "card_simple"
 title = "GitHub Backup"
 link = "https://github.com/orellazri/github-backup"
 content = "Back up your GitHub repositories to a compressed tar archive"
