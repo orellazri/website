@@ -1,5 +1,5 @@
 +++
-title = "Migrating From Raindrop to Linkding"
+title = "Migrating My Bookmarks From Raindrop to Linkding"
 date = "2025-12-13"
 
 [taxonomies]
