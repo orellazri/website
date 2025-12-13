@@ -3,7 +3,7 @@ title = "Self Hosting On a Hetzner VM: Terraform, Ansible, Docker"
 date = "2024-02-27"
 
 [taxonomies]
-tags=["devops"]
+tags=["devops", "self-hosting"]
 +++
 
 I started my self-hosting journey a few years back with a single desktop machine serving as both my NAS and the host for all the services I was running.
@@ -134,13 +134,13 @@ Here are some useful tasks that you may find yourself using as well:
 - name: Configure sshd login
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.line }}'
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
     state: present
   loop:
-    - {regexp: ^PermitRootLogin, line: PermitRootLogin no}
-    - {regexp: ^PasswordAuthentication, line: PasswordAuthentication no}
-    - {regexp: ^KbdInteractiveAuthentication, line: KbdInteractiveAuthentication no}
+    - { regexp: ^PermitRootLogin, line: PermitRootLogin no }
+    - { regexp: ^PasswordAuthentication, line: PasswordAuthentication no }
+    - { regexp: ^KbdInteractiveAuthentication, line: KbdInteractiveAuthentication no }
 
 - name: Restart SSH server
   service:
@@ -218,12 +218,12 @@ Here are some useful tasks that you may find yourself using as well:
       copy:
         src: /tmp/lazydocker
         dest: /usr/local/bin/lazydocker
-        mode: '0755'
+        mode: "0755"
         remote_src: true
 
     - name: Remove temporary lazydocker files
       file:
-        path: '{{ item }}'
+        path: "{{ item }}"
         state: absent
       loop:
         - /tmp/lazydocker.tar.gz
@@ -235,10 +235,10 @@ Here are some useful tasks that you may find yourself using as well:
 ```yaml
 - name: Synchronize stacks
   template:
-    src: '{{ item }}'
-    dest: '/home/<user>/stacks/{{ item | basename }}'
+    src: "{{ item }}"
+    dest: "/home/<user>/stacks/{{ item | basename }}"
     owner: <user>
-    mode: '0644'
+    mode: "0644"
   with_fileglob:
     - templates/stacks/*.yml
   tags: stacks
@@ -252,14 +252,14 @@ Here are some useful tasks that you may find yourself using as well:
     path: /mnt/Storage
     state: directory
     owner: <user>
-    mode: '0755'
+    mode: "0755"
 
 - name: Mount storage box
   mount:
     path: /mnt/Storage
-    src: '{{ hcloud_storage_box_path }}'
+    src: "{{ hcloud_storage_box_path }}"
     fstype: cifs
-    opts: 'iocharset=utf8,rw,user={{ hcloud_storage_box_username }},pass={{ hcloud_storage_box_password }},uid=1000,gid=1000,file_mode=0660,dir_mode=0770'
+    opts: "iocharset=utf8,rw,user={{ hcloud_storage_box_username }},pass={{ hcloud_storage_box_password }},uid=1000,gid=1000,file_mode=0660,dir_mode=0770"
     state: mounted
 ```
 
@@ -274,10 +274,10 @@ Here are some compose files that can come in handy (make sure to change the vari
 ### NGINX Proxy Manager
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   app:
-    image: 'jc21/nginx-proxy-manager:latest'
+    image: "jc21/nginx-proxy-manager:latest"
     container_name: nginx-proxy-manager
     restart: unless-stopped
     network_mode: host
@@ -289,7 +289,7 @@ services:
 ### Nextcloud
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   mariadb:
     image: mariadb:10.6

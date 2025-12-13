@@ -3,7 +3,7 @@ title = "Beginning My Smart Home Journey with Zigbee"
 date = "2025-01-19"
 
 [taxonomies]
-tags=["smart-home"]
+tags=["smart-home", "self-hosting"]
 +++
 
 In the last few weeks, I've been wanting to make my home smarter, in an efficient and secure way.
@@ -15,6 +15,7 @@ That's where I stubmled upon Zigbee and got into this rabbit hole.
 ## What is Zigbee?
 
 From Wikipedia:
+
 > Zigbee is a ... specification for a suite of high-level communication protocols used to create personal area networks with small, low-power digital radios, such as for home automation, ... designed for small scale projects which need wireless connection. Hence, Zigbee is a low-power, low-data-rate, and close proximity (i.e., personal area) wireless ad hoc network.
 
 What that means for me is that my Zigbee-powered smart devices can be on a network of their own, with no access to the internet (since they don't receive IP addresses).
