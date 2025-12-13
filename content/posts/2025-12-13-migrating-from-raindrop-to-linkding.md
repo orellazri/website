@@ -6,11 +6,13 @@ date = "2025-12-13"
 tags=["self-hosting", "ai"]
 +++
 
-I recently decided to migrate my bookmarks from Raindrop.io to [Linkding](https://github.com/sissbruecker/linkding), a self-hosted bookmark manager. I rather own my bookmarks' data instead of using a third-party service for this simple use-case. While Linkding has a built-in HTML import feature, it doesn't preserve the folder structure from Raindrop so all bookmarks end up unorganized. It doesn't help that Raindrop uses a folder structure, while Linkding uses a tag-based system (with a nifty feature called "Bundles" on top of that).
+I recently decided to migrate my bookmarks from Raindrop.io to [Linkding](https://github.com/sissbruecker/linkding), a self-hosted bookmark manager. I rather own my bookmarks' data instead of using a third-party service for this simple use-case.
+
+While Linkding has a built-in HTML import feature, it doesn't preserve the folder structure from Raindrop so all bookmarks end up unorganized. It also doesn't help that Raindrop uses a folder structure, while Linkding uses a tag-based system (with a nifty feature called "Bundles" on top of that).
 
 ## Let's ask AI to automate this for us!
 
-I spun up a local intance of Linkding (See [Linkding#Using Docker](https://linkding.link/installation/#using-docker)), mounted the data directory so I have access to the SQLite database files, navigated into it and fired up Claude Code.
+I spun up a local intance of Linkding (See [Linkding#Using Docker](https://linkding.link/installation/#using-docker)), mounted the data directory so I could have access to the SQLite database files, navigated into it and fired up Claude Code.
 
 I had to give Claude Code all the necessary context so that it could successfully finish the task. I asked it to:
 
@@ -74,12 +76,10 @@ And that's it!
 The script follows these rules:
 
 1. **Tag normalization**: All tags are lowercase with dashes
-
    - "3D Printing" → `3d-printing`
    - "Mechanical Keyboards" → `mechanical-keyboards`
 
 2. **Nested folders**: Only the deepest folder becomes a tag
-
    - Bookmark in "Software > Rust" → gets tag `rust`
 
 3. **All tags are created**: Even parent folders become separate tags for organization
