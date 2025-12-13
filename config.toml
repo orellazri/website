@@ -1,7 +1,6 @@
 base_url = "https://orellazri.com"
 title = "Orel Lazri"
 default_language = "en"
-
 compile_sass = true
 minify_html = false
 build_search_index = false
@@ -36,14 +35,10 @@ sections = [
   { name = "rss", path = "/atom.xml", is_external = false },
 ]
 blog_section_path = "/posts"
-
-back_link_text = "Back" # Text of the back button
-force_theme = false # false | "light" | "dark"
-
+back_link_text = "Back"  # Text of the back button
+force_theme = "dark"  # false | "light" | "dark"
 not_found_error_text = "404 Not Found"
 not_found_recover_text = "« back to home »"
-
 footer_copyright = ""
 footer_credits = false
-
 reaction = false
