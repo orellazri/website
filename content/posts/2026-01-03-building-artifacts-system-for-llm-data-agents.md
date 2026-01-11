@@ -4,6 +4,9 @@ date = "2026-01-03"
 
 [taxonomies]
 tags=["ai", "coding"]
+
+[extra]
+mermaid = true
 +++
 
 At my day job, I've been working on an AI-powered data assistant that helps users query and analyze advertising campaign data through natural language. The initial version worked great for one-off questions, but I quickly discovered a fundamental challenge that was costing us both time and money. The AI had no memory of what data it had just fetched, unless it was stored in the context window.
@@ -152,6 +155,45 @@ User: "Compare that to the previous week"
 ```
 
 One database query, four analyses. The data stays consistent throughout. The user can keep drilling down, pivoting, and comparing without ever triggering another warehouse query.
+
+{% mermaid() %}
+sequenceDiagram
+    autonumber
+    actor User
+    participant Agent as AI Orchestrator
+    participant Tools as Processing Tools
+    participant Artifacts as Artifact Database
+    participant Warehouse as Data Warehouse
+
+    Note over User, Warehouse: Turn 1: Initial Query
+    User->>Agent: "Show me sales for last month"
+    Agent->>Tools: Request Data Retrieval
+    Tools->>Warehouse: Execute SQL Query
+    Warehouse-->>Tools: Raw Data (10k rows)
+    Tools->>Artifacts: Save Data as JSON
+    Artifacts-->>Tools: Return Artifact ID (UUID)
+    Tools-->>Agent: Return Summary + Artifact ID
+    Agent-->>User: "I found the data. (Artifact ID: 123)"
+
+    Note over User, Warehouse: Turn 2: Transformation
+    User->>Agent: "Now group that by region"
+    Agent->>Tools: Request Transformation (ID: 123)
+    Tools->>Artifacts: Load Data (ID: 123)
+    Artifacts-->>Tools: JSON Data
+    Tools->>Tools: In-Memory SQL Processing (DuckDB)
+    Tools->>Artifacts: Save Grouped Data
+    Artifacts-->>Tools: New Artifact ID (UUID: 456)
+    Tools-->>Agent: New Summary + New ID
+    Agent-->>User: "Grouped. Want to see a chart?"
+
+    Note over User, Warehouse: Turn 3: Visualization
+    User->>Agent: "Yes, make it a bar chart"
+    Agent->>Tools: Generate Widget (ID: 456)
+    Tools->>Artifacts: Read Data
+    Tools->>Tools: Analyze Structure & Create Config
+    Tools-->>Agent: Chart Configuration
+    Agent-->>User: Displays Bar Chart
+{% end %}
 
 ## Wrapping Up
 
