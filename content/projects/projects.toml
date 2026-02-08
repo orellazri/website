@@ -7,6 +7,13 @@ featured = false
 
 [[collection]]
 type = "card_simple"
+title = "Laterfeed"
+link = "https://github.com/orellazri/laterfeed"
+content = "Self-hosted read-it-later service that serves your saved links as an Atom feed"
+featured = false
+
+[[collection]]
+type = "card_simple"
 title = "Coda MCP"
 link = "https://github.com/orellazri/coda-mcp"
 content = "MCP Server for Coda"
@@ -39,4 +46,3 @@ title = "Todoist Backup Exporter"
 link = "https://github.com/orellazri/todoist-backup-exporter"
 content = "Export your last Todoist backup archive"
 featured = false
-
