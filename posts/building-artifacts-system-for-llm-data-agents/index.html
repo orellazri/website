@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Building an Artifacts System for Our LLM Data Agents</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#when-every-question-starts-from-scratch">When Every Question Starts from Scratch</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#store-big-sample-small-query-on-demand">Store Big, Sample Small, Query on Demand</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#conversation-flow-example">Conversation Flow Example</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#wrapping-up">Wrapping Up</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Building an Artifacts System for Our LLM Data Agents</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Jan 3, 2026</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/ai"><span>#</span>ai</a><a class="instant" href="https://orellazri.com/tags/coding"><span>#</span>coding</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>At my day job, I've been working on an AI-powered data assistant that helps users query and analyze advertising campaign data through natural language. The initial version worked great for one-off questions, but I quickly discovered a fundamental challenge that was costing us both time and money. The AI had no memory of what data it had just fetched, unless it was stored in the context window.</p>
+<h2 id="when-every-question-starts-from-scratch">When Every Question Starts from Scratch<a class="zola-anchor" href="#when-every-question-starts-from-scratch" aria-label="Anchor link for: when-every-question-starts-from-scratch" style="visibility: hidden;"></a>
+</h2>
+<p>Consider this scenario: a user asks "Show me the spend and CPM for my campaigns during last Christmas" (spend and CPM are ad-related metrics). The assistant generates SQL, queries the data warehouse, and returns 500 rows of campaign data. Great.</p>
+<p>Then the user asks: "Filter that to just the top 10 by spend."</p>
+<p>Without a memory system, the assistant faced two problematic options. The first was to re-query the database entirely. This meant generating a new SQL query, hitting the data warehouse again, and potentially returning different results if the underlying data had changed, even slightly, between requests. Users expect to manipulate the same data they just saw, not a fresh snapshot.</p>
+<p>The second option was to keep all 500 rows in the conversation context. While modern models support impressive context lengths, stuffing hundreds of database rows into that window consumes tokens rapidly, increases costs, and can degrade response quality as the model struggles to find relevant information in a sea of data.</p>
+<p>Neither worked well. I needed something smarter.</p>
+<h2 id="store-big-sample-small-query-on-demand">Store Big, Sample Small, Query on Demand<a class="zola-anchor" href="#store-big-sample-small-query-on-demand" aria-label="Anchor link for: store-big-sample-small-query-on-demand" style="visibility: hidden;"></a>
+</h2>
+<p>The insight that unlocked the solution was simple: the LLM doesn't need to <em>see</em> all the data to <em>understand</em> it. A three-row sample tells the model everything it needs to know about column names and data types. The full dataset can live elsewhere, ready to be queried when needed.</p>
+<p>This led to the artifacts system:</p>
+<ol>
+<li><strong>PostgreSQL</strong> stores the full dataset as JSON with a unique artifact ID</li>
+<li><strong>DuckDB</strong> handles in-memory SQL queries against stored artifacts</li>
+<li><strong>The LLM</strong> only sees the artifact ID, row count, and a small sample</li>
+</ol>
+<p>I store artifacts in PostgreSQL using a simple model with JSONB for the data column:</p>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">class</span><span class="z-entity z-name"> ConversationArtifact</span><span>(</span><span class="z-entity">Base</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span>    __tablename__</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">conversation_artifacts</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">    id</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span class="z-constant">UUID</span><span>,</span><span class="z-variable"> primary_key</span><span class="z-keyword">=</span><span class="z-constant">True</span><span>,</span><span class="z-variable"> default</span><span class="z-keyword">=</span><span>uuid</span><span>.</span><span>uuid4</span><span>)</span></span>
+<span class="giallo-l"><span>    conversation_id</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span>String</span><span>,</span><span class="z-variable"> nullable</span><span class="z-keyword">=</span><span class="z-constant">False</span><span>)</span></span>
+<span class="giallo-l"><span>    data</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span class="z-constant">JSONB</span><span>,</span><span class="z-variable"> nullable</span><span class="z-keyword">=</span><span class="z-constant">False</span><span>)</span></span>
+<span class="giallo-l"><span>    created_at</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span>DateTime</span><span>,</span><span class="z-variable"> server_default</span><span class="z-keyword">=</span><span>func</span><span>.</span><span>now</span><span>(</span><span>)</span><span>)</span></span></code></pre>
+<p>Why JSONB? Different queries return different columns. A spend report has different fields than a performance breakdown. JSONB lets me store any shape of data without schema migrations every time I add a new query type.</p>
+<p>When the agent fetches data from the warehouse, I store the full result but only return a sample to the LLM. It looks something like this:</p>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> get_data</span><span>(</span><span class="z-variable z-parameter z-function">query_params</span><span>:</span><span class="z-support"> dict</span><span>)</span><span> -&gt;</span><span class="z-support"> dict</span><span>:</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Execute SQL against the data warehouse</span></span>
+<span class="giallo-l"><span>    df</span><span class="z-keyword"> =</span><span> run_sql_query</span><span>(</span><span>generated_sql</span><span>)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Store full dataset in PostgreSQL</span></span>
+<span class="giallo-l"><span>    artifact</span><span class="z-keyword"> =</span><span> artifact_repo</span><span>.</span><span>insert</span><span>(</span></span>
+<span class="giallo-l"><span class="z-variable">        conversation_id</span><span class="z-keyword">=</span><span>conversation_id</span><span>,</span></span>
+<span class="giallo-l"><span class="z-variable">        data</span><span class="z-keyword">=</span><span>df</span><span>.</span><span>to_json</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span>    )</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Return only what the LLM needs</span></span>
+<span class="giallo-l"><span class="z-keyword">    return</span><span> {</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">artifact_id</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> str</span><span>(</span><span>artifact</span><span>.</span><span>id</span><span>)</span><span>,</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">sample</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span> df</span><span>.</span><span>head</span><span>(</span><span class="z-constant">3</span><span>)</span><span>.</span><span>to_dict</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span><span>,</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">total_rows</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> len</span><span>(</span><span>df</span><span>)</span><span>,</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">columns</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> list</span><span>(</span><span>df</span><span>.</span><span>columns</span><span>)</span></span>
+<span class="giallo-l"><span>    }</span></span></code></pre>
+<p>The LLM receives something like:</p>
+<pre class="giallo z-code"><code data-lang="json"><span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">artifact_id</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">abc-123</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span></span>
+<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">sample</span><span class="z-support">&quot;</span><span>:</span><span> [</span></span>
+<span class="giallo-l"><span>    {</span><span class="z-support"> &quot;</span><span class="z-support">campaign</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Holiday Sale</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">spend</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 1500.0</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">cpm</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 2.34</span><span> }</span><span>,</span></span>
+<span class="giallo-l"><span>    {</span><span class="z-support"> &quot;</span><span class="z-support">campaign</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Winter Promo</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">spend</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 1200.0</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">cpm</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 1.98</span><span> }</span><span>,</span></span>
+<span class="giallo-l"><span>    {</span><span class="z-support"> &quot;</span><span class="z-support">campaign</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Year End</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">spend</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 980.0</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">cpm</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 2.1</span><span> }</span></span>
+<span class="giallo-l"><span>  ]</span><span>,</span></span>
+<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">total_rows</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 500</span><span>,</span></span>
+<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">columns</span><span class="z-support">&quot;</span><span>:</span><span> [</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">campaign</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">spend</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">cpm</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">impressions</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">clicks</span><span class="z-punctuation z-definition z-string">&quot;</span><span>]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Three rows is enough for the model to understand the data structure. It knows there's a "spend" column with decimal values, a "campaign" column with strings, and so on. The full 500 rows stay safely in PostgreSQL.</p>
+<p>And for the last part - this is where the magic happens. When users want to filter, aggregate, or transform their data, we can load the artifact into DuckDB and run SQL against it by exposing another tool to the agent:</p>
+<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> execute_sql_on_dataframe</span><span>(</span><span class="z-variable z-parameter z-function">artifact_ids</span><span>:</span><span> list</span><span>[</span><span class="z-support">str</span><span>]</span><span>,</span><span class="z-variable z-parameter z-function"> query</span><span>:</span><span class="z-support"> str</span><span>)</span><span> -&gt;</span><span class="z-support"> dict</span><span>:</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Load artifacts from PostgreSQL</span></span>
+<span class="giallo-l"><span>    artifacts</span><span class="z-keyword"> =</span><span> [</span><span>artifact_repo</span><span>.</span><span>get_by_id</span><span>(</span><span class="z-support">id</span><span>)</span><span class="z-keyword"> for</span><span class="z-support"> id</span><span class="z-keyword"> in</span><span> artifact_ids</span><span>]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Create ephemeral DuckDB connection (in-memory)</span></span>
+<span class="giallo-l"><span>    conn</span><span class="z-keyword"> =</span><span> duckdb</span><span>.</span><span>connect</span><span>(</span><span>)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Register each artifact as a table</span></span>
+<span class="giallo-l"><span class="z-keyword">    for</span><span> i</span><span>,</span><span> artifact</span><span class="z-keyword"> in</span><span class="z-support"> enumerate</span><span>(</span><span>artifacts</span><span>)</span><span>:</span></span>
+<span class="giallo-l"><span>        df</span><span class="z-keyword"> =</span><span> pd</span><span>.</span><span>read_json</span><span>(</span><span>StringIO</span><span>(</span><span>artifact</span><span>.</span><span>data</span><span>)</span><span>)</span></span>
+<span class="giallo-l"><span>        conn</span><span>.</span><span>register</span><span>(</span><span class="z-storage z-type">f</span><span class="z-string">&quot;</span><span class="z-string">df_</span><span class="z-constant">{</span><span>i</span><span class="z-constant">}</span><span class="z-string">&quot;</span><span>,</span><span> df</span><span>)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Execute the SQL query</span></span>
+<span class="giallo-l"><span>    result_df</span><span class="z-keyword"> =</span><span> conn</span><span>.</span><span>sql</span><span>(</span><span>query</span><span>)</span><span>.</span><span>df</span><span>(</span><span>)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Store result as a new artifact</span></span>
+<span class="giallo-l"><span>    new_artifact</span><span class="z-keyword"> =</span><span> artifact_repo</span><span>.</span><span>insert</span><span>(</span></span>
+<span class="giallo-l"><span class="z-variable">        conversation_id</span><span class="z-keyword">=</span><span>conversation_id</span><span>,</span></span>
+<span class="giallo-l"><span class="z-variable">        data</span><span class="z-keyword">=</span><span>result_df</span><span>.</span><span>to_json</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"><span>    )</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">    return</span><span> {</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">artifact_id</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> str</span><span>(</span><span>new_artifact</span><span>.</span><span>id</span><span>)</span><span>,</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">results</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span> result_df</span><span>.</span><span>to_dict</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span><span>,</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">total_rows</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> len</span><span>(</span><span>result_df</span><span>)</span></span>
+<span class="giallo-l"><span>    }</span></span></code></pre>
+<p>I chose DuckDB for a few reasons:</p>
+<ul>
+<li><strong>Native Pandas integration</strong> - <code>conn.register()</code> turns a DataFrame into a queryable table with zero serialization overhead</li>
+<li><strong>Full SQL support</strong> - Including JOINs across multiple artifacts, window functions, CTEs, everything</li>
+<li><strong>In-memory and ephemeral</strong> - No disk management, no cleanup, connections are garbage collected automatically</li>
+<li><strong>Fast</strong> - DuckDB is optimized for analytical queries on columnar data</li>
+</ul>
+<p>The consistent table naming (<code>df_0</code>, <code>df_1</code>, etc.) is important. It makes the LLM's job predictable when generating SQL for multi-artifact queries. We instruct the LLM to use these table names in the order of the artifact IDs it receives so it can reference the correct data.</p>
+<h2 id="conversation-flow-example">Conversation Flow Example<a class="zola-anchor" href="#conversation-flow-example" aria-label="Anchor link for: conversation-flow-example" style="visibility: hidden;"></a>
+</h2>
+<p>Here's how a multi-turn conversation actually works:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>User: &quot;Show me spend by line item for last week&quot;</span></span>
+<span class="giallo-l"><span>  → get_data executes</span></span>
+<span class="giallo-l"><span>  → artifact_abc created (847 rows)</span></span>
+<span class="giallo-l"><span>  → LLM sees: 3-row sample + &quot;847 total rows&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>User: &quot;Which ones have CTR below 0.5%?&quot;</span></span>
+<span class="giallo-l"><span>  → execute_sql_on_dataframe([&quot;artifact_abc&quot;],</span></span>
+<span class="giallo-l"><span>      &quot;SELECT * FROM df_0 WHERE ctr &lt; 0.005&quot;)</span></span>
+<span class="giallo-l"><span>  → artifact_def created (127 rows)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>User: &quot;Sum the spend for those&quot;</span></span>
+<span class="giallo-l"><span>  → execute_sql_on_dataframe([&quot;artifact_def&quot;],</span></span>
+<span class="giallo-l"><span>      &quot;SELECT SUM(spend) as total_spend FROM df_0&quot;)</span></span>
+<span class="giallo-l"><span>  → Returns: $45,230</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>User: &quot;Compare that to the previous week&quot;</span></span>
+<span class="giallo-l"><span>  → get_data for previous week → artifact_ghi</span></span>
+<span class="giallo-l"><span>  → execute_sql_on_dataframe([&quot;artifact_def&quot;, &quot;artifact_ghi&quot;],</span></span>
+<span class="giallo-l"><span>      &quot;SELECT &#39;current&#39; as period, SUM(spend) FROM df_0</span></span>
+<span class="giallo-l"><span>       UNION ALL</span></span>
+<span class="giallo-l"><span>       SELECT &#39;previous&#39; as period, SUM(spend) FROM df_1&quot;)</span></span></code></pre>
+<p>One database query, four analyses. The data stays consistent throughout. The user can keep drilling down, pivoting, and comparing without ever triggering another warehouse query.</p>
+<pre class="mermaid">
+  sequenceDiagram
+    autonumber
+    actor User
+    participant Agent as AI Orchestrator
+    participant Tools as Processing Tools
+    participant Artifacts as Artifact Database
+    participant Warehouse as Data Warehouse
+
+    Note over User, Warehouse: Turn 1: Initial Query
+    User-&gt;&gt;Agent: &quot;Show me sales for last month&quot;
+    Agent-&gt;&gt;Tools: Request Data Retrieval
+    Tools-&gt;&gt;Warehouse: Execute SQL Query
+    Warehouse--&gt;&gt;Tools: Raw Data (10k rows)
+    Tools-&gt;&gt;Artifacts: Save Data as JSON
+    Artifacts--&gt;&gt;Tools: Return Artifact ID (UUID)
+    Tools--&gt;&gt;Agent: Return Summary + Artifact ID
+    Agent--&gt;&gt;User: &quot;I found the data. (Artifact ID: 123)&quot;
+
+    Note over User, Warehouse: Turn 2: Transformation
+    User-&gt;&gt;Agent: &quot;Now group that by region&quot;
+    Agent-&gt;&gt;Tools: Request Transformation (ID: 123)
+    Tools-&gt;&gt;Artifacts: Load Data (ID: 123)
+    Artifacts--&gt;&gt;Tools: JSON Data
+    Tools-&gt;&gt;Tools: In-Memory SQL Processing (DuckDB)
+    Tools-&gt;&gt;Artifacts: Save Grouped Data
+    Artifacts--&gt;&gt;Tools: New Artifact ID (UUID: 456)
+    Tools--&gt;&gt;Agent: New Summary + New ID
+    Agent--&gt;&gt;User: &quot;Grouped. Want to see a chart?&quot;
+
+    Note over User, Warehouse: Turn 3: Visualization
+    User-&gt;&gt;Agent: &quot;Yes, make it a bar chart&quot;
+    Agent-&gt;&gt;Tools: Generate Widget (ID: 456)
+    Tools-&gt;&gt;Artifacts: Read Data
+    Tools-&gt;&gt;Tools: Analyze Structure &amp; Create Config
+    Tools--&gt;&gt;Agent: Chart Configuration
+    Agent--&gt;&gt;User: Displays Bar Chart
+</pre><h2 id="wrapping-up">Wrapping Up<a class="zola-anchor" href="#wrapping-up" aria-label="Anchor link for: wrapping-up" style="visibility: hidden;"></a>
+</h2>
+<p>The artifacts pattern turned out to be simpler than I expected and more powerful than I hoped. The core idea is straightforward: store the full data externally, give the LLM a reference and a sample, let it request operations on demand.</p>
+<p>This solution reduced latency, saved us money, allowed our users to query for thousands of rows, and significantly reduced LLM hallucinations.</p>
+<p>This pattern isn't limited to data analysis. Anywhere you have large content that needs to persist across conversation turns, whether that's documents, code files, or query results, the same approach applies. Store big, sample small, query on demand.</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>

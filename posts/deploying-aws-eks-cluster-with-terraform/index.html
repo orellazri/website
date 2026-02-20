@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Deploying an AWS EKS Cluster With Terraform</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#table-of-contents">Table of Contents</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#introduction">Introduction</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#setting-up-the-terraform-configuration">Setting Up the Terraform Configuration</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#networking-configuration">Networking Configuration</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#eks-cluster-configuration">EKS Cluster Configuration</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#node-group-configuration">Node Group Configuration</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#iam-permissions">IAM Permissions</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#conclusion">Conclusion</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Deploying an AWS EKS Cluster With Terraform</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Sep 3, 2024</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/devops"><span>#</span>devops</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>In this post, we'll walk through the process of deploying an Amazon EKS (Elastic Kubernetes Service) cluster using Terraform. We'll cover everything from setting up the basic infrastructure to configuring the cluster and its node groups. Let's dive in!</p>
+<h2 id="table-of-contents">Table of Contents<a class="zola-anchor" href="#table-of-contents" aria-label="Anchor link for: table-of-contents" style="visibility: hidden;"></a>
+</h2>
+<ol>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#introduction">Introduction</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#setting-up-the-terraform-configuration">Setting Up the Terraform Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#networking-configuration">Networking Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#eks-cluster-configuration">EKS Cluster Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#node-group-configuration">Node Group Configuration</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#iam-permissions">IAM Permissions</a></li>
+<li><a href="https://orellazri.com/posts/deploying-aws-eks-cluster-with-terraform/#conclusion">Conclusion</a></li>
+</ol>
+<h2 id="introduction">Introduction<a class="zola-anchor" href="#introduction" aria-label="Anchor link for: introduction" style="visibility: hidden;"></a>
+</h2>
+<p>Amazon EKS is a managed Kubernetes service that makes it easy to run Kubernetes on AWS without needing to install and operate your own Kubernetes control plane. In this guide, we'll use Terraform to automate the deployment of an EKS cluster, including all necessary networking and security configurations.</p>
+<h2 id="setting-up-the-terraform-configuration">Setting Up the Terraform Configuration<a class="zola-anchor" href="#setting-up-the-terraform-configuration" aria-label="Anchor link for: setting-up-the-terraform-configuration" style="visibility: hidden;"></a>
+</h2>
+<p>First, let's set up our main Terraform configuration file. This file will define the AWS provider and some default tags for our resources.</p>
+<p>Create a <code>main.tf</code> file, and inside it, add the following configuration:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>terraform {</span></span>
+<span class="giallo-l"><span>  required_providers {</span></span>
+<span class="giallo-l"><span>    aws = {</span></span>
+<span class="giallo-l"><span>      source  = &quot;hashicorp/aws&quot;</span></span>
+<span class="giallo-l"><span>      version = &quot;~&gt; 5.0&quot;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>provider &quot;aws&quot; {</span></span>
+<span class="giallo-l"><span>  region = &quot;us-east-1&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  assume_role {</span></span>
+<span class="giallo-l"><span>    role_arn = &quot;arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;ROLE&gt;&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  default_tags {</span></span>
+<span class="giallo-l"><span>    tags = {</span></span>
+<span class="giallo-l"><span>      Managed-By  = &quot;Terraform&quot;</span></span>
+<span class="giallo-l"><span>      EKS-Cluster = &quot;&lt;CLUSTER_NAME&gt;&quot;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>In this configuration:</p>
+<ul>
+<li>We specify the AWS provider and its version.</li>
+<li>We set the AWS region to <code>us-east-1</code>.</li>
+<li>We use an IAM role for authentication (replace <code>&lt;ACCOUNT_ID&gt;</code> with your actual AWS account ID and <code>&lt;ROLE&gt;</code> with your actual role name).</li>
+<li>We define default tags that will be applied to all resources created by Terraform.</li>
+</ul>
+<p>After creating this file, run <code>terraform init</code> to initialize the Terraform configuration.</p>
+<h2 id="networking-configuration">Networking Configuration<a class="zola-anchor" href="#networking-configuration" aria-label="Anchor link for: networking-configuration" style="visibility: hidden;"></a>
+</h2>
+<p>Next, let's set up the networking infrastructure for our EKS cluster. This includes creating a VPC, subnets, internet gateway, NAT gateway, and route tables.</p>
+<p>Create a new file named <code>networking.tf</code> and add the following configuration:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>resource &quot;aws_vpc&quot; &quot;main&quot; {</span></span>
+<span class="giallo-l"><span>  cidr_block = &quot;10.43.0.0/22&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-main-vpc&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_internet_gateway&quot; &quot;igw&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id = aws_vpc.main.id</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-igw&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Create private and public subnets</span></span>
+<span class="giallo-l"><span>resource &quot;aws_subnet&quot; &quot;private-us-east-1a&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id            = aws_vpc.main.id</span></span>
+<span class="giallo-l"><span>  cidr_block        = &quot;10.43.0.0/24&quot;</span></span>
+<span class="giallo-l"><span>  availability_zone = &quot;us-east-1a&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-private-us-east-1a&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/role/internal-elb&quot;      = &quot;1&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;</span></span>
+<span class="giallo-l"><span>    &quot;SubnetType&quot;                           = &quot;Private&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_subnet&quot; &quot;private-us-east-1b&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id            = aws_vpc.main.id</span></span>
+<span class="giallo-l"><span>  cidr_block        = &quot;10.43.1.0/24&quot;</span></span>
+<span class="giallo-l"><span>  availability_zone = &quot;us-east-1b&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-private-us-east-1b&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/role/internal-elb&quot;      = &quot;1&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;</span></span>
+<span class="giallo-l"><span>    &quot;SubnetType&quot;                           = &quot;Private&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_subnet&quot; &quot;public-us-east-1a&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id                  = aws_vpc.main.id</span></span>
+<span class="giallo-l"><span>  cidr_block              = &quot;10.43.2.0/24&quot;</span></span>
+<span class="giallo-l"><span>  availability_zone       = &quot;us-east-1a&quot;</span></span>
+<span class="giallo-l"><span>  map_public_ip_on_launch = true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-public-us-east-1a&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/role/elb&quot;               = &quot;1&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_subnet&quot; &quot;public-us-east-1b&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id                  = aws_vpc.main.id</span></span>
+<span class="giallo-l"><span>  cidr_block              = &quot;10.43.3.0/24&quot;</span></span>
+<span class="giallo-l"><span>  availability_zone       = &quot;us-east-1b&quot;</span></span>
+<span class="giallo-l"><span>  map_public_ip_on_launch = true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    &quot;Name&quot;                                 = &quot;&lt;CLUSTER_NAME&gt;-public-us-east-1b&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/role/elb&quot;               = &quot;1&quot;</span></span>
+<span class="giallo-l"><span>    &quot;kubernetes.io/cluster/&lt;CLUSTER_NAME&gt;&quot; = &quot;owned&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Set up NAT gateway</span></span>
+<span class="giallo-l"><span>resource &quot;aws_eip&quot; &quot;nat&quot; {</span></span>
+<span class="giallo-l"><span>  domain = &quot;vpc&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-nat&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_nat_gateway&quot; &quot;nat&quot; {</span></span>
+<span class="giallo-l"><span>  allocation_id = aws_eip.nat.id</span></span>
+<span class="giallo-l"><span>  subnet_id     = aws_subnet.public-us-east-1a.id</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-nat&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  depends_on = [aws_internet_gateway.igw]</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Create route tables</span></span>
+<span class="giallo-l"><span>resource &quot;aws_route_table&quot; &quot;private&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id = aws_vpc.main.id</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  route {</span></span>
+<span class="giallo-l"><span>    cidr_block     = &quot;0.0.0.0/0&quot;</span></span>
+<span class="giallo-l"><span>    nat_gateway_id = aws_nat_gateway.nat.id</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  # ... (other routes)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-private-route-table&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_route_table&quot; &quot;public&quot; {</span></span>
+<span class="giallo-l"><span>  vpc_id = aws_vpc.main.id</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  route {</span></span>
+<span class="giallo-l"><span>    cidr_block = &quot;0.0.0.0/0&quot;</span></span>
+<span class="giallo-l"><span>    gateway_id = aws_internet_gateway.igw.id</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-public-route-table&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Associate route tables with subnets</span></span>
+<span class="giallo-l"><span>resource &quot;aws_route_table_association&quot; &quot;private-us-east-1a&quot; {</span></span>
+<span class="giallo-l"><span>  subnet_id      = aws_subnet.private-us-east-1a.id</span></span>
+<span class="giallo-l"><span>  route_table_id = aws_route_table.private.id</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_route_table_association&quot; &quot;private-us-east-1b&quot; {</span></span>
+<span class="giallo-l"><span>  subnet_id      = aws_subnet.private-us-east-1b.id</span></span>
+<span class="giallo-l"><span>  route_table_id = aws_route_table.private.id</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_route_table_association&quot; &quot;public-us-east-1a&quot; {</span></span>
+<span class="giallo-l"><span>  subnet_id      = aws_subnet.public-us-east-1a.id</span></span>
+<span class="giallo-l"><span>  route_table_id = aws_route_table.public.id</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_route_table_association&quot; &quot;public-us-east-1b&quot; {</span></span>
+<span class="giallo-l"><span>  subnet_id      = aws_subnet.public-us-east-1b.id</span></span>
+<span class="giallo-l"><span>  route_table_id = aws_route_table.public.id</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Create security group</span></span>
+<span class="giallo-l"><span>resource &quot;aws_security_group&quot; &quot;internal&quot; {</span></span>
+<span class="giallo-l"><span>  name_prefix = &quot;&lt;CLUSTER_NAME&gt;-internal-security-group&quot;</span></span>
+<span class="giallo-l"><span>  description = &quot;Allow traffic within the internal network&quot;</span></span>
+<span class="giallo-l"><span>  vpc_id      = aws_vpc.main.id</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  egress {</span></span>
+<span class="giallo-l"><span>    from_port   = 0</span></span>
+<span class="giallo-l"><span>    to_port     = 0</span></span>
+<span class="giallo-l"><span>    protocol    = &quot;-1&quot;</span></span>
+<span class="giallo-l"><span>    cidr_blocks = [&quot;0.0.0.0/0&quot;]</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tags = {</span></span>
+<span class="giallo-l"><span>    Name = &quot;&lt;CLUSTER_NAME&gt;-internal-security-group&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This configuration sets up:</p>
+<ul>
+<li>A VPC with a CIDR block of 10.43.0.0/22 (You can use any CIDR block you prefer)</li>
+<li>Public and private subnets in two availability zones</li>
+<li>An Internet Gateway for public internet access</li>
+<li>A NAT Gateway for outbound internet access from private subnets</li>
+<li>Route tables for public and private subnets</li>
+<li>A security group allowing outbound traffic</li>
+</ul>
+<h2 id="eks-cluster-configuration">EKS Cluster Configuration<a class="zola-anchor" href="#eks-cluster-configuration" aria-label="Anchor link for: eks-cluster-configuration" style="visibility: hidden;"></a>
+</h2>
+<p>Now, let's define our EKS cluster back in the <code>main.tf</code> file:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>resource &quot;aws_eks_cluster&quot; &quot;cluster&quot; {</span></span>
+<span class="giallo-l"><span>  name     = &quot;&lt;CLUSTER_NAME&gt;&quot;</span></span>
+<span class="giallo-l"><span>  role_arn = aws_iam_role.cluster.arn</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  vpc_config {</span></span>
+<span class="giallo-l"><span>    subnet_ids = [</span></span>
+<span class="giallo-l"><span>      aws_subnet.private-us-east-1a.id,</span></span>
+<span class="giallo-l"><span>      aws_subnet.private-us-east-1b.id,</span></span>
+<span class="giallo-l"><span>      aws_subnet.public-us-east-1a.id,</span></span>
+<span class="giallo-l"><span>      aws_subnet.public-us-east-1b.id</span></span>
+<span class="giallo-l"><span>    ]</span></span>
+<span class="giallo-l"><span>    endpoint_private_access = true</span></span>
+<span class="giallo-l"><span>    endpoint_public_access  = false</span></span>
+<span class="giallo-l"><span>    security_group_ids      = [aws_security_group.internal.id]</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  access_config {</span></span>
+<span class="giallo-l"><span>    authentication_mode = &quot;API_AND_CONFIG_MAP&quot;</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  depends_on = [aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPolicy]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This configuration:</p>
+<ul>
+<li>Creates an EKS cluster named <code>&lt;CLUSTER_NAME&gt;</code></li>
+<li>Uses both private and public subnets</li>
+<li>Enables private endpoint access and disables public endpoint access</li>
+<li>Uses the internal security group we created earlier</li>
+<li>Sets up API server authentication using both Kubernetes API and ConfigMap</li>
+</ul>
+<h2 id="node-group-configuration">Node Group Configuration<a class="zola-anchor" href="#node-group-configuration" aria-label="Anchor link for: node-group-configuration" style="visibility: hidden;"></a>
+</h2>
+<p>Next, let's set up the EKS node group. Create a new file named <code>nodes.tf</code> and add the following configuration:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>resource &quot;aws_launch_template&quot; &quot;eks-with-disks&quot; {</span></span>
+<span class="giallo-l"><span>  name = &quot;eks-with-disks&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  key_name = &quot;&lt;KEY_PAIR_NAME&gt;&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  block_device_mappings {</span></span>
+<span class="giallo-l"><span>    device_name = &quot;/dev/xvda&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    ebs {</span></span>
+<span class="giallo-l"><span>      volume_size = 50</span></span>
+<span class="giallo-l"><span>      volume_type = &quot;gp3&quot;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  tag_specifications {</span></span>
+<span class="giallo-l"><span>    resource_type = &quot;instance&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    tags = {</span></span>
+<span class="giallo-l"><span>      Name = &quot;&lt;CLUSTER_NAME&gt;-node&quot;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_eks_node_group&quot; &quot;private-nodes&quot; {</span></span>
+<span class="giallo-l"><span>  cluster_name    = aws_eks_cluster.cluster.name</span></span>
+<span class="giallo-l"><span>  node_group_name = &quot;&lt;CLUSTER_NAME&gt;-private-nodes&quot;</span></span>
+<span class="giallo-l"><span>  node_role_arn   = aws_iam_role.nodes.arn</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  subnet_ids = [</span></span>
+<span class="giallo-l"><span>    aws_subnet.private-us-east-1a.id,</span></span>
+<span class="giallo-l"><span>    aws_subnet.private-us-east-1b.id</span></span>
+<span class="giallo-l"><span>  ]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  capacity_type  = &quot;ON_DEMAND&quot;</span></span>
+<span class="giallo-l"><span>  instance_types = [&quot;t3a.large&quot;]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  scaling_config {</span></span>
+<span class="giallo-l"><span>    desired_size = 3</span></span>
+<span class="giallo-l"><span>    max_size     = 3</span></span>
+<span class="giallo-l"><span>    min_size     = 3</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  launch_template {</span></span>
+<span class="giallo-l"><span>    name    = aws_launch_template.eks-with-disks.name</span></span>
+<span class="giallo-l"><span>    version = aws_launch_template.eks-with-disks.latest_version</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  depends_on = [</span></span>
+<span class="giallo-l"><span>    aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,</span></span>
+<span class="giallo-l"><span>    aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,</span></span>
+<span class="giallo-l"><span>    aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly,</span></span>
+<span class="giallo-l"><span>  ]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This configuration:</p>
+<ul>
+<li>Creates a launch template for EC2 instances with a 50GB gp3 EBS volume</li>
+<li>Sets up a node group with 3 t3a.large instances in the private subnets</li>
+<li>Uses On-Demand instances for the node group</li>
+</ul>
+<h2 id="iam-permissions">IAM Permissions<a class="zola-anchor" href="#iam-permissions" aria-label="Anchor link for: iam-permissions" style="visibility: hidden;"></a>
+</h2>
+<p>Finally, let's set up the necessary IAM roles and policies. Create a new file named <code>permissions.tf</code> and add the following configuration:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>resource &quot;aws_iam_role&quot; &quot;cluster&quot; {</span></span>
+<span class="giallo-l"><span>  name = &quot;&lt;CLUSTER_NAME&gt;-eks-cluster&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  assume_role_policy = &lt;&lt;POLICY</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>  &quot;Version&quot;: &quot;2012-10-17&quot;,</span></span>
+<span class="giallo-l"><span>  &quot;Statement&quot;: [</span></span>
+<span class="giallo-l"><span>    {</span></span>
+<span class="giallo-l"><span>      &quot;Effect&quot;: &quot;Allow&quot;,</span></span>
+<span class="giallo-l"><span>      &quot;Principal&quot;: {</span></span>
+<span class="giallo-l"><span>        &quot;Service&quot;: &quot;eks.amazonaws.com&quot;</span></span>
+<span class="giallo-l"><span>      },</span></span>
+<span class="giallo-l"><span>      &quot;Action&quot;: &quot;sts:AssumeRole&quot;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>  ]</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"><span>POLICY</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;cluster-AmazonEKSClusterPolicy&quot; {</span></span>
+<span class="giallo-l"><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKSClusterPolicy&quot;</span></span>
+<span class="giallo-l"><span>  role       = aws_iam_role.cluster.name</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_role&quot; &quot;nodes&quot; {</span></span>
+<span class="giallo-l"><span>  name = &quot;&lt;CLUSTER_NAME&gt;-eks-node-group-nodes&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  assume_role_policy = jsonencode({</span></span>
+<span class="giallo-l"><span>    Statement = [{</span></span>
+<span class="giallo-l"><span>      Action = &quot;sts:AssumeRole&quot;</span></span>
+<span class="giallo-l"><span>      Effect = &quot;Allow&quot;</span></span>
+<span class="giallo-l"><span>      Principal = {</span></span>
+<span class="giallo-l"><span>        Service = &quot;ec2.amazonaws.com&quot;</span></span>
+<span class="giallo-l"><span>      }</span></span>
+<span class="giallo-l"><span>    }]</span></span>
+<span class="giallo-l"><span>    Version = &quot;2012-10-17&quot;</span></span>
+<span class="giallo-l"><span>  })</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEKSWorkerNodePolicy&quot; {</span></span>
+<span class="giallo-l"><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy&quot;</span></span>
+<span class="giallo-l"><span>  role       = aws_iam_role.nodes.name</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEKS_CNI_Policy&quot; {</span></span>
+<span class="giallo-l"><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy&quot;</span></span>
+<span class="giallo-l"><span>  role       = aws_iam_role.nodes.name</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEC2ContainerRegistryReadOnly&quot; {</span></span>
+<span class="giallo-l"><span>  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly&quot;</span></span>
+<span class="giallo-l"><span>  role       = aws_iam_role.nodes.name</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_policy&quot; &quot;ebs_csi_driver&quot; {</span></span>
+<span class="giallo-l"><span>  name        = &quot;ebs_csi_driver_policy&quot;</span></span>
+<span class="giallo-l"><span>  description = &quot;Policy for EC2 Instances to access Elastic Block Store&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  policy = jsonencode({</span></span>
+<span class="giallo-l"><span>    &quot;Version&quot; : &quot;2012-10-17&quot;,</span></span>
+<span class="giallo-l"><span>    &quot;Statement&quot; : [</span></span>
+<span class="giallo-l"><span>      {</span></span>
+<span class="giallo-l"><span>        &quot;Effect&quot; : &quot;Allow&quot;,</span></span>
+<span class="giallo-l"><span>        &quot;Action&quot; : [</span></span>
+<span class="giallo-l"><span>          &quot;ec2:AttachVolume&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:CreateSnapshot&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:CreateTags&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:CreateVolume&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DeleteSnapshot&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DeleteTags&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DeleteVolume&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DescribeInstances&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DescribeSnapshots&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DescribeTags&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DescribeVolumes&quot;,</span></span>
+<span class="giallo-l"><span>          &quot;ec2:DetachVolume&quot;</span></span>
+<span class="giallo-l"><span>        ],</span></span>
+<span class="giallo-l"><span>        &quot;Resource&quot; : &quot;*&quot;</span></span>
+<span class="giallo-l"><span>      }</span></span>
+<span class="giallo-l"><span>    ]</span></span>
+<span class="giallo-l"><span>  })</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;aws_iam_role_policy_attachment&quot; &quot;nodes-AmazonEBS_CSI_Driver&quot; {</span></span>
+<span class="giallo-l"><span>  policy_arn = aws_iam_policy.ebs_csi_driver.arn</span></span>
+<span class="giallo-l"><span>  role       = aws_iam_role.nodes.name</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This configuration:</p>
+<ul>
+<li>Creates IAM roles for the EKS cluster and node group</li>
+<li>Attaches necessary policies to these roles, including the EKS cluster policy, worker node policy, CNI policy, and ECR read-only policy</li>
+<li>Creates a custom policy for the EBS CSI driver and attaches it to the node role</li>
+</ul>
+<h2 id="conclusion">Conclusion<a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion" style="visibility: hidden;"></a>
+</h2>
+<p>In this guide, we've walked through the process of deploying an Amazon EKS cluster using Terraform. We've covered setting up the basic infrastructure, configuring the EKS cluster, setting up node groups, and managing IAM permissions.</p>
+<p>By using Terraform, we can version control our infrastructure and easily replicate this setup across different environments. Remember to replace the placeholders in the configuration files with your actual values before running Terraform commands.</p>
+<p>Happy clustering!</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>

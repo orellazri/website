@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Building My Own AI Agent Orchestrator</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#the-vision-a-hands-off-ai-collaborator">The Vision: A Hands-Off AI Collaborator</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#the-high-level-architecture">The High-Level Architecture</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#the-implementation">The Implementation</a>
+          
+          <ul>
+            
+            <li>
+              <a class="h3" href="#the-orchestrator">The Orchestrator</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#the-runtime">The Runtime</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#the-frontend">The Frontend</a>
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#project-specific-context">Project-Specific Context</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#a-user-s-journey">A User&#x27;s Journey</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#conclusion">Conclusion</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Building My Own AI Agent Orchestrator</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Jun 17, 2025</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/coding"><span>#</span>coding</a><a class="instant" href="https://orellazri.com/tags/devops"><span>#</span>devops</a><a class="instant" href="https://orellazri.com/tags/ai"><span>#</span>ai</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>AI assistants and AI-powered IDEs are great, but I wanted a solution that could handle complex tasks from start to finish, in the repositories across our organization, and that could run in the background. I wanted a tool that I could give a high-level goal to, like "refactor the auth service," and have it autonomously navigate my codebase, understand its nuances, and execute the task, seamlessly integrated with the company's self-hosted GitLab instance.</p>
+<h2 id="the-vision-a-hands-off-ai-collaborator">The Vision: A Hands-Off AI Collaborator<a class="zola-anchor" href="#the-vision-a-hands-off-ai-collaborator" aria-label="Anchor link for: the-vision-a-hands-off-ai-collaborator" style="visibility: hidden;"></a>
+</h2>
+<p>The goal was to create a system where I could delegate complex tasks to an AI agent. The agent needed to be able to check out the right code, have the right tools and credentials, and understand project-specific instructions to get the job done. I also needed a simple web interface to submit these tasks and monitor their progress.</p>
+<p>Tools like OpenAI Codex and Cursor Background Agents already exist, but they are only available with GitHub and come with limitations. In my case, we are using a self-hosted GitLab instance in our company, so we wanted seamless integration with our existing infrastructure, with a user-friendly wrapper and additional features.</p>
+<p>For the purposes of this post, I'll be referring to this system as "Agent", even though we have a different internal name for it.</p>
+<h2 id="the-high-level-architecture">The High-Level Architecture<a class="zola-anchor" href="#the-high-level-architecture" aria-label="Anchor link for: the-high-level-architecture" style="visibility: hidden;"></a>
+</h2>
+<p>I decided to split the system into the following primary components:</p>
+<ol>
+<li><strong>Backend Server:</strong> A Go application that manages tasks and orchestrates the AI agents.</li>
+<li><strong>Web Application:</strong> A React and TypeScript interface for creating and tracking tasks.</li>
+<li><strong>Runtime:</strong> A Docker image that contains the agent and all the tools it needs to execute the tasks.</li>
+</ol>
+<p>This separation of concerns keeps the architecture clean and scalable. The frontend is focused purely on user interaction, while the backend handles the heavy lifting of agent execution.</p>
+<pre class="mermaid">
+  sequenceDiagram
+participant Web App
+participant Kubernetes API
+participant Kubernetes Job
+participant Agent Runtime
+participant GitLab Repository
+
+    Web App-&gt;&gt;Kubernetes API: Request job creation for code execution
+    Kubernetes API-&gt;&gt;Kubernetes Job: Start job with Agent Runtime image
+    Kubernetes Job-&gt;&gt;Agent Runtime: Initialize runtime environment
+
+    par Log streaming and runtime execution
+        Agent Runtime-&gt;&gt;Web App: Stream job logs in real time
+    and
+        Agent Runtime-&gt;&gt;GitLab Repository: Clone repository
+        loop Execute code tasks
+            Agent Runtime-&gt;&gt;Agent Runtime: Execute code tasks
+        end
+        Agent Runtime-&gt;&gt;GitLab Repository: Push changes
+    end
+
+    Agent Runtime-&gt;&gt;Kubernetes API: Notify completion
+    Kubernetes API-&gt;&gt;Kubernetes Job: Terminate job
+    Kubernetes API-&gt;&gt;Web App: Job terminated, execution complete
+</pre><h2 id="the-implementation">The Implementation<a class="zola-anchor" href="#the-implementation" aria-label="Anchor link for: the-implementation" style="visibility: hidden;"></a>
+</h2>
+<h3 id="the-orchestrator">The Orchestrator<a class="zola-anchor" href="#the-orchestrator" aria-label="Anchor link for: the-orchestrator" style="visibility: hidden;"></a>
+</h3>
+<p>The heart of the system is the Go backend. When a new task is submitted, the backend doesn't run the agent itself. Instead, it dynamically creates and dispatches a <strong>Kubernetes Job</strong>.</p>
+<p>I chose this approach for a few key advantages:</p>
+<ul>
+<li><strong>Isolation:</strong> Each agent runs in its own sandboxed container.</li>
+<li><strong>Scalability:</strong> Kubernetes can handle running multiple jobs in parallel.</li>
+<li><strong>Resilience:</strong> Kubernetes provides robust error handling and reporting.</li>
+<li><strong>Observability:</strong> Our Kubernetes clusters are already orchestrated with our observability stack, so we get metrics and logs collection out of the box.</li>
+</ul>
+<p>The Go server exposes a simple REST API, constructs the Kubernetes Job, injects the necessary context (prompt, Git info, API keys), and monitors the job's status.</p>
+<p>Each task has the following structure:</p>
+<pre class="giallo z-code"><code data-lang="go"><span class="giallo-l"><span class="z-keyword">type</span><span class="z-entity z-name"> Task</span><span class="z-keyword"> struct</span><span> {</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	ID</span><span class="z-storage z-type">         int</span><span class="z-punctuation z-definition z-string">       `</span><span class="z-string">json:&quot;id&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	Prompt</span><span class="z-storage z-type">     string</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;prompt&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	Repository</span><span class="z-storage z-type"> string</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;repository&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	Branch</span><span class="z-storage z-type">     string</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;branch&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	Status</span><span class="z-storage z-type">     string</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;status&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	JobName</span><span class="z-storage z-type">    string</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;job_name&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	UniqueID</span><span class="z-storage z-type">   string</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;unique_id&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	Duration</span><span class="z-keyword">   *</span><span class="z-storage z-type">int64</span><span class="z-punctuation z-definition z-string">    `</span><span class="z-string">json:&quot;duration&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span class="z-variable z-other">	CreatedAt</span><span class="z-entity z-name">  time</span><span>.</span><span class="z-entity z-name">Time</span><span class="z-punctuation z-definition z-string"> `</span><span class="z-string">json:&quot;created_at&quot;</span><span class="z-punctuation z-definition z-string">`</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>I used the <a rel="nofollow noreferrer external" href="https://github.com/kubernetes/client-go">kubernetes/client-go</a> library to interact with the Kubernetes API. This means loading the Kubernetes config from either the in-cluster config or from a file, creating new jobs, monitoring their status, etc.</p>
+<p>I keep track of the created tasks in an in-memory list wrapper with a <code>sync.Mutex</code> to ensure thread-safety, but this will later be replaced with a database.</p>
+<h3 id="the-runtime">The Runtime<a class="zola-anchor" href="#the-runtime" aria-label="Anchor link for: the-runtime" style="visibility: hidden;"></a>
+</h3>
+<p>The Kubernetes Job runs the specific runtime Docker image. This container is the environment where the AI agent lives. It's equipped with all the tools it needs:</p>
+<ul>
+<li>Git command-line tools.</li>
+<li>API credentials for services like GitLab, Jira, and Coda, and Anthropic.</li>
+<li>Claude Code and MCP servers.</li>
+</ul>
+<p>The user's prompt is passed directly as a command-line argument to the agent process inside the container.</p>
+<p>Following is a sample Dockerfile for the runtime:</p>
+<pre class="giallo z-code"><code data-lang="docker"><span class="giallo-l"><span class="z-keyword">FROM</span><span> ubuntu:24.04</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> apt-get update -y</span></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> apt-get install -y curl gnupg git sudo pipx</span></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> curl -fsSL https://deb.nodesource.com/setup_23.x | bash - &amp;&amp; apt-get install -y nodejs</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> useradd -m -u 1001 -s /bin/bash agent</span></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> echo </span><span class="z-string">&quot;</span><span class="z-string">agent ALL=(ALL) NOPASSWD:ALL</span><span class="z-string">&quot;</span><span> | tee /etc/sudoers.d/agent</span></span>
+<span class="giallo-l"><span class="z-keyword">USER</span><span> agent</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">ENV</span><span> PATH=</span><span class="z-string">&quot;</span><span class="z-string">/home/agent/.local/bin:/home/agent/.npm-global/bin:$PATH</span><span class="z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> mkdir -p ~/.npm-global</span></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> npm config set prefix </span><span class="z-string">&#39;</span><span class="z-string">~/.npm-global</span><span class="z-string">&#39;</span></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> npm install -g @anthropic-ai/claude-code</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">RUN</span><span> pipx install uv</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">COPY</span><span> ./docker/entrypoint.sh /entrypoint.sh</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">WORKDIR</span><span> /src</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">ENTRYPOINT</span><span> [</span><span class="z-string">&quot;</span><span class="z-string">/entrypoint.sh</span><span class="z-string">&quot;</span><span>]</span></span></code></pre>
+<p>And the entrypoint script:</p>
+<pre class="giallo z-code"><code data-lang="shellscript"><span class="giallo-l"><span class="z-punctuation z-definition z-comment">#!</span><span class="z-comment">/usr/bin/env bash</span></span>
+<span class="giallo-l"><span class="z-support">set</span><span class="z-constant"> -</span><span class="z-constant">euo</span><span class="z-string"> pipefail</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> -z</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">ANTHROPIC_API_KEY</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span><span class="z-support"> echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Error: ANTHROPIC_API_KEY environment variable is required</span><span class="z-punctuation z-definition z-string">&quot;</span><span>;</span><span class="z-support"> exit</span><span class="z-constant"> 1</span><span>;</span><span class="z-keyword"> fi</span></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> -z</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GIT_REPO</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span><span class="z-support"> echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Error: GIT_REPO environment variable is required</span><span class="z-punctuation z-definition z-string">&quot;</span><span>;</span><span class="z-support"> exit</span><span class="z-constant"> 1</span><span>;</span><span class="z-keyword"> fi</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> --- snip ---</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Setting up Claude configuration...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">mkdir</span><span class="z-constant"> -</span><span class="z-constant">p</span><span class="z-string"> ~/.claude</span></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &#39;</span><span class="z-string">{&quot;apiKeyHelper&quot;: &quot;~/.claude/anthropic_key.sh&quot;}</span><span class="z-punctuation z-definition z-string">&#39;</span><span class="z-keyword"> &gt;</span><span class="z-string"> ~/.claude/settings.json</span></span>
+<span class="giallo-l"><span class="z-entity z-name">cat</span><span class="z-keyword"> &gt;</span><span class="z-string"> ~/.claude/anthropic_key.sh</span><span class="z-keyword"> &lt;&lt;</span><span class="z-punctuation z-definition z-string"> EOF</span></span>
+<span class="giallo-l"><span class="z-string">echo &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">ANTHROPIC_API_KEY</span><span class="z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">EOF</span></span>
+<span class="giallo-l"><span class="z-entity z-name">chmod</span><span class="z-string"> +x</span><span class="z-string"> ~/.claude/anthropic_key.sh</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Creating MCP Servers file..</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">cat</span><span class="z-keyword"> &gt;</span><span class="z-string"> /tmp/mcp.json</span><span class="z-keyword"> &lt;&lt;</span><span class="z-punctuation z-definition z-string"> EOF</span></span>
+<span class="giallo-l"><span class="z-string">{</span></span>
+<span class="giallo-l"><span class="z-string">    &quot;mcpServers&quot;: {</span></span>
+<span class="giallo-l"><span class="z-string">      # --- snip ---</span></span>
+<span class="giallo-l"><span class="z-string">    }</span></span>
+<span class="giallo-l"><span class="z-string">}</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">EOF</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Setting up git configuration...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">git</span><span class="z-string"> config</span><span class="z-constant"> -</span><span class="z-constant">-global</span><span class="z-string"> user.email</span><span class="z-string"> ...</span></span>
+<span class="giallo-l"><span class="z-entity z-name">git</span><span class="z-string"> config</span><span class="z-constant"> -</span><span class="z-constant">-global</span><span class="z-string"> user.name</span><span class="z-string"> ...</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Cloning repository...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> -n</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">$</span><span class="z-string">{</span><span class="z-variable z-other">GIT_BRANCH</span><span class="z-keyword">:-</span><span class="z-string">}</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span> &amp;&amp;</span><span> [</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">$</span><span class="z-string">{</span><span class="z-variable z-other">GIT_BRANCH</span><span class="z-keyword">:-</span><span class="z-string">}</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-keyword"> !=</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span></span>
+<span class="giallo-l"><span class="z-entity z-name">    git</span><span class="z-string"> clone</span><span class="z-string"> https://</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GITLAB_USER</span><span class="z-string">:</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GITLAB_TOKEN</span><span class="z-string">@gitlab.company.com/</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GIT_REPO</span><span class="z-string">.git</span><span class="z-constant"> -</span><span class="z-constant">-depth</span><span class="z-constant"> 1</span><span class="z-constant"> -</span><span class="z-constant">-branch</span><span class="z-variable z-other"> $</span><span class="z-variable z-other">GIT_BRANCH</span></span>
+<span class="giallo-l"><span class="z-keyword">else</span></span>
+<span class="giallo-l"><span class="z-entity z-name">    git</span><span class="z-string"> clone</span><span class="z-string"> https://</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GITLAB_USER</span><span class="z-string">:</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GITLAB_TOKEN</span><span class="z-string">@gitlab.company.com/</span><span class="z-variable z-other">$</span><span class="z-variable z-other">GIT_REPO</span><span class="z-string">.git</span><span class="z-constant"> -</span><span class="z-constant">-depth</span><span class="z-constant"> 1</span></span>
+<span class="giallo-l"><span class="z-keyword">fi</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">cd</span><span class="z-variable z-other"> $</span><span class="z-variable z-other">repo_name</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> !</span><span class="z-keyword"> -f</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">CLAUDE.md</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span><span class="z-support"> echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Warning: CLAUDE.md file not found in repository</span><span class="z-punctuation z-definition z-string">&quot;</span><span>;</span><span class="z-keyword"> fi</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Running project setup script...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> !</span><span class="z-keyword"> -f</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">agent-setup.sh</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span><span class="z-support"> echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Error: agent-setup.sh not found in repository</span><span class="z-punctuation z-definition z-string">&quot;</span><span>;</span><span class="z-support"> exit</span><span class="z-constant"> 1</span><span>;</span><span class="z-keyword"> fi</span></span>
+<span class="giallo-l"><span class="z-entity z-name">bash</span><span class="z-string"> agent-setup.sh</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Creating branch </span><span class="z-variable z-other">$</span><span class="z-variable z-other">branch_name</span><span class="z-string">...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">git</span><span class="z-string"> checkout</span><span class="z-constant"> -</span><span class="z-constant">b</span><span class="z-variable z-other"> $</span><span class="z-variable z-other">branch_name</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Running claude with prompt: </span><span class="z-variable z-other">$</span><span class="z-variable z-other">prompt</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">claude</span><span class="z-constant"> -</span><span class="z-constant">-dangerously-skip-permissions</span><span class="z-constant"> -</span><span class="z-constant">-mcp-config</span><span class="z-string"> /tmp/mcp.json</span><span class="z-constant"> -</span><span class="z-constant">-verbose</span><span class="z-constant"> -</span><span class="z-constant">-output-format</span><span class="z-string"> stream-json</span><span class="z-constant"> -</span><span class="z-constant">p</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">prompt</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Pushing changes...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">git</span><span class="z-string"> add</span><span class="z-constant"> -</span><span class="z-constant">A</span></span>
+<span class="giallo-l"><span class="z-entity z-name">git</span><span class="z-string"> commit</span><span class="z-constant"> -</span><span class="z-constant">m</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">title</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">git</span><span class="z-string"> push</span><span class="z-string"> origin</span><span class="z-variable z-other"> $</span><span class="z-variable z-other">branch_name</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Creating merge request...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> Get the default branch (usually main or master)</span></span>
+<span class="giallo-l"><span class="z-variable z-other">default_branch</span><span class="z-keyword">=</span><span>$(</span><span class="z-entity z-name">git</span><span class="z-string"> remote</span><span class="z-string"> show</span><span class="z-string"> origin</span><span class="z-keyword"> |</span><span class="z-entity z-name"> grep</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">HEAD branch</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-keyword"> |</span><span class="z-entity z-name"> cut</span><span class="z-constant"> -</span><span class="z-constant">d</span><span class="z-punctuation z-definition z-string">&#39;</span><span class="z-punctuation z-definition z-string"> &#39;</span><span class="z-constant"> -</span><span class="z-constant">f5</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> -z</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">default_branch</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span></span>
+<span class="giallo-l"><span class="z-variable z-other">    default_branch</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">main</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-keyword">fi</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Creating merge request...</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-variable z-other">mr_response</span><span class="z-keyword">=</span><span>$(</span><span class="z-entity z-name">curl</span><span class="z-constant"> -</span><span class="z-constant">s</span><span class="z-constant"> -</span><span class="z-constant">X</span><span class="z-string"> POST</span><span class="z-constant"> \</span></span>
+<span class="giallo-l"><span class="z-constant">  -</span><span class="z-constant">H</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">PRIVATE-TOKEN: </span><span class="z-variable z-other">$</span><span class="z-variable z-other">GITLAB_TOKEN</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> \</span></span>
+<span class="giallo-l"><span class="z-constant">  -</span><span class="z-constant">H</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Content-Type: application/json</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> \</span></span>
+<span class="giallo-l"><span class="z-constant">  -</span><span class="z-constant">d</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">{</span></span>
+<span class="giallo-l"><span class="z-constant">    \&quot;</span><span class="z-string">source_branch</span><span class="z-constant">\&quot;</span><span class="z-string">: </span><span class="z-constant">\&quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">branch_name</span><span class="z-constant">\&quot;</span><span class="z-string">,</span></span>
+<span class="giallo-l"><span class="z-constant">    \&quot;</span><span class="z-string">target_branch</span><span class="z-constant">\&quot;</span><span class="z-string">: </span><span class="z-constant">\&quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">default_branch</span><span class="z-constant">\&quot;</span><span class="z-string">,</span></span>
+<span class="giallo-l"><span class="z-constant">    \&quot;</span><span class="z-string">title</span><span class="z-constant">\&quot;</span><span class="z-string">: </span><span class="z-constant">\&quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">title</span><span class="z-constant">\&quot;</span><span class="z-string">,</span></span>
+<span class="giallo-l"><span class="z-constant">    \&quot;</span><span class="z-string">description</span><span class="z-constant">\&quot;</span><span class="z-string">: </span><span class="z-constant">\&quot;</span><span class="z-string">Automated changes generated by Agent</span><span class="z-constant">\\</span><span class="z-string">n</span><span class="z-constant">\\</span><span class="z-string">nPrompt: </span><span class="z-variable z-other">$</span><span class="z-variable z-other">prompt</span><span class="z-constant">\&quot;</span><span class="z-string">,</span></span>
+<span class="giallo-l"><span class="z-constant">    \&quot;</span><span class="z-string">squash</span><span class="z-constant">\&quot;</span><span class="z-string">: true,</span></span>
+<span class="giallo-l"><span class="z-constant">    \&quot;</span><span class="z-string">remove_source_branch</span><span class="z-constant">\&quot;</span><span class="z-string">: true</span></span>
+<span class="giallo-l"><span class="z-string">  }</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> \</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">  &quot;</span><span class="z-string">https://gitlab.company.com/api/v4/projects/</span><span class="z-string">$(</span><span class="z-support">echo</span><span class="z-variable z-other"> $</span><span class="z-variable z-other">GIT_REPO</span><span class="z-keyword"> |</span><span class="z-entity z-name"> sed</span><span class="z-punctuation z-definition z-string"> &#39;</span><span class="z-string">s/\//%2F/g</span><span class="z-punctuation z-definition z-string">&#39;</span><span class="z-string">)</span><span class="z-string">/merge_requests</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-variable z-other">mr_url</span><span class="z-keyword">=</span><span>$(</span><span class="z-support">echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">mr_response</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-keyword"> |</span><span class="z-entity z-name"> grep</span><span class="z-constant"> -</span><span class="z-constant">o</span><span class="z-punctuation z-definition z-string"> &#39;</span><span class="z-string">&quot;web_url&quot;:&quot;[^&quot;]*&quot;</span><span class="z-punctuation z-definition z-string">&#39;</span><span class="z-keyword"> |</span><span class="z-entity z-name"> cut</span><span class="z-constant"> -</span><span class="z-constant">d</span><span class="z-punctuation z-definition z-string">&#39;</span><span class="z-string">&quot;</span><span class="z-punctuation z-definition z-string">&#39;</span><span class="z-constant"> -</span><span class="z-constant">f4</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">if</span><span> [</span><span class="z-keyword"> -n</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">mr_url</span><span class="z-punctuation z-definition z-string">&quot;</span><span> ]</span><span>;</span><span class="z-keyword"> then</span></span>
+<span class="giallo-l"><span class="z-support">    echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Merge request created successfully: </span><span class="z-variable z-other">$</span><span class="z-variable z-other">mr_url</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-keyword">else</span></span>
+<span class="giallo-l"><span class="z-support">    echo</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Failed to create merge request. Response: </span><span class="z-variable z-other">$</span><span class="z-variable z-other">mr_response</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-support">    exit</span><span class="z-constant"> 1</span></span>
+<span class="giallo-l"><span class="z-keyword">fi</span></span></code></pre>
+<p>As you can see, the entrypoint script takes care of the following:</p>
+<ul>
+<li>Setting up the GitLab credentials.</li>
+<li>Setting up Claude Code &amp; MCP servers.</li>
+<li>Cloning the repository.</li>
+<li>Running the project-specific setup script. This is needed to install dependencies, run database migrations, or set up any other project-specific tooling.</li>
+<li>Creating a new branch.</li>
+<li>Running the agent with the prompt.</li>
+<li>Pushing the changes to the repository.</li>
+<li>Creating a merge request.</li>
+</ul>
+<h3 id="the-frontend">The Frontend<a class="zola-anchor" href="#the-frontend" aria-label="Anchor link for: the-frontend" style="visibility: hidden;"></a>
+</h3>
+<p>The frontend is a straightforward application built with Vite &amp; React. A form allows the users to input the three key pieces of information for a task:</p>
+<ol>
+<li><strong>Prompt:</strong> The high-level instruction for the agent.</li>
+<li><strong>Repository:</strong> The path to the Git repository.</li>
+<li><strong>Branch:</strong> The specific branch to check out (optional).</li>
+</ol>
+<p>Once a task is submitted, it appears in a table that shows its status and auto-refreshes. Clicking a task streams the logs directly from the Kubernetes pod, which is crucial for seeing what the agent is doing.</p>
+<h2 id="project-specific-context">Project-Specific Context<a class="zola-anchor" href="#project-specific-context" aria-label="Anchor link for: project-specific-context" style="visibility: hidden;"></a>
+</h2>
+<p>One of the most powerful features is how the system understands the context of a specific project. It does this by looking for two special files in the root of the target repository:</p>
+<ol>
+<li>
+<p><code>agent-setup.sh</code>: A shell script the agent executes first. I use this to install dependencies (e.g. <code>pnpm install</code>), run database migrations, or set up any other project-specific tooling.</p>
+</li>
+<li>
+<p><code>CLAUDE.md</code>: A Markdown file with instructions for the AI model itself—a "meta-prompt" that guides the agent. Here, I can specify which test commands to use, coding style guidelines, or things the agent <em>should not</em> do.</p>
+</li>
+</ol>
+<p>This mechanism makes the system incredibly flexible without requiring any changes to the orchestrator itself.</p>
+<h2 id="a-user-s-journey">A User's Journey<a class="zola-anchor" href="#a-user-s-journey" aria-label="Anchor link for: a-user-s-journey" style="visibility: hidden;"></a>
+</h2>
+<p>Let's walk through a typical use case.</p>
+<ol>
+<li><strong>The Request:</strong> I want to add a health check endpoint to my new web service.</li>
+<li><strong>The Setup:</strong> In the service's repository, I create a <code>CLAUDE.md</code> file for general-purpose project instructions that says, "This project uses Go. All new endpoints should be added in <code>server.go</code> and include a unit test."</li>
+<li><strong>The Submission:</strong> I go to the web UI and create a new task with the prompt, "Add a <code>/health</code> endpoint that returns a 200 OK status," along with the repository and branch.</li>
+<li><strong>The Orchestration:</strong> The Go backend creates a Kubernetes job.</li>
+<li><strong>The Execution:</strong> The agent starts, clones the repo, reads the <code>CLAUDE.md</code> file, and then edits <code>server.go</code> to add the endpoint and a corresponding test.</li>
+<li><strong>The Monitoring:</strong> On the UI, I can see the status change from <code>pending</code> to <code>running</code> and watch the logs.</li>
+<li><strong>The Completion:</strong> Once the agent commits and pushes the code, the job completes, and the UI updates to <code>completed</code>.</li>
+</ol>
+<h2 id="conclusion">Conclusion<a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion" style="visibility: hidden;"></a>
+</h2>
+<p>Building this AI agent orchestrator has been a fascinating project, combining Go, React, Kubernetes, and LLMs into a practical tool. Using Kubernetes for execution makes the system scalable and robust, and the project-specific context files make the agent highly adaptable.</p>
+<p>This project has shown immense value to the organization in both cost and time savings. It's sometimes best used as the first step toward implementing a complex feature, and at other times it manages to deliver the feature in a fraction of the time.</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>

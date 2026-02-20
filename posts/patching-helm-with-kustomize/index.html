@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Patching and Extending Helm Resources With Kustomize</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#what-is-kustomize">What is Kustomize?</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#example-scenario">Example Scenario</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#generating-helm-manifests-with-kustomize">Generating Helm Manifests with Kustomize</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#applying-patches-with-kustomize">Applying Patches with Kustomize</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#extending-with-kustomize">Extending with Kustomize</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#usage-with-argo-cd-gitops">Usage with Argo CD &amp; GitOps</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Patching and Extending Helm Resources With Kustomize</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">May 24, 2024</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/devops"><span>#</span>devops</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>Helm deployments are a great way to manage Kubernetes resources, but sometimes you need to customize or extend the resources that Helm generates. In this post, we'll look at how you can use Kustomize to patch and extend Helm resources.</p>
+<h2 id="what-is-kustomize">What is Kustomize?<a class="zola-anchor" href="#what-is-kustomize" aria-label="Anchor link for: what-is-kustomize" style="visibility: hidden;"></a>
+</h2>
+<p>Kustomize is a tool for customizing Kubernetes resources. It allows you to define a set of patches that can be applied to existing resources, and it provides a way to extend resources with additional configurations.</p>
+<h2 id="example-scenario">Example Scenario<a class="zola-anchor" href="#example-scenario" aria-label="Anchor link for: example-scenario" style="visibility: hidden;"></a>
+</h2>
+<p>When you deploy a Helm chart, it generates a set of Kubernetes resources based on the templates defined in the chart. If you need to make changes to these resources, you can use Kustomize to apply patches.</p>
+<p>For example, let's say you have a Helm chart that deploys a Deployment resource with the following configuration:</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">a</span><span class="z-entity z-name z-tag">piVersion</span><span>:</span><span class="z-string"> a</span><span class="z-string">pps/v1</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">k</span><span class="z-entity z-name z-tag">ind</span><span>:</span><span class="z-string"> D</span><span class="z-string">eployment</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">m</span><span class="z-entity z-name z-tag">etadata</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> m</span><span class="z-string">y-deployment</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">s</span><span class="z-entity z-name z-tag">pec</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">eplicas</span><span>:</span><span class="z-constant"> 3</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">  #</span><span class="z-comment"> -- snip --</span></span></code></pre>
+<p>If you want to change the number of replicas to 5, you can create a patch file like this:</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">a</span><span class="z-entity z-name z-tag">piVersion</span><span>:</span><span class="z-string"> a</span><span class="z-string">pps/v1</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">k</span><span class="z-entity z-name z-tag">ind</span><span>:</span><span class="z-string"> D</span><span class="z-string">eployment</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">m</span><span class="z-entity z-name z-tag">etadata</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> m</span><span class="z-string">y-deployment</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">s</span><span class="z-entity z-name z-tag">pec</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">eplicas</span><span>:</span><span class="z-constant"> 5</span></span></code></pre><h2 id="generating-helm-manifests-with-kustomize">Generating Helm Manifests with Kustomize<a class="zola-anchor" href="#generating-helm-manifests-with-kustomize" aria-label="Anchor link for: generating-helm-manifests-with-kustomize" style="visibility: hidden;"></a>
+</h2>
+<p>How do you make sure that this patch is applied to the Deployment resource generated by the Helm chart? You can use Kustomize act as the generator for the Helm chart and apply the patch to the generated resources. That means that Kustomize will download the Helm chart into plain YAML files and patch them. Then, you can apply the patched resources to your cluster.</p>
+<p>Start by creating a <code>kustomization.yaml</code> file. Here is an example of a Bitnami Airflow deployment:</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">a</span><span class="z-entity z-name z-tag">piVersion</span><span>:</span><span class="z-string"> k</span><span class="z-string">ustomize.config.k8s.io/v1beta1</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">k</span><span class="z-entity z-name z-tag">ind</span><span>:</span><span class="z-string"> K</span><span class="z-string">ustomization</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">n</span><span class="z-entity z-name z-tag">amespace</span><span>:</span><span class="z-string"> a</span><span class="z-string">irflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">h</span><span class="z-entity z-name z-tag">elmCharts</span><span>:</span></span>
+<span class="giallo-l"><span>  -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> a</span><span class="z-string">irflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">epo</span><span>:</span><span class="z-string"> h</span><span class="z-string">ttps://charts.bitnami.com/bitnami</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">eleaseName</span><span>:</span><span class="z-string"> m</span><span class="z-string">y-airflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    n</span><span class="z-entity z-name z-tag">amespace</span><span>:</span><span class="z-string"> a</span><span class="z-string">irflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">ersion</span><span>:</span><span class="z-constant"> 17.2.4</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">aluesFile</span><span>:</span><span class="z-string"> v</span><span class="z-string">alues.yml</span></span></code></pre>
+<p>Currently, this file only specifies the Helm chart to use and the values file to apply. No patches or additional resources are defined yet.</p>
+<p>To generate the resources from the Helm chart, run the following command:</p>
+<pre class="giallo z-code"><code data-lang="shellscript"><span class="giallo-l"><span class="z-entity z-name">kustomize</span><span class="z-string"> build</span><span class="z-constant"> -</span><span class="z-constant">-enable-helm</span></span></code></pre>
+<p>This tells Kustomize to download the Helm chart, generate the resources, and output them as plain YAML files. You can then apply these resources to your cluster.</p>
+<h2 id="applying-patches-with-kustomize">Applying Patches with Kustomize<a class="zola-anchor" href="#applying-patches-with-kustomize" aria-label="Anchor link for: applying-patches-with-kustomize" style="visibility: hidden;"></a>
+</h2>
+<p>Now that we've established that Kustomize can generate resources from a Helm chart, let's look at how you can apply patches to these resources.</p>
+<p>Create a patch file (<code>patch.yaml</code>) that changes the number of replicas in the Deployment resource (note that I'm using <code>my-airflow</code> just as an example of a resource, you should replace it with the actual name of the resource you want to patch):</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">a</span><span class="z-entity z-name z-tag">piVersion</span><span>:</span><span class="z-string"> a</span><span class="z-string">pps/v1</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">k</span><span class="z-entity z-name z-tag">ind</span><span>:</span><span class="z-string"> D</span><span class="z-string">eployment</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">m</span><span class="z-entity z-name z-tag">etadata</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> m</span><span class="z-string">y-airflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">s</span><span class="z-entity z-name z-tag">pec</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">eplicas</span><span>:</span><span class="z-constant"> 5</span></span></code></pre>
+<p>Next, add the patch to the <code>kustomization.yaml</code> file, so it looks like this:</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">a</span><span class="z-entity z-name z-tag">piVersion</span><span>:</span><span class="z-string"> k</span><span class="z-string">ustomize.config.k8s.io/v1beta1</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">k</span><span class="z-entity z-name z-tag">ind</span><span>:</span><span class="z-string"> K</span><span class="z-string">ustomization</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">n</span><span class="z-entity z-name z-tag">amespace</span><span>:</span><span class="z-string"> a</span><span class="z-string">irflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">h</span><span class="z-entity z-name z-tag">elmCharts</span><span>:</span></span>
+<span class="giallo-l"><span>  -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> a</span><span class="z-string">irflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">epo</span><span>:</span><span class="z-string"> h</span><span class="z-string">ttps://charts.bitnami.com/bitnami</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">eleaseName</span><span>:</span><span class="z-string"> m</span><span class="z-string">y-airflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    n</span><span class="z-entity z-name z-tag">amespace</span><span>:</span><span class="z-string"> a</span><span class="z-string">irflow</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">ersion</span><span>:</span><span class="z-constant"> 17.2.4</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">aluesFile</span><span>:</span><span class="z-string"> v</span><span class="z-string">alues.yml</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">p</span><span class="z-entity z-name z-tag">atches</span><span>:</span></span>
+<span class="giallo-l"><span>  -</span><span class="z-entity z-name z-tag"> p</span><span class="z-entity z-name z-tag">ath</span><span>:</span><span class="z-string"> p</span><span class="z-string">atch.yaml</span></span></code></pre>
+<p>Now, when you run <code>kustomize build --enable-helm</code>, the patch will be applied to the resources generated by the Helm chart.</p>
+<h2 id="extending-with-kustomize">Extending with Kustomize<a class="zola-anchor" href="#extending-with-kustomize" aria-label="Anchor link for: extending-with-kustomize" style="visibility: hidden;"></a>
+</h2>
+<p>In addition to patching resources, you can treat the <code>kustomization.yaml</code> as you would normally, where you can treat it as a base and apply additional overlays, add more resources on top of the generated ones, add annotations, etc.</p>
+<h2 id="usage-with-argo-cd-gitops">Usage with Argo CD &amp; GitOps<a class="zola-anchor" href="#usage-with-argo-cd-gitops" aria-label="Anchor link for: usage-with-argo-cd-gitops" style="visibility: hidden;"></a>
+</h2>
+<p>If you're using Argo CD for GitOps, you can use kustomize with the <code>--enable-helm</code> flag to enable Kustomize to generate Helm manifests.</p>
+<p>We are currently using Argo CD Vault Plugin to deploy resources, so I modified our <code>ConfigManagementPlugin</code> to look like this:</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">a</span><span class="z-entity z-name z-tag">piVersion</span><span>:</span><span class="z-string"> a</span><span class="z-string">rgoproj.io/v1alpha1</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">k</span><span class="z-entity z-name z-tag">ind</span><span>:</span><span class="z-string"> C</span><span class="z-string">onfigManagementPlugin</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">m</span><span class="z-entity z-name z-tag">etadata</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> a</span><span class="z-string">rgocd-vault-plugin-kustomize</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">s</span><span class="z-entity z-name z-tag">pec</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  a</span><span class="z-entity z-name z-tag">llowConcurrency</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">  #</span><span class="z-comment"> Note: this command is run _before_ anything is done, therefore the logic is to check</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">  #</span><span class="z-comment"> if this looks like a Kustomize bundle</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  d</span><span class="z-entity z-name z-tag">iscover</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  f</span><span class="z-entity z-name z-tag">ind</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    c</span><span class="z-entity z-name z-tag">ommand</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> f</span><span class="z-string">ind</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-constant"> .</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> -n</span><span class="z-string">ame</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> k</span><span class="z-string">ustomization.yaml</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  g</span><span class="z-entity z-name z-tag">enerate</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  c</span><span class="z-entity z-name z-tag">ommand</span><span>:</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-string"> s</span><span class="z-string">h</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-string"> -c</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-punctuation z-definition z-string"> &#39;</span><span class="z-string">kustomize build --enable-helm . | argocd-vault-plugin generate -s vault-configuration -</span><span class="z-punctuation z-definition z-string">&#39;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  l</span><span class="z-entity z-name z-tag">ockRepo</span><span>:</span><span class="z-constant"> false</span></span></code></pre>
+<p>But depending on your setup, you might need to adjust this to fit your needs, or create a similar plugin yourself.</p>
+<p>I've also read that patching the <code>argocd-cm</code> ConfigMap resource and adding <code>kustomize.buildOptions: --enable-helm</code> might work, but I haven't tested it myself since we are using the above plugin for building the manifests.</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>

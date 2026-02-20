@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Self Hosting On a Hetzner VM: Terraform, Ansible, Docker</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#using-terraform-to-provision-cloud-resources">Using Terraform to provision cloud resources</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#using-ansible-to-set-up-the-vm">Using Ansible to set up the VM</a>
+          
+          <ul>
+            
+            <li>
+              <a class="h3" href="#configure-sshd">Configure sshd</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#install-docker">Install Docker</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#install-lazydocker">Install lazydocker</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#synchronize-docker-compose-directory">Synchronize docker compose directory</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#mount-hetzner-storage-box">Mount Hetzner Storage Box</a>
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#crafting-docker-compose-files">Crafting Docker compose files</a>
+          
+          <ul>
+            
+            <li>
+              <a class="h3" href="#nginx-proxy-manager">NGINX Proxy Manager</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#nextcloud">Nextcloud</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#accessing-the-vm-from-outside">Accessing the VM from outside</a>
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#final-words">Final words</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Self Hosting On a Hetzner VM: Terraform, Ansible, Docker</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Feb 27, 2024</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/devops"><span>#</span>devops</a><a class="instant" href="https://orellazri.com/tags/self-hosting"><span>#</span>self-hosting</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>I started my self-hosting journey a few years back with a single desktop machine serving as both my NAS and the host for all the services I was running.</p>
+<p>I found out the hard way, that sometimes it's not the best decision to have the important things that need to be always available running in my home, since they are doomed to experience downtime (power failures, ISP maintenance, and whatnot).</p>
+<p>After deciding that I want my critical services (like <a rel="nofollow noreferrer external" href="https://docs.paperless-ngx.com/">paperless</a> for document management, <a rel="nofollow noreferrer external" href="https://nextcloud.com/">Nextcloud</a> for cloud storage, and <a rel="nofollow noreferrer external" href="https://immich.app/">Immich</a> for my photos and videos) to endure as little downtime as possible, I started looking for a relatively cheap solution - a VM and block storage.</p>
+<p><a rel="nofollow noreferrer external" href="https://www.hetzner.com/">Hetzner</a> proved to be the the best solution I could find. They have unbeatable prices for ARM based VMs, and storage boxes that you can mount via CIFS, for as little as ~3€/mo.</p>
+<p>I also took this opportunity to get more familiar with Terraform, and to build my infrastructure declaratively.</p>
+<h2 id="using-terraform-to-provision-cloud-resources">Using Terraform to provision cloud resources<a class="zola-anchor" href="#using-terraform-to-provision-cloud-resources" aria-label="Anchor link for: using-terraform-to-provision-cloud-resources" style="visibility: hidden;"></a>
+</h2>
+<p>After signing up to Hetzner, you'll need to log in to your cloud dashboard and create a project. A project is a separation that you can have between different, well, projects. This is a good time to pick a name for this rabbithole we're going down in.</p>
+<p>Then, go ahead and generate an API token (under Security), name it <code>terraform</code>, and give it both read and write permissions.</p>
+<p>Create a repository and inside a <code>terraform</code> directory. The <code>main.tf</code> file will look similar to this:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>terraform {</span></span>
+<span class="giallo-l"><span>  required_providers {</span></span>
+<span class="giallo-l"><span>    hcloud = {</span></span>
+<span class="giallo-l"><span>      source  = &quot;hetznercloud/hcloud&quot;</span></span>
+<span class="giallo-l"><span>      version = &quot;1.41.0&quot;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>provider &quot;hcloud&quot; {</span></span>
+<span class="giallo-l"><span>  token = var.hcloud_token</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;hcloud_ssh_key&quot; &quot;personal&quot; {</span></span>
+<span class="giallo-l"><span>  name       = &quot;personal&quot;</span></span>
+<span class="giallo-l"><span>  public_key = file(var.ssh_public_key_path)</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;hcloud_firewall&quot; &quot;server&quot; {</span></span>
+<span class="giallo-l"><span>  name = &quot;crux-server-firewall&quot;</span></span>
+<span class="giallo-l"><span>  rule {</span></span>
+<span class="giallo-l"><span>    description = &quot;ssh&quot;</span></span>
+<span class="giallo-l"><span>    direction   = &quot;in&quot;</span></span>
+<span class="giallo-l"><span>    protocol    = &quot;tcp&quot;</span></span>
+<span class="giallo-l"><span>    port        = &quot;22&quot;</span></span>
+<span class="giallo-l"><span>    source_ips  = [&quot;0.0.0.0/0&quot;]</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>  rule {</span></span>
+<span class="giallo-l"><span>    description = &quot;http&quot;</span></span>
+<span class="giallo-l"><span>    direction   = &quot;in&quot;</span></span>
+<span class="giallo-l"><span>    protocol    = &quot;tcp&quot;</span></span>
+<span class="giallo-l"><span>    port        = &quot;80&quot;</span></span>
+<span class="giallo-l"><span>    source_ips  = [&quot;0.0.0.0/0&quot;]</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>  rule {</span></span>
+<span class="giallo-l"><span>    description = &quot;https&quot;</span></span>
+<span class="giallo-l"><span>    direction   = &quot;in&quot;</span></span>
+<span class="giallo-l"><span>    protocol    = &quot;tcp&quot;</span></span>
+<span class="giallo-l"><span>    port        = &quot;443&quot;</span></span>
+<span class="giallo-l"><span>    source_ips  = [&quot;0.0.0.0/0&quot;]</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>resource &quot;hcloud_server&quot; &quot;server&quot; {</span></span>
+<span class="giallo-l"><span>  name         = &quot;project-server&quot;</span></span>
+<span class="giallo-l"><span>  image        = &quot;ubuntu-22.04&quot;</span></span>
+<span class="giallo-l"><span>  server_type  = &quot;cax11&quot;</span></span>
+<span class="giallo-l"><span>  location     = &quot;fsn1&quot;</span></span>
+<span class="giallo-l"><span>  ssh_keys     = [hcloud_ssh_key.personal.id]</span></span>
+<span class="giallo-l"><span>  firewall_ids = [hcloud_firewall.server.id]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  public_net {</span></span>
+<span class="giallo-l"><span>    ipv6_enabled = false</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>output &quot;server_ip&quot; {</span></span>
+<span class="giallo-l"><span>  value = hcloud_server.server.ipv4_address</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This file basically provisions your firewall and VM. In my case, I made sure to add my public SSH key to the VM so I can SSH into it as soon as it's done provisioning. I also opened ports 80 and 443 in the firewall so I can have my domain name pointing to the VM.</p>
+<p>Make sure to change the values accordingly (such as the name and server type for your VM).</p>
+<p>The other files you'll need is <code>variables.tf</code>:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>variable &quot;hcloud_token&quot; {}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>variable &quot;ssh_public_key_path&quot; {</span></span>
+<span class="giallo-l"><span>  default = &quot;~/.ssh/personal.pub&quot;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><code>hcloud_token</code> is your API token, which will of course not be committed into your git repository, hence it's empty. When running Terraform, you can add a <code>--var-file=secrets.tfvars</code> which will point to a separate variables file that will contain the actual API token and will not be checked in to the repo.</p>
+<p>In my setup, I also added the <code>remote-exec</code> and <code>local-exec</code> provisioners so it runs my Ansible playbook automatically after the VM is up, but I left it out as an exercise to the reader ™.</p>
+<p>Now it should be as simple as running <code>terraform init</code> to initialize the directory, then <code>terraform plan</code> to view the planned changes, and <code>terraform apply --var-file=secrets.tfvars</code> to apply the changes and provision the resources.</p>
+<h2 id="using-ansible-to-set-up-the-vm">Using Ansible to set up the VM<a class="zola-anchor" href="#using-ansible-to-set-up-the-vm" aria-label="Anchor link for: using-ansible-to-set-up-the-vm" style="visibility: hidden;"></a>
+</h2>
+<p>I'm using Ansible to manage the configuration of my VM - my bash scripts, Docker compose files, cronjobs, packages, etc.</p>
+<p>Create a directory named <code>ansible</code> next to the <code>terraform</code> directory. Inside it, create a playbook with a name of your choice (<code>site.yml</code>, <code>vm.yml</code>, or whatever):</p>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> C</span><span class="z-string">onfigure VM</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  h</span><span class="z-entity z-name z-tag">osts</span><span>:</span><span class="z-string"> a</span><span class="z-string">ll</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  g</span><span class="z-entity z-name z-tag">ather_facts</span><span>:</span><span class="z-constant"> false</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  b</span><span class="z-entity z-name z-tag">ecome</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">oles</span><span>:</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-string"> v</span><span class="z-string">m</span></span></code></pre>
+<p>This basically calls the <code>vm</code> roles. Go ahead and create the following file: <code>roles/vm/tasks/main.yml</code></p>
+<p>Now, it's really up to you to build this role to your liking and configure anything you dream of.
+Me, personally? I use it to configure basic stuff (user, group, directories, packages), install Docker &amp; lazydocker, disable root &amp; password ssh authentication and so on.</p>
+<p>Here are some useful tasks that you may find yourself using as well:</p>
+<h3 id="configure-sshd">Configure sshd<a class="zola-anchor" href="#configure-sshd" aria-label="Anchor link for: configure-sshd" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> C</span><span class="z-string">onfigure sshd login</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  l</span><span class="z-entity z-name z-tag">ineinfile</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    d</span><span class="z-entity z-name z-tag">est</span><span>:</span><span class="z-string"> /</span><span class="z-string">etc/ssh/sshd_config</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">egexp</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">{{ item.regexp }}</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    l</span><span class="z-entity z-name z-tag">ine</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">{{ item.line }}</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> p</span><span class="z-string">resent</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  l</span><span class="z-entity z-name z-tag">oop</span><span>:</span></span>
+<span class="giallo-l"><span>    -</span><span> {</span><span class="z-entity z-name z-tag"> r</span><span class="z-entity z-name z-tag">egexp</span><span>:</span><span class="z-string"> ^</span><span class="z-string">PermitRootLogin</span><span>,</span><span class="z-entity z-name z-tag"> l</span><span class="z-entity z-name z-tag">ine</span><span>:</span><span class="z-string"> P</span><span class="z-string">ermitRootLogin no</span><span> }</span></span>
+<span class="giallo-l"><span>    -</span><span> {</span><span class="z-entity z-name z-tag"> r</span><span class="z-entity z-name z-tag">egexp</span><span>:</span><span class="z-string"> ^</span><span class="z-string">PasswordAuthentication</span><span>,</span><span class="z-entity z-name z-tag"> l</span><span class="z-entity z-name z-tag">ine</span><span>:</span><span class="z-string"> P</span><span class="z-string">asswordAuthentication no</span><span> }</span></span>
+<span class="giallo-l"><span>    -</span><span> {</span><span class="z-entity z-name z-tag"> r</span><span class="z-entity z-name z-tag">egexp</span><span>:</span><span class="z-string"> ^</span><span class="z-string">KbdInteractiveAuthentication</span><span>,</span><span class="z-entity z-name z-tag"> l</span><span class="z-entity z-name z-tag">ine</span><span>:</span><span class="z-string"> K</span><span class="z-string">bdInteractiveAuthentication no</span><span> }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> R</span><span class="z-string">estart SSH server</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  s</span><span class="z-entity z-name z-tag">ervice</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> s</span><span class="z-string">shd</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> r</span><span class="z-string">estarted</span></span></code></pre><h3 id="install-docker">Install Docker<a class="zola-anchor" href="#install-docker" aria-label="Anchor link for: install-docker" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> C</span><span class="z-string">heck if Docker is installed</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  c</span><span class="z-entity z-name z-tag">ommand</span><span>:</span><span class="z-string"> d</span><span class="z-string">ocker --version</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">egister</span><span>:</span><span class="z-string"> d</span><span class="z-string">ocker_valid</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  c</span><span class="z-entity z-name z-tag">hanged_when</span><span>:</span><span class="z-constant"> false</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  i</span><span class="z-entity z-name z-tag">gnore_errors</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> I</span><span class="z-string">nstall Docker</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  w</span><span class="z-entity z-name z-tag">hen</span><span>:</span><span class="z-string"> d</span><span class="z-string">ocker_valid.failed</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  b</span><span class="z-entity z-name z-tag">lock</span><span>:</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> I</span><span class="z-string">nstall required system packages</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      a</span><span class="z-entity z-name z-tag">pt</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        n</span><span class="z-entity z-name z-tag">ame</span><span>:</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> c</span><span class="z-string">a-certificates</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> c</span><span class="z-string">url</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> g</span><span class="z-string">nupg</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> l</span><span class="z-string">sb-release</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> p</span><span class="z-string">resent</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        u</span><span class="z-entity z-name z-tag">pdate_cache</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> noqa yaml[line-length]</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> S</span><span class="z-string">et up GPG key and repo</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      s</span><span class="z-entity z-name z-tag">hell</span><span>:</span><span class="z-keyword"> |</span></span>
+<span class="giallo-l"><span class="z-string">        mkdir -p /etc/apt/keyrings</span></span>
+<span class="giallo-l"><span class="z-string">        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg</span></span>
+<span class="giallo-l"><span class="z-string">        echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \</span></span>
+<span class="giallo-l"><span class="z-string">        https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot;\</span></span>
+<span class="giallo-l"><span class="z-string">        | tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      t</span><span class="z-entity z-name z-tag">ags</span><span>:</span><span class="z-string"> s</span><span class="z-string">kip_ansible_lint</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> I</span><span class="z-string">nstall Docker packages</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      a</span><span class="z-entity z-name z-tag">pt</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        n</span><span class="z-entity z-name z-tag">ame</span><span>:</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> d</span><span class="z-string">ocker-ce</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> d</span><span class="z-string">ocker-ce-cli</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> c</span><span class="z-string">ontainerd.io</span></span>
+<span class="giallo-l"><span>          -</span><span class="z-string"> d</span><span class="z-string">ocker-compose-plugin</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> p</span><span class="z-string">resent</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        u</span><span class="z-entity z-name z-tag">pdate_cache</span><span>:</span><span class="z-constant"> true</span></span></code></pre><h3 id="install-lazydocker">Install lazydocker<a class="zola-anchor" href="#install-lazydocker" aria-label="Anchor link for: install-lazydocker" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> C</span><span class="z-string">heck if lazydocker is installed</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  c</span><span class="z-entity z-name z-tag">ommand</span><span>:</span><span class="z-string"> l</span><span class="z-string">azydocker --version</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">egister</span><span>:</span><span class="z-string"> l</span><span class="z-string">azydocker_valid</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  c</span><span class="z-entity z-name z-tag">hanged_when</span><span>:</span><span class="z-constant"> false</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  i</span><span class="z-entity z-name z-tag">gnore_errors</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> I</span><span class="z-string">nstall lazydocker</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  w</span><span class="z-entity z-name z-tag">hen</span><span>:</span><span class="z-string"> l</span><span class="z-string">azydocker_valid.failed</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  b</span><span class="z-entity z-name z-tag">lock</span><span>:</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> D</span><span class="z-string">ownload lazydocker</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      g</span><span class="z-entity z-name z-tag">et_url</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        u</span><span class="z-entity z-name z-tag">rl</span><span>:</span><span class="z-string"> h</span><span class="z-string">ttps://github.com/jesseduffield/lazydocker/releases/download/v0.23.1/lazydocker_0.23.1_Linux_arm64.tar.gz</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        d</span><span class="z-entity z-name z-tag">est</span><span>:</span><span class="z-string"> /</span><span class="z-string">tmp/lazydocker.tar.gz</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> E</span><span class="z-string">xtract lazydocker</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      u</span><span class="z-entity z-name z-tag">narchive</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        s</span><span class="z-entity z-name z-tag">rc</span><span>:</span><span class="z-string"> /</span><span class="z-string">tmp/lazydocker.tar.gz</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        d</span><span class="z-entity z-name z-tag">est</span><span>:</span><span class="z-string"> /</span><span class="z-string">tmp</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        r</span><span class="z-entity z-name z-tag">emote_src</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> C</span><span class="z-string">opy lazydocker to /usr/local/bin</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      c</span><span class="z-entity z-name z-tag">opy</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        s</span><span class="z-entity z-name z-tag">rc</span><span>:</span><span class="z-string"> /</span><span class="z-string">tmp/lazydocker</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        d</span><span class="z-entity z-name z-tag">est</span><span>:</span><span class="z-string"> /</span><span class="z-string">usr/local/bin/lazydocker</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        m</span><span class="z-entity z-name z-tag">ode</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">0755</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        r</span><span class="z-entity z-name z-tag">emote_src</span><span>:</span><span class="z-constant"> true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    -</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> R</span><span class="z-string">emove temporary lazydocker files</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      f</span><span class="z-entity z-name z-tag">ile</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        p</span><span class="z-entity z-name z-tag">ath</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">{{ item }}</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">        s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> a</span><span class="z-string">bsent</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">      l</span><span class="z-entity z-name z-tag">oop</span><span>:</span></span>
+<span class="giallo-l"><span>        -</span><span class="z-string"> /</span><span class="z-string">tmp/lazydocker.tar.gz</span></span>
+<span class="giallo-l"><span>        -</span><span class="z-string"> /</span><span class="z-string">tmp/lazydocker</span></span></code></pre><h3 id="synchronize-docker-compose-directory">Synchronize docker compose directory<a class="zola-anchor" href="#synchronize-docker-compose-directory" aria-label="Anchor link for: synchronize-docker-compose-directory" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> S</span><span class="z-string">ynchronize stacks</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  t</span><span class="z-entity z-name z-tag">emplate</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    s</span><span class="z-entity z-name z-tag">rc</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">{{ item }}</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    d</span><span class="z-entity z-name z-tag">est</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">/home/&lt;user&gt;/stacks/{{ item | basename }}</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    o</span><span class="z-entity z-name z-tag">wner</span><span>:</span><span class="z-string"> &lt;</span><span class="z-string">user&gt;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    m</span><span class="z-entity z-name z-tag">ode</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">0644</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  w</span><span class="z-entity z-name z-tag">ith_fileglob</span><span>:</span></span>
+<span class="giallo-l"><span>    -</span><span class="z-string"> t</span><span class="z-string">emplates/stacks/*.yml</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  t</span><span class="z-entity z-name z-tag">ags</span><span>:</span><span class="z-string"> s</span><span class="z-string">tacks</span></span></code></pre><h3 id="mount-hetzner-storage-box">Mount Hetzner Storage Box<a class="zola-anchor" href="#mount-hetzner-storage-box" aria-label="Anchor link for: mount-hetzner-storage-box" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> C</span><span class="z-string">reate storage box mount directory</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  f</span><span class="z-entity z-name z-tag">ile</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    p</span><span class="z-entity z-name z-tag">ath</span><span>:</span><span class="z-string"> /</span><span class="z-string">mnt/Storage</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> d</span><span class="z-string">irectory</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    o</span><span class="z-entity z-name z-tag">wner</span><span>:</span><span class="z-string"> &lt;</span><span class="z-string">user&gt;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    m</span><span class="z-entity z-name z-tag">ode</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">0755</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>-</span><span class="z-entity z-name z-tag"> n</span><span class="z-entity z-name z-tag">ame</span><span>:</span><span class="z-string"> M</span><span class="z-string">ount storage box</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  m</span><span class="z-entity z-name z-tag">ount</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    p</span><span class="z-entity z-name z-tag">ath</span><span>:</span><span class="z-string"> /</span><span class="z-string">mnt/Storage</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    s</span><span class="z-entity z-name z-tag">rc</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">{{ hcloud_storage_box_path }}</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    f</span><span class="z-entity z-name z-tag">stype</span><span>:</span><span class="z-string"> c</span><span class="z-string">ifs</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    o</span><span class="z-entity z-name z-tag">pts</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">iocharset=utf8,rw,user={{ hcloud_storage_box_username }},pass={{ hcloud_storage_box_password }},uid=1000,gid=1000,file_mode=0660,dir_mode=0770</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    s</span><span class="z-entity z-name z-tag">tate</span><span>:</span><span class="z-string"> m</span><span class="z-string">ounted</span></span></code></pre>
+<p>It's really handy to use ansible-vault to manage secret variables.</p>
+<h2 id="crafting-docker-compose-files">Crafting Docker compose files<a class="zola-anchor" href="#crafting-docker-compose-files" aria-label="Anchor link for: crafting-docker-compose-files" style="visibility: hidden;"></a>
+</h2>
+<p>Your next step will be to actually run the services you want. For that, you'll need Docker compose files. I like to keep them in the Ansible role <code>templates/stacks</code> directory, and use Ansible's templating engine to fill in secret variables such as tokens and passwords.</p>
+<p>Here are some compose files that can come in handy (make sure to change the variables and volume mounts accordingly):</p>
+<h3 id="nginx-proxy-manager">NGINX Proxy Manager<a class="zola-anchor" href="#nginx-proxy-manager" aria-label="Anchor link for: nginx-proxy-manager" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">v</span><span class="z-entity z-name z-tag">ersion</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">3.8</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">s</span><span class="z-entity z-name z-tag">ervices</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  a</span><span class="z-entity z-name z-tag">pp</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    i</span><span class="z-entity z-name z-tag">mage</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">jc21/nginx-proxy-manager:latest</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    c</span><span class="z-entity z-name z-tag">ontainer_name</span><span>:</span><span class="z-string"> n</span><span class="z-string">ginx-proxy-manager</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">estart</span><span>:</span><span class="z-string"> u</span><span class="z-string">nless-stopped</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    n</span><span class="z-entity z-name z-tag">etwork_mode</span><span>:</span><span class="z-string"> h</span><span class="z-string">ost</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">olumes</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> /</span><span class="z-string">home/&lt;user&gt;/volumes/nginx-proxy-manager/data:/data</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> /</span><span class="z-string">home/&lt;user&gt;/volumes/nginx-proxy-manager/letsencrypt:/etc/letsencrypt</span></span></code></pre><h3 id="nextcloud">Nextcloud<a class="zola-anchor" href="#nextcloud" aria-label="Anchor link for: nextcloud" style="visibility: hidden;"></a>
+</h3>
+<pre class="giallo z-code"><code data-lang="yaml"><span class="giallo-l"><span class="z-entity z-name z-tag">v</span><span class="z-entity z-name z-tag">ersion</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">3.8</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">s</span><span class="z-entity z-name z-tag">ervices</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  m</span><span class="z-entity z-name z-tag">ariadb</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    i</span><span class="z-entity z-name z-tag">mage</span><span>:</span><span class="z-string"> m</span><span class="z-string">ariadb:10.6</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    c</span><span class="z-entity z-name z-tag">ontainer_name</span><span>:</span><span class="z-string"> n</span><span class="z-string">extcloud-mariadb</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    c</span><span class="z-entity z-name z-tag">ommand</span><span>:</span><span class="z-string"> --</span><span class="z-string">transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">estart</span><span>:</span><span class="z-string"> u</span><span class="z-string">nless-stopped</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">olumes</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> /</span><span class="z-string">home/&lt;user&gt;/volumes/nextcloud/mariadb:/var/lib/mysql:Z</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    e</span><span class="z-entity z-name z-tag">nvironment</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> M</span><span class="z-string">YSQL_ROOT_PASSWORD={{ nextcloud_mysql_password }}</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> M</span><span class="z-string">YSQL_PASSWORD={{ nextcloud_mysql_password }}</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> M</span><span class="z-string">YSQL_DATABASE=nextcloud</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> M</span><span class="z-string">YSQL_USER=nextcloud</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> M</span><span class="z-string">ARIADB_AUTO_UPGRADE=1</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> M</span><span class="z-string">ARIADB_DISABLE_UPGRADE_BACKUP=1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  r</span><span class="z-entity z-name z-tag">edis</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    i</span><span class="z-entity z-name z-tag">mage</span><span>:</span><span class="z-string"> r</span><span class="z-string">edis:alpine</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    c</span><span class="z-entity z-name z-tag">ontainer_name</span><span>:</span><span class="z-string"> n</span><span class="z-string">extcloud-redis</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">estart</span><span>:</span><span class="z-string"> u</span><span class="z-string">nless-stopped</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">  n</span><span class="z-entity z-name z-tag">extcloud</span><span>:</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    i</span><span class="z-entity z-name z-tag">mage</span><span>:</span><span class="z-string"> l</span><span class="z-string">scr.io/linuxserver/nextcloud:latest</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    c</span><span class="z-entity z-name z-tag">ontainer_name</span><span>:</span><span class="z-string"> n</span><span class="z-string">extcloud</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    e</span><span class="z-entity z-name z-tag">nvironment</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> P</span><span class="z-string">UID=1000</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> P</span><span class="z-string">GID=1000</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> T</span><span class="z-string">Z=&lt;timezone&gt;</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    v</span><span class="z-entity z-name z-tag">olumes</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> /</span><span class="z-string">home/&lt;user&gt;/volumes/nextcloud:/config</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> /</span><span class="z-string">mnt/&lt;nextcloud dir&gt;:/data</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    p</span><span class="z-entity z-name z-tag">orts</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> 8</span><span class="z-string">082:443</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    d</span><span class="z-entity z-name z-tag">epends_on</span><span>:</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> m</span><span class="z-string">ariadb</span></span>
+<span class="giallo-l"><span>      -</span><span class="z-string"> r</span><span class="z-string">edis</span></span>
+<span class="giallo-l"><span class="z-entity z-name z-tag">    r</span><span class="z-entity z-name z-tag">estart</span><span>:</span><span class="z-string"> u</span><span class="z-string">nless-stopped</span></span></code></pre><h3 id="accessing-the-vm-from-outside">Accessing the VM from outside<a class="zola-anchor" href="#accessing-the-vm-from-outside" aria-label="Anchor link for: accessing-the-vm-from-outside" style="visibility: hidden;"></a>
+</h3>
+<p>The safest option to access your VM from outside the cloud network is using a VPN. You can self host Wireguard with <code>wg-easy</code> or use Tailscale (recommended).</p>
+<p>If you want your services to be publicly accessible, you'll need to set up a reverse proxy which will map subdomains to your services which are exposed on certain ports (for example, to access your Nextcloud instance, you'll visit <code>nextcloud.mylab.com</code> instead of <code>mylab.com:8082</code>).</p>
+<p>I do a mix of both. I like using Tailscale to access services that I don't need exposed to the internet, and that I don't mind connecting to the VPN for, like Netdata, and I use Nginx Proxy Manager as a reverse proxy for other services that I want to access from anywhere without a VPN.</p>
+<p>FYI, there are other solutions which I won't cover here like Cloudflare tunnels. Do your research if this seems right for you.</p>
+<h4 id="reverse-proxy">Reverse proxy<a class="zola-anchor" href="#reverse-proxy" aria-label="Anchor link for: reverse-proxy" style="visibility: hidden;"></a>
+</h4>
+<p>First you'll need to purchase a domain. I recommend heading over to <a rel="nofollow noreferrer external" href="https://tld-list.com/">TLD-List</a> to look for a cheap TLD (you probably don't need <code>.com</code> or <code>.ai</code> for your cheap lab).</p>
+<p>After that, I like to change the DNS nameserver for the domain from the domain registrar's to Cloudflare, simply because I like their UI and their API.</p>
+<p>Set an A record for <code>@</code> (root) to your VM's IP address, and set a CNAME record for <code>*</code> to point to <code>@</code>, so any subdomain will also point to the VM.</p>
+<p>Then in your reverse proxy of choice, you can map each subdomain you want to a service, along with an SSL certificate.</p>
+<h2 id="final-words">Final words<a class="zola-anchor" href="#final-words" aria-label="Anchor link for: final-words" style="visibility: hidden;"></a>
+</h2>
+<p>I hope you found this writeup useful. I tried to only write about the general gist of things without going into many details, but also without being too brisk and missing critical points. Self-hosting can be intimidating at first, but once you experiment with it, and try things out, it's not too scary.</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>

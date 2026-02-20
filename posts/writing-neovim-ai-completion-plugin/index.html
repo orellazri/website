@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Writing a Neovim AI Code Completion Plugin From Scratch</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#what-is-fill-in-the-middle-fim">What is Fill-in-the-Middle (FIM)?</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#corridor">Corridor</a>
+          
+          <ul>
+            
+            <li>
+              <a class="h3" href="#gathering-context">Gathering Context</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#cancelling-stale-requests">Cancelling Stale Requests</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#rendering-ghost-text">Rendering Ghost Text</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#debouncing">Debouncing</a>
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Writing a Neovim AI Code Completion Plugin From Scratch</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Feb 20, 2026</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/coding"><span>#</span>coding</a><a class="instant" href="https://orellazri.com/tags/ai"><span>#</span>ai</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>I've used AI code completion (Copilot and Cursor) long enough that I miss it when it's not there. But I never loved the "trust me" part: a closed service, running somewhere else. I wanted a version I could run locally, point at a model on my own machine, and understand end-to-end.</p>
+<p>So I built <a rel="nofollow noreferrer external" href="https://github.com/orellazri/corridor.nvim">Corridor</a>, a small inline code completion plugin for Neovim.</p>
+<p>I wanted it small and boring:</p>
+<ul>
+<li>Ghost text suggestions that appear as you type, like Copilot</li>
+<li>Works with local models via <a rel="nofollow noreferrer external" href="https://lmstudio.ai">LM Studio</a></li>
+<li>Uses FIM (Fill-in-the-Middle) completions, which are purpose-built for code infilling</li>
+<li>Small codebase I can actually understand and maintain</li>
+</ul>
+<p>Also, this was the first time I wrote a Neovim plugin from scratch. I'm happy with how it turned out, but I'm sure there are improvements to be made.</p>
+<h2 id="what-is-fill-in-the-middle-fim">What is Fill-in-the-Middle (FIM)?<a class="zola-anchor" href="#what-is-fill-in-the-middle-fim" aria-label="Anchor link for: what-is-fill-in-the-middle-fim" style="visibility: hidden;"></a>
+</h2>
+<p>Most language models generate left-to-right. Great for chat, awkward for code completion. In an editor, your cursor is usually <em>in the middle of something</em>: inside an argument list, between two lines, halfway through a conditional. If the model only sees what comes before the cursor, it's guessing blind about what you're trying to fit into.</p>
+<p>FIM solves this by giving the model both sides of the cursor. The prompt is split into three parts:</p>
+<ul>
+<li><strong>Prefix</strong>: Everything before the cursor</li>
+<li><strong>Suffix</strong>: Everything after the cursor</li>
+<li><strong>Middle</strong>: The gap the model needs to fill</li>
+</ul>
+<p>The model is trained with special tokens that mark these regions. For example, with Qwen-based models:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>&lt;|fim_prefix|&gt;</span></span>
+<span class="giallo-l"><span>def calculate_total(items):</span></span>
+<span class="giallo-l"><span>    total = 0</span></span>
+<span class="giallo-l"><span>    for item in items:</span></span>
+<span class="giallo-l"><span>&lt;|fim_suffix|&gt;</span></span>
+<span class="giallo-l"><span>    return total</span></span>
+<span class="giallo-l"><span>&lt;|fim_middle|&gt;</span></span></code></pre>
+<p>The model sees the function signature, the loop setup, <em>and</em> the return statement, then fills the hole with something like <code>total += item.price</code>. Without the suffix, it tends to wander: more lines than you want, or a different shape of function altogether.</p>
+<p>Different model families use different FIM tokens. CodeLlama uses <code>&lt;PRE&gt;</code>, <code>&lt;SUF&gt;</code>, <code>&lt;MID&gt;</code>. DeepSeek uses <code>&lt;｜fim▁begin｜&gt;</code>, <code>&lt;｜fim▁hole｜&gt;</code>, <code>&lt;｜fim▁end｜&gt;</code>. Corridor ships with presets for all the major ones:</p>
+<pre class="giallo z-code"><code data-lang="lua"><span class="giallo-l"><span class="z-variable z-other">M</span><span>.</span><span class="z-entity">fim_presets</span><span class="z-keyword"> =</span><span> {</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  starcoder</span><span class="z-keyword"> =</span><span> { </span><span class="z-variable z-other">prefix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;fim_prefix&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">suffix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;fim_suffix&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">middle</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;fim_middle&gt;</span><span class="z-punctuation z-definition z-string">&quot; </span><span>},</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  codellama</span><span class="z-keyword"> =</span><span> { </span><span class="z-variable z-other">prefix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;PRE&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">suffix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;SUF&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">middle</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;MID&gt;</span><span class="z-punctuation z-definition z-string">&quot; </span><span>},</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  deepseek</span><span class="z-keyword">  =</span><span> { </span><span class="z-variable z-other">prefix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;｜fim▁begin｜&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">suffix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;｜fim▁hole｜&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">middle</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;｜fim▁end｜&gt;</span><span class="z-punctuation z-definition z-string">&quot; </span><span>},</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  qwen</span><span class="z-keyword">      =</span><span> { </span><span class="z-variable z-other">prefix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;|fim_prefix|&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">suffix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;|fim_suffix|&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">middle</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;|fim_middle|&gt;</span><span class="z-punctuation z-definition z-string">&quot; </span><span>},</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  codestral</span><span class="z-keyword"> =</span><span> { </span><span class="z-variable z-other">prefix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;|fim_prefix|&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">suffix</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;|fim_suffix|&gt;</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-variable z-other">middle</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">&lt;|fim_middle|&gt;</span><span class="z-punctuation z-definition z-string">&quot; </span><span>},</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="corridor">Corridor<a class="zola-anchor" href="#corridor" aria-label="Anchor link for: corridor" style="visibility: hidden;"></a>
+</h2>
+<p>The flow is: you type in insert mode, Neovim fires <code>CursorMovedI</code>, Corridor debounces that, grabs context around the cursor, sends a FIM request, and renders the result as ghost text. Tab accepts, Shift-Tab dismisses.</p>
+<h3 id="gathering-context">Gathering Context<a class="zola-anchor" href="#gathering-context" aria-label="Anchor link for: gathering-context" style="visibility: hidden;"></a>
+</h3>
+<p>The context module extracts the prefix and suffix from the current buffer. The interesting bit is the asymmetric context window: when you limit the context size, Corridor allocates 70% of the budget to lines <em>before</em> the cursor and 30% to lines <em>after</em>:</p>
+<pre class="giallo z-code"><code data-lang="lua"><span class="giallo-l"><span class="z-keyword">local</span><span class="z-variable z-other"> before_limit</span><span class="z-keyword"> =</span><span class="z-support"> math.floor</span><span>(</span><span class="z-variable z-other">max_lines</span><span class="z-keyword"> *</span><span class="z-constant"> 0.7</span><span>)</span></span>
+<span class="giallo-l"><span class="z-variable z-other">before_start</span><span class="z-keyword"> =</span><span class="z-support"> math.max</span><span>(</span><span class="z-constant">0</span><span>, </span><span class="z-variable z-other">row</span><span class="z-keyword"> -</span><span class="z-variable z-other"> before_limit</span><span>)</span></span></code></pre>
+<p>The code you just wrote tends to be a better predictor than whatever happens to be below the cursor. With a 50-line budget, 35 lines back and 15 forward is usually more useful than 25/25.</p>
+<p>The context module also detects whether the cursor is mid-line (non-whitespace characters exist after the cursor). This matters later when deciding whether to show multi-line or single-line suggestions.</p>
+<h3 id="cancelling-stale-requests">Cancelling Stale Requests<a class="zola-anchor" href="#cancelling-stale-requests" aria-label="Anchor link for: cancelling-stale-requests" style="visibility: hidden;"></a>
+</h3>
+<p>When you type quickly you end up with a burst of in-flight requests. You only want the newest one; everything else is stale. The catch is that <code>plenary.curl</code> doesn't give you a clean way to cancel an HTTP request mid-flight.</p>
+<p>The solution is a monotonically increasing request ID:</p>
+<pre class="giallo z-code"><code data-lang="lua"><span class="giallo-l"><span class="z-keyword">local</span><span class="z-variable z-other"> current_request_id</span><span class="z-keyword"> =</span><span class="z-constant"> 0</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-variable z-other">M</span><span>.</span><span class="z-entity z-name">cancel</span><span class="z-keyword"> =</span><span class="z-keyword"> function</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  current_request_id</span><span class="z-keyword"> =</span><span class="z-variable z-other"> current_request_id</span><span class="z-keyword"> +</span><span class="z-constant"> 1</span></span>
+<span class="giallo-l"><span class="z-keyword">end</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-variable z-other">M</span><span>.</span><span class="z-entity z-name">fetch_suggestion</span><span class="z-keyword"> =</span><span class="z-keyword"> function</span><span>(</span><span class="z-variable z-parameter z-function">context</span><span>,</span><span class="z-variable z-parameter z-function"> callback</span><span>)</span></span>
+<span class="giallo-l"><span class="z-variable z-other">  M</span><span>.</span><span class="z-support">cancel</span><span>()  </span><span class="z-punctuation z-definition z-comment">--</span><span class="z-comment"> Invalidate any in-flight request</span></span>
+<span class="giallo-l"><span class="z-keyword">  local</span><span class="z-variable z-other"> my_request_id</span><span class="z-keyword"> =</span><span class="z-variable z-other"> current_request_id</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-variable z-other">  curl</span><span>.</span><span class="z-support">post</span><span>(</span><span class="z-variable z-other">endpoint</span><span>, {</span></span>
+<span class="giallo-l"><span class="z-constant">    ...</span></span>
+<span class="giallo-l"><span class="z-entity z-name">    callback</span><span class="z-keyword"> =</span><span class="z-keyword"> function</span><span>(</span><span class="z-variable z-parameter z-function">res</span><span>)</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">      --</span><span class="z-comment"> If our ID doesn&#39;t match, a newer request was made -- bail</span></span>
+<span class="giallo-l"><span class="z-keyword">      if</span><span class="z-variable z-other"> my_request_id</span><span class="z-keyword"> ~=</span><span class="z-variable z-other"> current_request_id</span><span class="z-keyword"> then</span><span class="z-keyword"> return</span><span class="z-keyword"> end</span></span>
+<span class="giallo-l"><span class="z-constant">      ...</span></span>
+<span class="giallo-l"><span class="z-keyword">    end</span><span>,</span></span>
+<span class="giallo-l"><span>  })</span></span>
+<span class="giallo-l"><span class="z-keyword">end</span></span></code></pre>
+<p>The response still arrives and gets parsed, but if a newer request was started in the meantime, the callback just drops it. I repeat that check a few times (after the response, after <code>vim.schedule</code>, and right before rendering) because editor state changes fast and stale suggestions are extremely noticeable.</p>
+<h3 id="rendering-ghost-text">Rendering Ghost Text<a class="zola-anchor" href="#rendering-ghost-text" aria-label="Anchor link for: rendering-ghost-text" style="visibility: hidden;"></a>
+</h3>
+<p>Neovim's extmark API makes ghost text pretty clean. The first line is rendered as an overlay at the cursor, and extra lines are rendered as virtual lines below:</p>
+<pre class="giallo z-code"><code data-lang="lua"><span class="giallo-l"><span class="z-variable z-other">M</span><span>.</span><span class="z-entity z-name">show</span><span class="z-keyword"> =</span><span class="z-keyword"> function</span><span>(</span><span class="z-variable z-parameter z-function">text</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">  local</span><span class="z-variable z-other"> lines</span><span class="z-keyword"> =</span><span class="z-variable z-other"> vim</span><span>.</span><span class="z-support">split</span><span>(</span><span class="z-variable z-other">text</span><span>, </span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant">\n</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, { </span><span class="z-variable z-other">plain</span><span class="z-keyword"> =</span><span class="z-constant"> true</span><span> })</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">  local</span><span class="z-variable z-other"> extmark_opts</span><span class="z-keyword"> =</span><span> {</span></span>
+<span class="giallo-l"><span class="z-variable z-other">    virt_text</span><span class="z-keyword"> =</span><span> { { </span><span class="z-variable z-other">lines</span><span>[</span><span class="z-constant">1</span><span>], </span><span class="z-variable z-other">hl_group</span><span> } },</span></span>
+<span class="giallo-l"><span class="z-variable z-other">    virt_text_pos</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">overlay</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span></span>
+<span class="giallo-l"><span>  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-keyword">  if</span><span class="z-keyword"> #</span><span class="z-variable z-other">lines</span><span class="z-keyword"> &gt;</span><span class="z-constant"> 1</span><span class="z-keyword"> then</span></span>
+<span class="giallo-l"><span class="z-keyword">    local</span><span class="z-variable z-other"> virt_lines</span><span class="z-keyword"> =</span><span> {}</span></span>
+<span class="giallo-l"><span class="z-keyword">    for</span><span class="z-variable z-other"> i</span><span class="z-keyword"> =</span><span class="z-constant"> 2</span><span>, </span><span class="z-keyword">#</span><span class="z-variable z-other">lines</span><span class="z-keyword"> do</span></span>
+<span class="giallo-l"><span class="z-support">      table.insert</span><span>(</span><span class="z-variable z-other">virt_lines</span><span>, { { </span><span class="z-variable z-other">lines</span><span>[</span><span class="z-variable z-other">i</span><span>], </span><span class="z-variable z-other">hl_group</span><span> } })</span></span>
+<span class="giallo-l"><span class="z-keyword">    end</span></span>
+<span class="giallo-l"><span class="z-variable z-other">    extmark_opts</span><span>.</span><span class="z-entity">virt_lines</span><span class="z-keyword"> =</span><span class="z-variable z-other"> virt_lines</span></span>
+<span class="giallo-l"><span class="z-keyword">  end</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-variable z-other">  vim</span><span>.</span><span class="z-entity">api</span><span>.</span><span class="z-support">nvim_buf_set_extmark</span><span>(</span><span class="z-variable z-other">buf</span><span>, </span><span class="z-variable z-other">ns_id</span><span>, </span><span class="z-variable z-other">line</span><span>, </span><span class="z-variable z-other">col</span><span>, </span><span class="z-variable z-other">extmark_opts</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">end</span></span></code></pre>
+<p>The suggestion is styled with a custom <code>CorridorSuggestion</code> highlight group that defaults to <code>Comment</code> (typically gray/dimmed), so it's visually distinct from real code.</p>
+<h3 id="debouncing">Debouncing<a class="zola-anchor" href="#debouncing" aria-label="Anchor link for: debouncing" style="visibility: hidden;"></a>
+</h3>
+<p>Debouncing is straightforward with <code>vim.uv.new_timer()</code>. Every keystroke resets the timer; the request only fires after you pause for 250ms (configurable):</p>
+<pre class="giallo z-code"><code data-lang="lua"><span class="giallo-l"><span class="z-entity z-name">timer</span><span>:</span><span class="z-support">stop</span><span>()</span></span>
+<span class="giallo-l"><span class="z-entity z-name">timer</span><span>:</span><span class="z-support">start</span><span>(</span><span class="z-variable z-other">config</span><span>.</span><span class="z-support">get</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">debounce_ms</span><span class="z-punctuation z-definition z-string">&quot;</span><span>), </span><span class="z-constant">0</span><span>, </span><span class="z-variable z-other">vim</span><span>.</span><span class="z-support">schedule_wrap</span><span>(</span><span class="z-keyword">function</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">  if</span><span class="z-variable z-other"> vim</span><span>.</span><span class="z-entity">api</span><span>.</span><span class="z-support">nvim_get_mode</span><span>().</span><span class="z-entity">mode</span><span class="z-keyword"> ==</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">i</span><span class="z-punctuation z-definition z-string">&quot; </span><span class="z-keyword">then</span></span>
+<span class="giallo-l"><span class="z-variable z-other">    M</span><span>.</span><span class="z-support">_request_suggestion</span><span>()</span></span>
+<span class="giallo-l"><span class="z-keyword">  end</span></span>
+<span class="giallo-l"><span class="z-keyword">end</span><span>))</span></span></code></pre>
+<p>The keymap setup has a nice trick: Tab accepts the suggestion when one is visible, but falls through to its default behavior (indentation, completion menu navigation) when there's no suggestion:</p>
+<pre class="giallo z-code"><code data-lang="lua"><span class="giallo-l"><span class="z-keyword">local</span><span class="z-keyword"> function</span><span class="z-entity z-name"> with_suggestion_or_fallback</span><span>(</span><span class="z-variable z-parameter z-function">key</span><span>,</span><span class="z-variable z-parameter z-function"> action</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">  return</span><span class="z-keyword"> function</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    if</span><span class="z-variable z-other"> ui</span><span>.</span><span class="z-entity">current_suggestion</span><span class="z-keyword"> then</span></span>
+<span class="giallo-l"><span class="z-support">      action</span><span>()</span></span>
+<span class="giallo-l"><span class="z-keyword">    else</span></span>
+<span class="giallo-l"><span class="z-keyword">      local</span><span class="z-variable z-other"> termcodes</span><span class="z-keyword"> =</span><span class="z-variable z-other"> vim</span><span>.</span><span class="z-entity">api</span><span>.</span><span class="z-support">nvim_replace_termcodes</span><span>(</span><span class="z-variable z-other">key</span><span>, </span><span class="z-constant">true</span><span>, </span><span class="z-constant">true</span><span>, </span><span class="z-constant">true</span><span>)</span></span>
+<span class="giallo-l"><span class="z-variable z-other">      vim</span><span>.</span><span class="z-entity">api</span><span>.</span><span class="z-support">nvim_feedkeys</span><span>(</span><span class="z-variable z-other">termcodes</span><span>, </span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">n</span><span class="z-punctuation z-definition z-string">&quot;</span><span>, </span><span class="z-constant">false</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    end</span></span>
+<span class="giallo-l"><span class="z-keyword">  end</span></span>
+<span class="giallo-l"><span class="z-keyword">end</span></span></code></pre>
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>

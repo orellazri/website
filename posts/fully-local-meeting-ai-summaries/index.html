@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  
+  
+    
+  
+  <meta name="description" content="">
+
+  <title>Fully Local AI Meeting Summaries</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
+  <style>
+@font-face {
+  font-display: swap;
+  font-family: 'Piazzolla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/Piazzolla.woff2') format('woff2');
+}
+</style>
+
+  <style>
+
+  /* light mode colors */
+  body {
+    --primary-color: #5871a2;
+    --primary-pale-color: #5871a233;
+    --primary-decoration-color: #5871a210;
+    --bg-color: #ffffff;
+    --text-color: #2f3030;
+    --text-pale-color: #767676;
+    --text-decoration-color: #a9a9a9;
+    --highlight-mark-color: #5f75b020;
+
+    --callout-note-color: #5871a2;
+    --callout-tip-color: #268556;
+    --callout-important-color: #885fc9;
+    --callout-warning-color: #ab6632;
+    --callout-caution-color: #c64e4e;
+  }
+
+  /* dark mode colors */
+  body.dark {
+    --primary-color: #6f8fd1;
+    --primary-pale-color: #6f8fd166;
+    --primary-decoration-color: #6f8fd112;
+    --bg-color: #2b2b38;
+    --text-color: #c1c1c1;
+    --text-pale-color: #848484;
+    --text-decoration-color: #5f5f5f;
+    --highlight-mark-color: #8296cb3b;
+
+    --callout-note-color: #6f8fd1;
+    --callout-tip-color: #47976f;
+    --callout-important-color: #9776cd;
+    --callout-warning-color: #ad7a52;
+    --callout-caution-color: #d06161;
+  }
+
+  /* typography */
+  body {
+    --main-font: 'Piazzolla', serif;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --homepage-max-width: 768px;
+    --main-max-width: 768px;
+    --avatar-size: 50px;
+    --font-size: 17px;
+    --line-height: 1.75;
+    --img-border-radius: 0px;
+    --detail-border-radius: 0px;
+    --dark-mode-img-brightness: 0.75;
+    --dark-mode-chart-brightness: 0.75;
+    --inline-code-border-radius: 2px;
+    --inline-code-bg-color: var(--primary-decoration-color);
+    --block-code-border-radius: 0px;
+    --block-code-border-color: var(--primary-color);
+    --detail-border-color: var(--primary-color);
+  }
+
+</style>
+
+  <link rel="stylesheet" href="https://orellazri.com/main.css">
+  
+
+<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
+
+
+
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</head>
+
+<body class="post dark">
+  
+  
+<div id="wrapper">
+  <div id="blank"></div>
+  <aside>
+    
+    
+    <nav>
+      <ul>
+        
+        <li>
+          <a class="h2" href="#the-problem">The Problem</a>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#technical-architecture">Technical Architecture</a>
+          
+          <ul>
+            
+            <li>
+              <a class="h3" href="#transcription">Transcription</a>
+            </li>
+            
+            <li>
+              <a class="h3" href="#summarization">Summarization</a>
+            </li>
+            
+          </ul>
+          
+        </li>
+        
+        <li>
+          <a class="h2" href="#unix-philosophy-and-cli-design">Unix Philosophy and CLI Design</a>
+          
+        </li>
+        
+      </ul>
+    </nav>
+    
+    
+    <button id="back-to-top" aria-label="back to top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+
+    </button>
+    
+  </aside>
+  <main>
+    
+<header>
+  <nav>
+    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
+  </nav>
+</header>
+
+
+    <div>
+      
+      
+      
+      
+      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+"></div>
+      
+      <article class="prose">
+        <h1>Fully Local AI Meeting Summaries</h1>
+        <div id="post-info">
+          <div id="date">
+            <span id="publish">Jul 26, 2025</span>
+            </div>
+
+          
+          <div id="tags">
+            <a class="instant" href="https://orellazri.com/tags/coding"><span>#</span>coding</a><a class="instant" href="https://orellazri.com/tags/ai"><span>#</span>ai</a>
+          </div>
+          
+        </div>
+
+        
+        
+
+        
+
+        <p>Remote work has transformed how we conduct meetings, but it's also created a new challenge: keeping track of everything discussed across countless video calls. While most platforms offer cloud recording, searching through hours of audio for that one key decision made three meetings ago remains a painful experience. This led me to build <a rel="nofollow noreferrer external" href="https://github.com/orellazri/essence"><strong>Essence</strong></a>, a fully local command-line tool that transcribes meeting audio and generates structured summaries without sending any data to external services.</p>
+<p>This project builds on my previous exploration of local AI with Rust - <a rel="nofollow noreferrer external" href="https://orellazri.com/posts/rag-pipeline-chat-with-my-obsidian-vault/">RAG Pipeline to Chat with My Obsidian Vault</a>, where I first dove into running AI models locally for privacy and performance.</p>
+<h2 id="the-problem">The Problem<a class="zola-anchor" href="#the-problem" aria-label="Anchor link for: the-problem" style="visibility: hidden;"></a>
+</h2>
+<p>Meeting recordings pile up quickly, but finding specific information requires listening through entire recordings. What I needed was something that could:</p>
+<ol>
+<li>Convert audio recordings to searchable text</li>
+<li>Generate concise summaries highlighting key decisions and action items</li>
+<li>Work entirely offline for privacy and speed</li>
+<li>Integrate seamlessly into my existing CLI-based workflow</li>
+</ol>
+<p>I did not want to use/pay for any cloud services that join the meetings for me (**<em>cough</em>** [Some Stupid Name] The Note Taker **<em>cough</em>**), and I wanted to use my own hardware.</p>
+<h2 id="technical-architecture">Technical Architecture<a class="zola-anchor" href="#technical-architecture" aria-label="Anchor link for: technical-architecture" style="visibility: hidden;"></a>
+</h2>
+<p>Essence is built in Rust and follows a modular design with two primary components: transcription and summarization. I'm using OpenAI's Whisper model running locally via the <code>whisper-rs</code> crate for speech recognition, and Ollama for local language model inference. Everything runs entirely on my machine - no data ever leaves my system, which you know I love.</p>
+<p>I achieved good results by using Apple's Metal acceleration for the Whisper model (<code>ggml-large-v3.bin</code>), and the <code>gemma3:27b</code> model from Ollama for summarization. On my M4 Pro, transcribing a and summarizing a 45-minute meeting took less than 8 minutes (your mileage may vary).</p>
+<h3 id="transcription">Transcription<a class="zola-anchor" href="#transcription" aria-label="Anchor link for: transcription" style="visibility: hidden;"></a>
+</h3>
+<p>The transcription module wraps Whisper's C++ implementation, handling the complex audio preprocessing required for speech recognition.</p>
+<p>We first have to read the <code>wav</code> audio file (using <code>hound</code>) into a vector of 16-bit integers.</p>
+<pre class="giallo z-code"><code data-lang="rust"><span class="giallo-l"><span class="z-storage z-type">let</span><span class="z-variable z-other"> samples</span><span class="z-keyword">:</span><span class="z-entity z-name"> Vec</span><span>&lt;</span><span class="z-entity z-name">i16</span><span>&gt;</span><span class="z-keyword"> =</span><span class="z-entity z-name"> WavReader</span><span class="z-keyword">::</span><span class="z-entity z-name">open</span><span>(</span><span class="z-variable z-other">audio_path</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    .</span><span class="z-entity z-name">map_err</span><span>(</span><span class="z-keyword">|</span><span class="z-variable z-other">e</span><span class="z-keyword">|</span><span class="z-entity z-name"> Error</span><span class="z-keyword">::</span><span class="z-entity z-name">new</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-entity z-name">format!</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">Failed to open wav file: </span><span class="z-string">{</span><span class="z-string">}</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-variable z-other"> e</span><span>)</span><span>)</span><span>)</span><span class="z-keyword">?</span></span>
+<span class="giallo-l"><span class="z-keyword">    .</span><span class="z-entity z-name">into_samples</span><span class="z-keyword">::</span><span>&lt;</span><span class="z-entity z-name">i16</span><span>&gt;</span><span>(</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    .</span><span class="z-entity z-name">map</span><span>(</span><span class="z-keyword">|</span><span class="z-variable z-other">x</span><span class="z-keyword">|</span><span class="z-variable z-other"> x</span><span class="z-keyword">.</span><span class="z-entity z-name">map_err</span><span>(</span><span class="z-keyword">|</span><span class="z-variable z-other">e</span><span class="z-keyword">|</span><span class="z-entity z-name"> Error</span><span class="z-keyword">::</span><span class="z-entity z-name">new</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-entity z-name">format!</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">Failed to read wav file: </span><span class="z-string">{</span><span class="z-string">}</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-variable z-other"> e</span><span>)</span><span>)</span><span>)</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    .</span><span class="z-entity z-name">collect</span><span class="z-keyword">::</span><span>&lt;</span><span class="z-entity z-name">Result</span><span>&lt;</span><span class="z-entity z-name">Vec</span><span>&lt;</span><span class="z-entity z-name">i16</span><span>&gt;</span><span>,</span><span class="z-entity z-name"> Error</span><span>&gt;</span><span>&gt;</span><span>(</span><span>)</span><span class="z-keyword">?</span><span>;</span></span></code></pre>
+<p>The Whisper model expects 16KHz mono f32 samples, meaning we have to do just a bit more work:</p>
+<pre class="giallo z-code"><code data-lang="rust"><span class="giallo-l"><span class="z-storage z-type">let</span><span class="z-storage"> mut</span><span class="z-variable z-other"> inter_samples</span><span class="z-keyword"> =</span><span class="z-entity z-name"> vec!</span><span>[</span><span class="z-entity z-name">Default</span><span class="z-keyword">::</span><span class="z-entity z-name">default</span><span>(</span><span>)</span><span>;</span><span class="z-variable z-other"> samples</span><span class="z-keyword">.</span><span class="z-entity z-name">len</span><span>(</span><span>)</span><span>]</span><span>;</span></span>
+<span class="giallo-l"><span class="z-entity z-name">whisper_rs</span><span class="z-keyword">::</span><span class="z-entity z-name">convert_integer_to_float_audio</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-variable z-other">samples</span><span>,</span><span class="z-keyword"> &amp;</span><span class="z-storage">mut</span><span class="z-variable z-other"> inter_samples</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    .</span><span class="z-entity z-name">map_err</span><span>(</span><span class="z-keyword">|</span><span class="z-variable z-other">e</span><span class="z-keyword">|</span><span class="z-entity z-name"> Error</span><span class="z-keyword">::</span><span class="z-entity z-name">new</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-entity z-name">format!</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">Failed to convert audio data: </span><span class="z-string">{</span><span class="z-string">}</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-variable z-other"> e</span><span>)</span><span>)</span><span>)</span><span class="z-keyword">?</span><span>;</span></span>
+<span class="giallo-l"><span class="z-storage z-type">let</span><span class="z-variable z-other"> samples</span><span class="z-keyword"> =</span><span class="z-entity z-name"> whisper_rs</span><span class="z-keyword">::</span><span class="z-entity z-name">convert_stereo_to_mono_audio</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-variable z-other">inter_samples</span><span>)</span></span>
+<span class="giallo-l"><span class="z-keyword">    .</span><span class="z-entity z-name">map_err</span><span>(</span><span class="z-keyword">|</span><span class="z-variable z-other">e</span><span class="z-keyword">|</span><span class="z-entity z-name"> Error</span><span class="z-keyword">::</span><span class="z-entity z-name">new</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-entity z-name">format!</span><span>(</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">Failed to convert audio data: </span><span class="z-string">{</span><span class="z-string">}</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-variable z-other"> e</span><span>)</span><span>)</span><span>)</span><span class="z-keyword">?</span><span>;</span></span></code></pre>
+<p>After that's done, we can run the model and get back a vector of text segments. Et voila!</p>
+<h3 id="summarization">Summarization<a class="zola-anchor" href="#summarization" aria-label="Anchor link for: summarization" style="visibility: hidden;"></a>
+</h3>
+<p>The summarization component interfaces with Ollama to run large language models locally. The model parameters are tuned for consistent, focused output - low temperature reduces randomness while constrained sampling ensures the model stays on topic.</p>
+<p>The prompt engineering focuses on extracting actionable information:</p>
+<pre class="giallo z-code"><code data-lang="rust"><span class="giallo-l"><span class="z-keyword">fn</span><span class="z-entity z-name"> get_prompt</span><span>(</span><span class="z-keyword">&amp;</span><span class="z-variable z-language">self</span><span>,</span><span class="z-variable z-other"> text</span><span class="z-keyword">:</span><span class="z-keyword"> &amp;</span><span class="z-entity z-name">str</span><span>)</span><span class="z-keyword"> -&gt;</span><span class="z-entity z-name"> String</span><span> {</span></span>
+<span class="giallo-l"><span class="z-entity z-name">    format!</span><span>(</span></span>
+<span class="giallo-l"><span class="z-string">        r</span><span class="z-punctuation z-definition z-string">#</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-string">You are an AI assistant that summarizes meeting transcriptions. Your task is to:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-string">1. Extract the key topics and decisions discussed</span></span>
+<span class="giallo-l"><span class="z-string">2. Identify action items and their owners (if mentioned)</span></span>
+<span class="giallo-l"><span class="z-string">3. Note any important technical details or specifications</span></span>
+<span class="giallo-l"><span class="z-string">4. Highlight any unresolved questions or issues</span></span>
+<span class="giallo-l"><span class="z-string">5. Keep the summary concise but comprehensive</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-string">Please provide a well-structured summary of the following meeting transcript:</span></span>
+<span class="giallo-l"><span class="z-string">        {text}</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-punctuation z-definition z-string">#</span></span>
+<span class="giallo-l"><span>    )</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="unix-philosophy-and-cli-design">Unix Philosophy and CLI Design<a class="zola-anchor" href="#unix-philosophy-and-cli-design" aria-label="Anchor link for: unix-philosophy-and-cli-design" style="visibility: hidden;"></a>
+</h2>
+<p>I designed Essence to follow Unix principles: do one thing well and play nicely with other tools. The CLI exposes two primary commands that can be chained together or used independently:</p>
+<pre class="giallo z-code"><code data-lang="shellscript"><span class="giallo-l"><span class="z-entity z-name">essence</span><span class="z-string"> transcribe</span><span class="z-constant"> -</span><span class="z-constant">i</span><span class="z-string"> audio.wav</span><span class="z-constant"> -</span><span class="z-constant">l</span><span class="z-string"> en</span><span class="z-constant"> -</span><span class="z-constant">m</span><span class="z-string"> ggml-large-v3.bin</span></span>
+<span class="giallo-l"><span class="z-entity z-name">essence</span><span class="z-string"> summarize</span><span class="z-constant"> -</span><span class="z-constant">i</span><span class="z-string"> transcript.txt</span><span class="z-constant"> -</span><span class="z-constant">m</span><span class="z-string"> gemma3:27b</span></span></code></pre>
+<p>Following Unix conventions, the tool outputs results to stdout and logs to stderr. This makes it perfect for scripting and automation. Here's a script that takes a locally recorded meeting video and produces a summary:</p>
+<pre class="giallo z-code"><code data-lang="shellscript"><span class="giallo-l"><span class="z-punctuation z-definition z-comment">#!</span><span class="z-comment">/bin/bash</span></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> extract_and_summarize.sh - Convert video to summary</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-variable z-other">VIDEO_FILE</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-variable">$</span><span class="z-variable">1</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-variable z-other">AUDIO_FILE</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">meeting_audio.wav</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"><span class="z-variable z-other">TRANSCRIPT_FILE</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">transcript.txt</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> Extract audio from video</span></span>
+<span class="giallo-l"><span class="z-entity z-name">ffmpeg</span><span class="z-constant"> -</span><span class="z-constant">i</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">VIDEO_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> -</span><span class="z-constant">ar</span><span class="z-constant"> 16000</span><span class="z-constant"> -</span><span class="z-constant">ac</span><span class="z-constant"> 1</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">AUDIO_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> -</span><span class="z-constant">y</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> Transcribe the audio</span></span>
+<span class="giallo-l"><span class="z-entity z-name">essence</span><span class="z-string"> transcribe</span><span class="z-constant"> -</span><span class="z-constant">i</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">AUDIO_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> -</span><span class="z-constant">l</span><span class="z-string"> en</span><span class="z-constant"> -</span><span class="z-constant">m</span><span class="z-string"> ~/models/ggml-large-v3.bin</span><span class="z-keyword"> &gt;</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">TRANSCRIPT_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> Generate summary</span></span>
+<span class="giallo-l"><span class="z-entity z-name">essence</span><span class="z-string"> summarize</span><span class="z-constant"> -</span><span class="z-constant">i</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">TRANSCRIPT_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-constant"> -</span><span class="z-constant">m</span><span class="z-string"> gemma3:27b</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span class="z-punctuation z-definition z-comment">#</span><span class="z-comment"> Cleanup</span></span>
+<span class="giallo-l"><span class="z-entity z-name">rm</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">AUDIO_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-variable z-other">$</span><span class="z-variable z-other">TRANSCRIPT_FILE</span><span class="z-punctuation z-definition z-string">&quot;</span></span></code></pre>
+<p>Now imagine running this script after each meeting, saving the result in your Obsidian vault, and then chatting with it using the <a rel="nofollow noreferrer external" href="https://orellazri.com/posts/rag-pipeline-chat-with-my-obsidian-vault/">fully-local RAG pipeline I previously built</a>.</p>
+
+      </article>
+
+      
+      
+
+      
+      
+    </div>
+
+    
+
+
+<footer>
+  <div class="left">
+    <div class="copyright">
+      
+      
+    </div>
+  </div>
+
+  <div class="right">
+    
+    
+      
+    
+    
+    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
+    
+    
+
+    
+  </div>
+</footer>
+
+
+
+
+<dialog id="rss-mask">
+  <div>
+    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
+    
+    
+    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
+" >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
+
+    </button>
+  </div>
+</dialog>
+
+
+
+  </main>
+</div>
+
+  
+<script src="/js/lightense.min.js"></script>
+
+
+  <script src="https://orellazri.com/js/main.js"></script>
+</body>
+
+</html>
