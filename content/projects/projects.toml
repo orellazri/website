@@ -14,6 +14,13 @@ featured = false
 
 [[collection]]
 type = "card_simple"
+title = "corridor.nvim"
+link = "https://github.com/orellazri/corridor.nvim"
+content = "AI-powered inline code completion for Neovim"
+featured = false
+
+[[collection]]
+type = "card_simple"
 title = "Coda MCP"
 link = "https://github.com/orellazri/coda-mcp"
 content = "MCP Server for Coda"
