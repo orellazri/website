@@ -10,7 +10,7 @@ pub struct Frontmatter {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Post {
-    pub frontmatter: Frontmatter,
+    pub front: Frontmatter,
     pub slug: String,
     pub html: String,
 }

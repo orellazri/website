@@ -4,7 +4,7 @@ use anyhow::{Result, anyhow};
 
 use crate::models::Frontmatter;
 
-/// Parse a markdown file, returing its frontmatter and its content as HTML
+/// Parse a markdown file, returing its front and its content as HTML
 pub fn parse_file(path: &Path) -> Result<(Frontmatter, String)> {
     let raw = fs::read_to_string(path)?;
 
@@ -14,7 +14,7 @@ pub fn parse_file(path: &Path) -> Result<(Frontmatter, String)> {
         return Err(anyhow!("missing front matter in  {:?}", path));
     }
 
-    let frontmatter: Frontmatter = toml::from_str(parts[1].trim())?;
+    let front: Frontmatter = toml::from_str(parts[1].trim())?;
     let markdown = parts[2].trim();
 
     // markdown -> HTML
@@ -27,5 +27,5 @@ pub fn parse_file(path: &Path) -> Result<(Frontmatter, String)> {
     let mut html_out = String::new();
     pulldown_cmark::html::push_html(&mut html_out, parser);
 
-    Ok((frontmatter, html_out))
+    Ok((front, html_out))
 }
