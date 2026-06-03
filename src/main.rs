@@ -1,13 +1,16 @@
 use std::{fs, path::Path};
 
 use anyhow::{Context, Result};
+use clap::Parser;
 use walkdir::WalkDir;
 
-use crate::{models::Post, parser::parse_file, renderer::Renderer};
+use crate::{cli::Cli, models::Post, parser::parse_file, renderer::Renderer, serve::serve};
 
+mod cli;
 mod models;
 mod parser;
 mod renderer;
+mod serve;
 
 fn collect_posts(content_dir: &Path) -> Result<Vec<Post>> {
     let mut posts = vec![];
@@ -56,6 +59,8 @@ fn build() -> Result<()> {
     let posts = collect_posts(Path::new("content"))?;
     let renderer = Renderer::new(Path::new("templates"), dist)?;
 
+    let out_dir = dist.join("posts");
+    fs::create_dir_all(out_dir)?;
     for post in &posts {
         renderer.render_post(post)?;
     }
@@ -64,7 +69,15 @@ fn build() -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    build()?;
+    let cli = Cli::parse();
+
+    match cli.command {
+        cli::Command::Build => build()?,
+        cli::Command::Serve { port } => {
+            build()?;
+            serve(port)?;
+        }
+    }
 
     Ok(())
 }
