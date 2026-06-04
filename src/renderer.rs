@@ -6,7 +6,7 @@ use std::{
 use anyhow::Result;
 use tera::{Context, Tera};
 
-use crate::models::{Page, Post};
+use crate::models::PageContext;
 
 pub struct Renderer {
     tera: Tera,
@@ -23,35 +23,23 @@ impl Renderer {
         })
     }
 
-    pub fn render_page(&self, page: &Page) -> Result<()> {
-        let mut ctx = Context::new();
-        ctx.insert("page", page);
+    pub fn render(&self, ctx: &PageContext) -> Result<()> {
+        let mut tera_ctx = Context::new();
 
-        let out_path = if page.front.slug.is_empty() {
-            // slug "" → dist/index.html
-            self.out.join("index.html")
-        } else {
-            // slug "about" → dist/about/index.html
-            let dir = self.out.join(&page.front.slug);
-            std::fs::create_dir_all(&dir)?;
-            dir.join("index.html")
-        };
+        match ctx {
+            PageContext::Index { posts } => tera_ctx.insert("posts", posts),
+            PageContext::PostList { posts } => tera_ctx.insert("posts", posts),
+            PageContext::Post { post } => tera_ctx.insert("post", post),
+            PageContext::Page { page } => tera_ctx.insert("page", page),
+        }
 
-        let html = self.tera.render(&page.front.template, &ctx)?;
-        std::fs::write(out_path, html)?;
+        let out_path = ctx.out_path(&self.out);
+        if let Some(parent) = out_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
 
-        Ok(())
-    }
-
-    pub fn render_post(&self, post: &Post) -> Result<()> {
-        let dir = self.out.join("posts").join(&post.slug);
-        fs::create_dir_all(&dir)?;
-
-        let mut ctx = Context::new();
-        ctx.insert("post", post);
-
-        let html = self.tera.render("post.html", &ctx)?;
-        fs::write(dir.join("index.html"), html)?;
+        let html = self.tera.render(ctx.template(), &tera_ctx)?;
+        fs::write(out_path, html)?;
 
         Ok(())
     }

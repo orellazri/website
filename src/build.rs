@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use walkdir::WalkDir;
 
 use crate::{
-    models::{Page, Post},
+    models::{Page, PageContext, Post},
     parser::parse_file,
     renderer::Renderer,
 };
@@ -25,37 +25,22 @@ pub fn build() -> Result<()> {
         },
     )?;
 
-    let pages = collect_pages(Path::new("content/pages"))?;
     let posts = collect_posts(Path::new("content/posts"))?;
+    let pages = collect_pages(Path::new("content/pages"))?;
     let renderer = Renderer::new(Path::new("templates"), dist)?;
 
-    fs::create_dir_all(dist.join("pages"))?;
-    for page in &pages {
-        renderer.render_page(page)?;
+    renderer.render(&PageContext::Index { posts: &posts })?;
+    renderer.render(&PageContext::PostList { posts: &posts })?;
+
+    for post in &posts {
+        renderer.render(&PageContext::Post { post })?;
     }
 
-    fs::create_dir_all(dist.join("posts"))?;
-    for post in &posts {
-        renderer.render_post(post)?;
+    for page in &pages {
+        renderer.render(&PageContext::Page { page })?;
     }
 
     Ok(())
-}
-
-fn collect_pages(content_dir: &Path) -> Result<Vec<Page>> {
-    let mut pages = vec![];
-
-    for entry in WalkDir::new(content_dir)
-        .into_iter()
-        .filter_map(|e| e.ok())
-        .filter(|e| e.path().extension() == Some("md".as_ref()))
-    {
-        let (front, html) = parse_file(entry.path())?;
-
-        pages.push(Page { front, html })
-    }
-
-    Ok(pages)
 }
 
 fn collect_posts(content_dir: &Path) -> Result<Vec<Post>> {
@@ -84,4 +69,26 @@ fn collect_posts(content_dir: &Path) -> Result<Vec<Post>> {
     posts.sort_by_key(|b| std::cmp::Reverse(b.front.date));
 
     Ok(posts)
+}
+
+fn collect_pages(content_dir: &Path) -> Result<Vec<Page>> {
+    let mut pages = vec![];
+
+    for entry in WalkDir::new(content_dir)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension() == Some("md".as_ref()))
+    {
+        let (front, html) = parse_file(entry.path())?;
+        let slug = entry
+            .path()
+            .file_stem()
+            .context(format!("cannot extract file stem from {:?}", entry))?
+            .to_string_lossy()
+            .to_string();
+
+        pages.push(Page { front, slug, html })
+    }
+
+    Ok(pages)
 }
