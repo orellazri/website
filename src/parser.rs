@@ -1,11 +1,13 @@
 use std::{fs, path::Path};
 
 use anyhow::{Result, anyhow};
+use serde::de::DeserializeOwned;
 
-use crate::models::Frontmatter;
-
-/// Parse a markdown file, returing its front and its content as HTML
-pub fn parse_file(path: &Path) -> Result<(Frontmatter, String)> {
+/// Parse a markdown file, returing its frontmatter and its content as HTML
+pub fn parse_file<F>(path: &Path) -> Result<(F, String)>
+where
+    F: DeserializeOwned,
+{
     let raw = fs::read_to_string(path)?;
 
     // split on the +++ delimiters
@@ -14,7 +16,7 @@ pub fn parse_file(path: &Path) -> Result<(Frontmatter, String)> {
         return Err(anyhow!("missing front matter in  {:?}", path));
     }
 
-    let front: Frontmatter = toml::from_str(parts[1].trim())?;
+    let front: F = toml::from_str(parts[1].trim())?;
     let markdown = parts[2].trim();
 
     // markdown -> HTML

@@ -3,7 +3,11 @@ use std::{fs, path::Path};
 use anyhow::{Context, Result};
 use walkdir::WalkDir;
 
-use crate::{models::Post, parser::parse_file, renderer::Renderer};
+use crate::{
+    models::{Page, Post},
+    parser::parse_file,
+    renderer::Renderer,
+};
 
 pub fn build() -> Result<()> {
     let dist = Path::new("dist");
@@ -21,11 +25,16 @@ pub fn build() -> Result<()> {
         },
     )?;
 
-    let posts = collect_posts(Path::new("content"))?;
+    let pages = collect_pages(Path::new("content/pages"))?;
+    let posts = collect_posts(Path::new("content/posts"))?;
     let renderer = Renderer::new(Path::new("templates"), dist)?;
 
-    let out_dir = dist.join("posts");
-    fs::create_dir_all(out_dir)?;
+    fs::create_dir_all(dist.join("pages"))?;
+    for page in &pages {
+        renderer.render_page(page)?;
+    }
+
+    fs::create_dir_all(dist.join("posts"))?;
     for post in &posts {
         renderer.render_post(post)?;
     }
@@ -33,10 +42,26 @@ pub fn build() -> Result<()> {
     Ok(())
 }
 
+fn collect_pages(content_dir: &Path) -> Result<Vec<Page>> {
+    let mut pages = vec![];
+
+    for entry in WalkDir::new(content_dir)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension() == Some("md".as_ref()))
+    {
+        let (front, html) = parse_file(entry.path())?;
+
+        pages.push(Page { front, html })
+    }
+
+    Ok(pages)
+}
+
 fn collect_posts(content_dir: &Path) -> Result<Vec<Post>> {
     let mut posts = vec![];
 
-    for entry in WalkDir::new(content_dir.join("posts"))
+    for entry in WalkDir::new(content_dir)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| e.path().extension() == Some("md".as_ref()))
