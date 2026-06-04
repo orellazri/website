@@ -5,6 +5,7 @@ use crate::{build::build, cli::Cli, serve::serve};
 
 mod build;
 mod cli;
+mod highlight;
 mod models;
 mod parser;
 mod renderer;
