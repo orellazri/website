@@ -1,3 +1,6 @@
+use axum::Router;
+use tower_http::services::ServeDir;
+
 pub fn serve(port: u16) -> anyhow::Result<()> {
     println!("Serving at http://localhost:{port}");
 
@@ -7,9 +10,6 @@ pub fn serve(port: u16) -> anyhow::Result<()> {
 }
 
 async fn run_server(port: u16) {
-    use axum::Router;
-    use tower_http::services::ServeDir;
-
     let app = Router::new()
         .fallback_service(ServeDir::new("dist").append_index_html_on_directories(true));
 
