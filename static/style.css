@@ -29,3 +29,17 @@ header {
   gap: 1rem;
   align-items: center;
 }
+
+.index-main {
+  margin-top: 2rem;
+}
+
+.index-subtitle {
+  font-weight: 500;
+  margin-top: 0.1rem;
+  font-size: 1.3rem;
+}
+
+.index-text {
+  margin-top: 1rem;
+}
