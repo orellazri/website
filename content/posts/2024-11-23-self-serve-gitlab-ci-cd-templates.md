@@ -33,8 +33,8 @@ stages:
   # -- snip --
 
 include:
-  - 'utilities/*.yml'
-  - 'templates/**/*.yml'
+  - "utilities/*.yml"
+  - "templates/**/*.yml"
   # -- snip --
 ```
 
@@ -50,8 +50,8 @@ And an example of a step template:
 .slack:send-message:
   image: organization/image
   variables:
-    SLACK_WEBHOOK: ''
-    MESSAGE: ''
+    SLACK_WEBHOOK: ""
+    MESSAGE: ""
   script:
     - |
       cat <<'EOF' > notification_template
@@ -63,7 +63,7 @@ And an example of a step template:
     - 'curl -X POST -H "Content-type: application/json" --data @notification.json ${SLACK_WEBHOOK}'
 ```
 
-*Shameless plug: We use [Render Kit](https://github.com/orellazri/renderkit) to render templates, which is a handly tool that I developed, check it out!*
+_Shameless plug: We use [Render Kit](https://github.com/orellazri/renderkit) to render templates, which is a handly tool that I developed, check it out!_
 
 ## Example of Using Templates
 
@@ -105,6 +105,6 @@ Each template can include documentation for optional and requires variables, sta
 The resulting documentation shows how to use each template, with practical examples and explanations.
 
 The output, when rendered by MkDocs, looks like this:
-![MkDocs Screenshot](../self-serve-gitlab-ci-cd-templates-mkdocs-screenshot.png "Screenshot of MkDocs output")
+![MkDocs Screenshot](/images/self-serve-gitlab-ci-cd-templates-mkdocs-screenshot.png "Screenshot of MkDocs output")
 
 By implementing generic templates in GitLab, we have empowered our developers to build and manage their own CI/CD pipelines. This self-serve system not only accelerates the development process but also ensures consistency and best practices across all projects.
