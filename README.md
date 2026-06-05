@@ -6,5 +6,3 @@ This repository contains the source code for my personal website.
 cargo run -- serve
 cargo run -- build
 ```
-
----
