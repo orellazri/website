@@ -43,6 +43,7 @@ code {
   font-family: var(--font-mono);
   font-optical-sizing: auto;
   font-size: 0.875rem;
+  overflow-wrap: break-word;
 }
 
 .site-header {
@@ -133,6 +134,16 @@ code {
   align-items: baseline;
 }
 
+.post-list li a {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.post-list li time {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .post-subtitle {
   display: flex;
   align-items: center;
@@ -154,4 +165,35 @@ code {
 
 .post-tags li:not(:last-child)::after {
   content: ", ";
+}
+
+.site-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+@media (max-width: 600px) {
+  .site-main {
+    margin: 1rem auto 2rem;
+  }
+
+  .site-content {
+    margin-top: 1.5rem;
+  }
+
+  .site-footer-content {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+  }
+
+  .site-footer-content-block:last-child {
+    text-align: start;
+  }
+
+  .intro-subtitle {
+    font-size: 1.15rem;
+  }
 }
