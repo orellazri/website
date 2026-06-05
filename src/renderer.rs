@@ -38,6 +38,10 @@ impl Renderer {
             PageContext::PostList { posts } => tera_ctx.insert("posts", posts),
             PageContext::Post { post } => tera_ctx.insert("post", post),
             PageContext::Page { page } => tera_ctx.insert("page", page),
+            PageContext::Tag { tag, posts } => {
+                tera_ctx.insert("tag", tag);
+                tera_ctx.insert("posts", posts);
+            }
         }
 
         let out_path = ctx.out_path(&self.out);

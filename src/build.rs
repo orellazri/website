@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{collections::HashMap, fs, path::Path};
 
 use anyhow::{Context, Result};
 use walkdir::WalkDir;
@@ -38,6 +38,19 @@ pub fn build() -> Result<()> {
 
     for page in &pages {
         renderer.render(&PageContext::Page { page })?;
+    }
+
+    let mut tag_map: HashMap<&str, Vec<&Post>> = HashMap::new();
+    for post in &posts {
+        for tag in &post.front.tags {
+            tag_map.entry(tag).or_default().push(post);
+        }
+    }
+    for (tag, tagged_posts) in &tag_map {
+        renderer.render(&PageContext::Tag {
+            tag,
+            posts: tagged_posts,
+        })?;
     }
 
     Ok(())

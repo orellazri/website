@@ -34,6 +34,7 @@ pub enum PageContext<'a> {
     PostList { posts: &'a [Post] },
     Post { post: &'a Post },
     Page { page: &'a Page },
+    Tag { tag: &'a str, posts: &'a [&'a Post] },
 }
 
 impl PageContext<'_> {
@@ -43,6 +44,7 @@ impl PageContext<'_> {
             PageContext::PostList { .. } => "posts.html",
             PageContext::Post { .. } => "post.html",
             PageContext::Page { .. } => "page.html",
+            PageContext::Tag { .. } => "tag.html",
         }
     }
 
@@ -52,6 +54,7 @@ impl PageContext<'_> {
             PageContext::PostList { .. } => dist.join("posts/index.html"),
             PageContext::Post { post } => dist.join(format!("posts/{}/index.html", post.slug)),
             PageContext::Page { page } => dist.join(format!("{}/index.html", page.slug)),
+            PageContext::Tag { tag, .. } => dist.join(format!("tags/{}/index.html", tag)),
         }
     }
 }
