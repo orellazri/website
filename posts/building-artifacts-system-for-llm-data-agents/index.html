@@ -1,185 +1,48 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light dark">
-  
-  
-    
-  
-  <meta name="description" content="">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Building an Artifacts System for Our LLM Data Agents</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="https://orellazri.com/img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="https://orellazri.com/img/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://orellazri.com/img/apple-touch-icon.png">
-  <style>
-@import url('https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,CRSV@300..1000,0.9,1&display=swap');
-</style>
-
-  <style>
-
-  /* light mode colors */
-  body {
-    --primary-color: #5871a2;
-    --primary-pale-color: #5871a233;
-    --primary-decoration-color: #5871a210;
-    --bg-color: #ffffff;
-    --text-color: #2f3030;
-    --text-pale-color: #767676;
-    --text-decoration-color: #a9a9a9;
-    --highlight-mark-color: #5f75b020;
-
-    --callout-note-color: #5871a2;
-    --callout-tip-color: #268556;
-    --callout-important-color: #885fc9;
-    --callout-warning-color: #ab6632;
-    --callout-caution-color: #c64e4e;
-  }
-
-  /* dark mode colors */
-  body.dark {
-    --primary-color: #93cce8;
-    --primary-pale-color: #6f8fd166;
-    --primary-decoration-color: #6f8fd112;
-    --bg-color: #242338;
-    --text-color: #f7ece5;
-    --text-pale-color: #848484;
-    --text-decoration-color: #5f5f5f;
-    --highlight-mark-color: #8296cb3b;
-
-    --callout-note-color: #6f8fd1;
-    --callout-tip-color: #47976f;
-    --callout-important-color: #9776cd;
-    --callout-warning-color: #ad7a52;
-    --callout-caution-color: #d06161;
-  }
-
-  /* typography */
-  body {
-    --main-font: 'Recursive', serif;
-    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    --font-size: 16px;
-    --homepage-max-width: 768px;
-    --main-max-width: 768px;
-    --avatar-size: 50px;
-    --line-height: 1.75;
-    --img-border-radius: 0px;
-    --detail-border-radius: 0px;
-    --dark-mode-img-brightness: 0.75;
-    --dark-mode-chart-brightness: 0.75;
-    --inline-code-border-radius: 2px;
-    --inline-code-bg-color: var(--primary-decoration-color);
-    --block-code-border-radius: 0px;
-    --block-code-border-color: var(--primary-color);
-    --detail-border-color: var(--primary-color);
-  }
-
-</style>
-
-  <link rel="stylesheet" href="https://orellazri.com/main.css">
-  
-
-<link id="hl" rel="stylesheet" type="text/css" href="/giallo-dark.css" />
-
-
-
+  <link rel="stylesheet" href="/reset.css" />
+  <link rel="stylesheet" href="/style.css" />
   <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-
 </head>
 
-<body class="post dark">
-  
-  
-<div id="wrapper">
-  <div id="blank"></div>
-  <aside>
-    
-    
-    <nav>
-      <ul>
-        
-        <li>
-          <a class="h2" href="#when-every-question-starts-from-scratch">When Every Question Starts from Scratch</a>
-          
-        </li>
-        
-        <li>
-          <a class="h2" href="#store-big-sample-small-query-on-demand">Store Big, Sample Small, Query on Demand</a>
-          
-        </li>
-        
-        <li>
-          <a class="h2" href="#conversation-flow-example">Conversation Flow Example</a>
-          
-        </li>
-        
-        <li>
-          <a class="h2" href="#wrapping-up">Wrapping Up</a>
-          
-        </li>
-        
-      </ul>
-    </nav>
-    
-    
-    <button id="back-to-top" aria-label="back to top">
+<body>
+  <main class="site-main">
+    <header class="site-header">
+      <div class="site-header-block">
+        <a href="/">Home</a>
+        <a href="/posts">Posts</a>
+        <a href="/projects">Projects</a>
+      </div>
+      <div class="site-header-block">
+      </div>
+    </header>
+
+    <div class="site-content">
+<article>
+  <h1>Building an Artifacts System for Our LLM Data Agents</h1>
+  <div class="post-subtitle">
+    <time>2026-01-03</time>
+    <ul class="post-tags">
       
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-
-    </button>
-    
-  </aside>
-  <main>
-    
-<header>
-  <nav>
-    <a id="back-link" href="https:&#x2F;&#x2F;orellazri.com&#x2F;posts">← Back</a>
-  </nav>
-</header>
-
-
-    <div>
+      <li><a href="/tags/ai">ai</a></li>
       
+      <li><a href="/tags/coding">coding</a></li>
       
-      
-      
-      <div id="copy-cfg" style="display: none;" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
-" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
-"></div>
-      
-      <article class="prose">
-        <h1>Building an Artifacts System for Our LLM Data Agents</h1>
-        <div id="post-info">
-          <div id="date">
-            <span id="publish">Jan 3, 2026</span>
-            </div>
-
-          
-          <div id="tags">
-            <a class="instant" href="https://orellazri.com/tags/ai"><span>#</span>ai</a><a class="instant" href="https://orellazri.com/tags/coding"><span>#</span>coding</a>
-          </div>
-          
-        </div>
-
-        
-        
-
-        
-
-        <p>At my day job, I've been working on an AI-powered data assistant that helps users query and analyze advertising campaign data through natural language. The initial version worked great for one-off questions, but I quickly discovered a fundamental challenge that was costing us both time and money. The AI had no memory of what data it had just fetched, unless it was stored in the context window.</p>
-<h2 id="when-every-question-starts-from-scratch">When Every Question Starts from Scratch<a class="zola-anchor" href="#when-every-question-starts-from-scratch" aria-label="Anchor link for: when-every-question-starts-from-scratch" style="visibility: hidden;"></a>
-</h2>
+    </ul>
+  </div>
+  <p>At my day job, I've been working on an AI-powered data assistant that helps users query and analyze advertising campaign data through natural language. The initial version worked great for one-off questions, but I quickly discovered a fundamental challenge that was costing us both time and money. The AI had no memory of what data it had just fetched, unless it was stored in the context window.</p>
+<h2>When Every Question Starts from Scratch</h2>
 <p>Consider this scenario: a user asks "Show me the spend and CPM for my campaigns during last Christmas" (spend and CPM are ad-related metrics). The assistant generates SQL, queries the data warehouse, and returns 500 rows of campaign data. Great.</p>
 <p>Then the user asks: "Filter that to just the top 10 by spend."</p>
 <p>Without a memory system, the assistant faced two problematic options. The first was to re-query the database entirely. This meant generating a new SQL query, hitting the data warehouse again, and potentially returning different results if the underlying data had changed, even slightly, between requests. Users expect to manipulate the same data they just saw, not a fresh snapshot.</p>
 <p>The second option was to keep all 500 rows in the conversation context. While modern models support impressive context lengths, stuffing hundreds of database rows into that window consumes tokens rapidly, increases costs, and can degrade response quality as the model struggles to find relevant information in a sea of data.</p>
 <p>Neither worked well. I needed something smarter.</p>
-<h2 id="store-big-sample-small-query-on-demand">Store Big, Sample Small, Query on Demand<a class="zola-anchor" href="#store-big-sample-small-query-on-demand" aria-label="Anchor link for: store-big-sample-small-query-on-demand" style="visibility: hidden;"></a>
-</h2>
+<h2>Store Big, Sample Small, Query on Demand</h2>
 <p>The insight that unlocked the solution was simple: the LLM doesn't need to <em>see</em> all the data to <em>understand</em> it. A three-row sample tells the model everything it needs to know about column names and data types. The full dataset can live elsewhere, ready to be queried when needed.</p>
 <p>This led to the artifacts system:</p>
 <ol>
@@ -188,71 +51,75 @@
 <li><strong>The LLM</strong> only sees the artifact ID, row count, and a small sample</li>
 </ol>
 <p>I store artifacts in PostgreSQL using a simple model with JSONB for the data column:</p>
-<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">class</span><span class="z-entity z-name"> ConversationArtifact</span><span>(</span><span class="z-entity">Base</span><span>)</span><span>:</span></span>
-<span class="giallo-l"><span>    __tablename__</span><span class="z-keyword"> =</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">conversation_artifacts</span><span class="z-punctuation z-definition z-string">&quot;</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-support">    id</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span class="z-constant">UUID</span><span>,</span><span class="z-variable"> primary_key</span><span class="z-keyword">=</span><span class="z-constant">True</span><span>,</span><span class="z-variable"> default</span><span class="z-keyword">=</span><span>uuid</span><span>.</span><span>uuid4</span><span>)</span></span>
-<span class="giallo-l"><span>    conversation_id</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span>String</span><span>,</span><span class="z-variable"> nullable</span><span class="z-keyword">=</span><span class="z-constant">False</span><span>)</span></span>
-<span class="giallo-l"><span>    data</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span class="z-constant">JSONB</span><span>,</span><span class="z-variable"> nullable</span><span class="z-keyword">=</span><span class="z-constant">False</span><span>)</span></span>
-<span class="giallo-l"><span>    created_at</span><span class="z-keyword"> =</span><span> Column</span><span>(</span><span>DateTime</span><span>,</span><span class="z-variable"> server_default</span><span class="z-keyword">=</span><span>func</span><span>.</span><span>now</span><span>(</span><span>)</span><span>)</span></span></code></pre>
+<pre><code><span style="color:#d3d0c8;">class ConversationArtifact(Base):
+</span><span style="color:#d3d0c8;">    __tablename__ = &quot;conversation_artifacts&quot;
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+</span><span style="color:#d3d0c8;">    conversation_id = Column(String, nullable=False)
+</span><span style="color:#d3d0c8;">    data = Column(JSONB, nullable=False)
+</span><span style="color:#d3d0c8;">    created_at = Column(DateTime, server_default=func.now())
+</span></code></pre>
 <p>Why JSONB? Different queries return different columns. A spend report has different fields than a performance breakdown. JSONB lets me store any shape of data without schema migrations every time I add a new query type.</p>
 <p>When the agent fetches data from the warehouse, I store the full result but only return a sample to the LLM. It looks something like this:</p>
-<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> get_data</span><span>(</span><span class="z-variable z-parameter z-function">query_params</span><span>:</span><span class="z-support"> dict</span><span>)</span><span> -&gt;</span><span class="z-support"> dict</span><span>:</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Execute SQL against the data warehouse</span></span>
-<span class="giallo-l"><span>    df</span><span class="z-keyword"> =</span><span> run_sql_query</span><span>(</span><span>generated_sql</span><span>)</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Store full dataset in PostgreSQL</span></span>
-<span class="giallo-l"><span>    artifact</span><span class="z-keyword"> =</span><span> artifact_repo</span><span>.</span><span>insert</span><span>(</span></span>
-<span class="giallo-l"><span class="z-variable">        conversation_id</span><span class="z-keyword">=</span><span>conversation_id</span><span>,</span></span>
-<span class="giallo-l"><span class="z-variable">        data</span><span class="z-keyword">=</span><span>df</span><span>.</span><span>to_json</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
-<span class="giallo-l"><span>    )</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Return only what the LLM needs</span></span>
-<span class="giallo-l"><span class="z-keyword">    return</span><span> {</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">artifact_id</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> str</span><span>(</span><span>artifact</span><span>.</span><span>id</span><span>)</span><span>,</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">sample</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span> df</span><span>.</span><span>head</span><span>(</span><span class="z-constant">3</span><span>)</span><span>.</span><span>to_dict</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span><span>,</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">total_rows</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> len</span><span>(</span><span>df</span><span>)</span><span>,</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">columns</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> list</span><span>(</span><span>df</span><span>.</span><span>columns</span><span>)</span></span>
-<span class="giallo-l"><span>    }</span></span></code></pre>
+<pre><code><span style="color:#d3d0c8;">def get_data(query_params: dict) -&gt; dict:
+</span><span style="color:#d3d0c8;">    # Execute SQL against the data warehouse
+</span><span style="color:#d3d0c8;">    df = run_sql_query(generated_sql)
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    # Store full dataset in PostgreSQL
+</span><span style="color:#d3d0c8;">    artifact = artifact_repo.insert(
+</span><span style="color:#d3d0c8;">        conversation_id=conversation_id,
+</span><span style="color:#d3d0c8;">        data=df.to_json(orient=&quot;records&quot;)
+</span><span style="color:#d3d0c8;">    )
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    # Return only what the LLM needs
+</span><span style="color:#d3d0c8;">    return {
+</span><span style="color:#d3d0c8;">        &quot;artifact_id&quot;: str(artifact.id),
+</span><span style="color:#d3d0c8;">        &quot;sample&quot;: df.head(3).to_dict(orient=&quot;records&quot;),
+</span><span style="color:#d3d0c8;">        &quot;total_rows&quot;: len(df),
+</span><span style="color:#d3d0c8;">        &quot;columns&quot;: list(df.columns)
+</span><span style="color:#d3d0c8;">    }
+</span></code></pre>
 <p>The LLM receives something like:</p>
-<pre class="giallo z-code"><code data-lang="json"><span class="giallo-l"><span>{</span></span>
-<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">artifact_id</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">abc-123</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span></span>
-<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">sample</span><span class="z-support">&quot;</span><span>:</span><span> [</span></span>
-<span class="giallo-l"><span>    {</span><span class="z-support"> &quot;</span><span class="z-support">campaign</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Holiday Sale</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">spend</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 1500.0</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">cpm</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 2.34</span><span> }</span><span>,</span></span>
-<span class="giallo-l"><span>    {</span><span class="z-support"> &quot;</span><span class="z-support">campaign</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Winter Promo</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">spend</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 1200.0</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">cpm</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 1.98</span><span> }</span><span>,</span></span>
-<span class="giallo-l"><span>    {</span><span class="z-support"> &quot;</span><span class="z-support">campaign</span><span class="z-support">&quot;</span><span>:</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">Year End</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">spend</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 980.0</span><span>,</span><span class="z-support"> &quot;</span><span class="z-support">cpm</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 2.1</span><span> }</span></span>
-<span class="giallo-l"><span>  ]</span><span>,</span></span>
-<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">total_rows</span><span class="z-support">&quot;</span><span>:</span><span class="z-constant"> 500</span><span>,</span></span>
-<span class="giallo-l"><span class="z-support">  &quot;</span><span class="z-support">columns</span><span class="z-support">&quot;</span><span>:</span><span> [</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">campaign</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">spend</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">cpm</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">impressions</span><span class="z-punctuation z-definition z-string">&quot;</span><span>,</span><span class="z-punctuation z-definition z-string"> &quot;</span><span class="z-string">clicks</span><span class="z-punctuation z-definition z-string">&quot;</span><span>]</span></span>
-<span class="giallo-l"><span>}</span></span></code></pre>
+<pre><code><span style="color:#d3d0c8;">{
+</span><span style="color:#d3d0c8;">  &quot;</span><span style="color:#99cc99;">artifact_id</span><span style="color:#d3d0c8;">&quot;: &quot;</span><span style="color:#99cc99;">abc-123</span><span style="color:#d3d0c8;">&quot;,
+</span><span style="color:#d3d0c8;">  &quot;</span><span style="color:#99cc99;">sample</span><span style="color:#d3d0c8;">&quot;: [
+</span><span style="color:#d3d0c8;">    { &quot;</span><span style="color:#99cc99;">campaign</span><span style="color:#d3d0c8;">&quot;: &quot;</span><span style="color:#99cc99;">Holiday Sale</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">spend</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">1500.0</span><span style="color:#d3d0c8;">, &quot;</span><span style="color:#99cc99;">cpm</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">2.34 </span><span style="color:#d3d0c8;">},
+</span><span style="color:#d3d0c8;">    { &quot;</span><span style="color:#99cc99;">campaign</span><span style="color:#d3d0c8;">&quot;: &quot;</span><span style="color:#99cc99;">Winter Promo</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">spend</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">1200.0</span><span style="color:#d3d0c8;">, &quot;</span><span style="color:#99cc99;">cpm</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">1.98 </span><span style="color:#d3d0c8;">},
+</span><span style="color:#d3d0c8;">    { &quot;</span><span style="color:#99cc99;">campaign</span><span style="color:#d3d0c8;">&quot;: &quot;</span><span style="color:#99cc99;">Year End</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">spend</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">980.0</span><span style="color:#d3d0c8;">, &quot;</span><span style="color:#99cc99;">cpm</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">2.1 </span><span style="color:#d3d0c8;">}
+</span><span style="color:#d3d0c8;">  ],
+</span><span style="color:#d3d0c8;">  &quot;</span><span style="color:#99cc99;">total_rows</span><span style="color:#d3d0c8;">&quot;: </span><span style="color:#f99157;">500</span><span style="color:#d3d0c8;">,
+</span><span style="color:#d3d0c8;">  &quot;</span><span style="color:#99cc99;">columns</span><span style="color:#d3d0c8;">&quot;: [&quot;</span><span style="color:#99cc99;">campaign</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">spend</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">cpm</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">impressions</span><span style="color:#d3d0c8;">&quot;, &quot;</span><span style="color:#99cc99;">clicks</span><span style="color:#d3d0c8;">&quot;]
+</span><span style="color:#d3d0c8;">}
+</span></code></pre>
 <p>Three rows is enough for the model to understand the data structure. It knows there's a "spend" column with decimal values, a "campaign" column with strings, and so on. The full 500 rows stay safely in PostgreSQL.</p>
 <p>And for the last part - this is where the magic happens. When users want to filter, aggregate, or transform their data, we can load the artifact into DuckDB and run SQL against it by exposing another tool to the agent:</p>
-<pre class="giallo z-code"><code data-lang="python"><span class="giallo-l"><span class="z-storage z-type">def</span><span class="z-entity z-name"> execute_sql_on_dataframe</span><span>(</span><span class="z-variable z-parameter z-function">artifact_ids</span><span>:</span><span> list</span><span>[</span><span class="z-support">str</span><span>]</span><span>,</span><span class="z-variable z-parameter z-function"> query</span><span>:</span><span class="z-support"> str</span><span>)</span><span> -&gt;</span><span class="z-support"> dict</span><span>:</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Load artifacts from PostgreSQL</span></span>
-<span class="giallo-l"><span>    artifacts</span><span class="z-keyword"> =</span><span> [</span><span>artifact_repo</span><span>.</span><span>get_by_id</span><span>(</span><span class="z-support">id</span><span>)</span><span class="z-keyword"> for</span><span class="z-support"> id</span><span class="z-keyword"> in</span><span> artifact_ids</span><span>]</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Create ephemeral DuckDB connection (in-memory)</span></span>
-<span class="giallo-l"><span>    conn</span><span class="z-keyword"> =</span><span> duckdb</span><span>.</span><span>connect</span><span>(</span><span>)</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Register each artifact as a table</span></span>
-<span class="giallo-l"><span class="z-keyword">    for</span><span> i</span><span>,</span><span> artifact</span><span class="z-keyword"> in</span><span class="z-support"> enumerate</span><span>(</span><span>artifacts</span><span>)</span><span>:</span></span>
-<span class="giallo-l"><span>        df</span><span class="z-keyword"> =</span><span> pd</span><span>.</span><span>read_json</span><span>(</span><span>StringIO</span><span>(</span><span>artifact</span><span>.</span><span>data</span><span>)</span><span>)</span></span>
-<span class="giallo-l"><span>        conn</span><span>.</span><span>register</span><span>(</span><span class="z-storage z-type">f</span><span class="z-string">&quot;</span><span class="z-string">df_</span><span class="z-constant">{</span><span>i</span><span class="z-constant">}</span><span class="z-string">&quot;</span><span>,</span><span> df</span><span>)</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Execute the SQL query</span></span>
-<span class="giallo-l"><span>    result_df</span><span class="z-keyword"> =</span><span> conn</span><span>.</span><span>sql</span><span>(</span><span>query</span><span>)</span><span>.</span><span>df</span><span>(</span><span>)</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-comment">    #</span><span class="z-comment"> Store result as a new artifact</span></span>
-<span class="giallo-l"><span>    new_artifact</span><span class="z-keyword"> =</span><span> artifact_repo</span><span>.</span><span>insert</span><span>(</span></span>
-<span class="giallo-l"><span class="z-variable">        conversation_id</span><span class="z-keyword">=</span><span>conversation_id</span><span>,</span></span>
-<span class="giallo-l"><span class="z-variable">        data</span><span class="z-keyword">=</span><span>result_df</span><span>.</span><span>to_json</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span></span>
-<span class="giallo-l"><span>    )</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span class="z-keyword">    return</span><span> {</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">artifact_id</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> str</span><span>(</span><span>new_artifact</span><span>.</span><span>id</span><span>)</span><span>,</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">results</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span> result_df</span><span>.</span><span>to_dict</span><span>(</span><span class="z-variable">orient</span><span class="z-keyword">=</span><span class="z-punctuation z-definition z-string">&quot;</span><span class="z-string">records</span><span class="z-punctuation z-definition z-string">&quot;</span><span>)</span><span>,</span></span>
-<span class="giallo-l"><span class="z-punctuation z-definition z-string">        &quot;</span><span class="z-string">total_rows</span><span class="z-punctuation z-definition z-string">&quot;</span><span>:</span><span class="z-support"> len</span><span>(</span><span>result_df</span><span>)</span></span>
-<span class="giallo-l"><span>    }</span></span></code></pre>
+<pre><code><span style="color:#d3d0c8;">def execute_sql_on_dataframe(artifact_ids: list[str], query: str) -&gt; dict:
+</span><span style="color:#d3d0c8;">    # Load artifacts from PostgreSQL
+</span><span style="color:#d3d0c8;">    artifacts = [artifact_repo.get_by_id(id) for id in artifact_ids]
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    # Create ephemeral DuckDB connection (in-memory)
+</span><span style="color:#d3d0c8;">    conn = duckdb.connect()
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    # Register each artifact as a table
+</span><span style="color:#d3d0c8;">    for i, artifact in enumerate(artifacts):
+</span><span style="color:#d3d0c8;">        df = pd.read_json(StringIO(artifact.data))
+</span><span style="color:#d3d0c8;">        conn.register(f&quot;df_{i}&quot;, df)
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    # Execute the SQL query
+</span><span style="color:#d3d0c8;">    result_df = conn.sql(query).df()
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    # Store result as a new artifact
+</span><span style="color:#d3d0c8;">    new_artifact = artifact_repo.insert(
+</span><span style="color:#d3d0c8;">        conversation_id=conversation_id,
+</span><span style="color:#d3d0c8;">        data=result_df.to_json(orient=&quot;records&quot;)
+</span><span style="color:#d3d0c8;">    )
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">    return {
+</span><span style="color:#d3d0c8;">        &quot;artifact_id&quot;: str(new_artifact.id),
+</span><span style="color:#d3d0c8;">        &quot;results&quot;: result_df.to_dict(orient=&quot;records&quot;),
+</span><span style="color:#d3d0c8;">        &quot;total_rows&quot;: len(result_df)
+</span><span style="color:#d3d0c8;">    }
+</span></code></pre>
 <p>I chose DuckDB for a few reasons:</p>
 <ul>
 <li><strong>Native Pandas integration</strong> - <code>conn.register()</code> turns a DataFrame into a queryable table with zero serialization overhead</li>
@@ -261,140 +128,61 @@
 <li><strong>Fast</strong> - DuckDB is optimized for analytical queries on columnar data</li>
 </ul>
 <p>The consistent table naming (<code>df_0</code>, <code>df_1</code>, etc.) is important. It makes the LLM's job predictable when generating SQL for multi-artifact queries. We instruct the LLM to use these table names in the order of the artifact IDs it receives so it can reference the correct data.</p>
-<h2 id="conversation-flow-example">Conversation Flow Example<a class="zola-anchor" href="#conversation-flow-example" aria-label="Anchor link for: conversation-flow-example" style="visibility: hidden;"></a>
-</h2>
+<h2>Conversation Flow Example</h2>
 <p>Here's how a multi-turn conversation actually works:</p>
-<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>User: &quot;Show me spend by line item for last week&quot;</span></span>
-<span class="giallo-l"><span>  → get_data executes</span></span>
-<span class="giallo-l"><span>  → artifact_abc created (847 rows)</span></span>
-<span class="giallo-l"><span>  → LLM sees: 3-row sample + &quot;847 total rows&quot;</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span>User: &quot;Which ones have CTR below 0.5%?&quot;</span></span>
-<span class="giallo-l"><span>  → execute_sql_on_dataframe([&quot;artifact_abc&quot;],</span></span>
-<span class="giallo-l"><span>      &quot;SELECT * FROM df_0 WHERE ctr &lt; 0.005&quot;)</span></span>
-<span class="giallo-l"><span>  → artifact_def created (127 rows)</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span>User: &quot;Sum the spend for those&quot;</span></span>
-<span class="giallo-l"><span>  → execute_sql_on_dataframe([&quot;artifact_def&quot;],</span></span>
-<span class="giallo-l"><span>      &quot;SELECT SUM(spend) as total_spend FROM df_0&quot;)</span></span>
-<span class="giallo-l"><span>  → Returns: $45,230</span></span>
-<span class="giallo-l"></span>
-<span class="giallo-l"><span>User: &quot;Compare that to the previous week&quot;</span></span>
-<span class="giallo-l"><span>  → get_data for previous week → artifact_ghi</span></span>
-<span class="giallo-l"><span>  → execute_sql_on_dataframe([&quot;artifact_def&quot;, &quot;artifact_ghi&quot;],</span></span>
-<span class="giallo-l"><span>      &quot;SELECT &#39;current&#39; as period, SUM(spend) FROM df_0</span></span>
-<span class="giallo-l"><span>       UNION ALL</span></span>
-<span class="giallo-l"><span>       SELECT &#39;previous&#39; as period, SUM(spend) FROM df_1&quot;)</span></span></code></pre>
+<pre><code><span style="color:#d3d0c8;">User: &quot;Show me spend by line item for last week&quot;
+</span><span style="color:#d3d0c8;">  → get_data executes
+</span><span style="color:#d3d0c8;">  → artifact_abc created (847 rows)
+</span><span style="color:#d3d0c8;">  → LLM sees: 3-row sample + &quot;847 total rows&quot;
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">User: &quot;Which ones have CTR below 0.5%?&quot;
+</span><span style="color:#d3d0c8;">  → execute_sql_on_dataframe([&quot;artifact_abc&quot;],
+</span><span style="color:#d3d0c8;">      &quot;SELECT * FROM df_0 WHERE ctr &lt; 0.005&quot;)
+</span><span style="color:#d3d0c8;">  → artifact_def created (127 rows)
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">User: &quot;Sum the spend for those&quot;
+</span><span style="color:#d3d0c8;">  → execute_sql_on_dataframe([&quot;artifact_def&quot;],
+</span><span style="color:#d3d0c8;">      &quot;SELECT SUM(spend) as total_spend FROM df_0&quot;)
+</span><span style="color:#d3d0c8;">  → Returns: $45,230
+</span><span style="color:#d3d0c8;">
+</span><span style="color:#d3d0c8;">User: &quot;Compare that to the previous week&quot;
+</span><span style="color:#d3d0c8;">  → get_data for previous week → artifact_ghi
+</span><span style="color:#d3d0c8;">  → execute_sql_on_dataframe([&quot;artifact_def&quot;, &quot;artifact_ghi&quot;],
+</span><span style="color:#d3d0c8;">      &quot;SELECT &#39;current&#39; as period, SUM(spend) FROM df_0
+</span><span style="color:#d3d0c8;">       UNION ALL
+</span><span style="color:#d3d0c8;">       SELECT &#39;previous&#39; as period, SUM(spend) FROM df_1&quot;)
+</span></code></pre>
 <p>One database query, four analyses. The data stays consistent throughout. The user can keep drilling down, pivoting, and comparing without ever triggering another warehouse query.</p>
-<pre class="mermaid">
-  sequenceDiagram
-    autonumber
-    actor User
-    participant Agent as AI Orchestrator
-    participant Tools as Processing Tools
-    participant Artifacts as Artifact Database
-    participant Warehouse as Data Warehouse
-
-    Note over User, Warehouse: Turn 1: Initial Query
-    User-&gt;&gt;Agent: &quot;Show me sales for last month&quot;
-    Agent-&gt;&gt;Tools: Request Data Retrieval
-    Tools-&gt;&gt;Warehouse: Execute SQL Query
-    Warehouse--&gt;&gt;Tools: Raw Data (10k rows)
-    Tools-&gt;&gt;Artifacts: Save Data as JSON
-    Artifacts--&gt;&gt;Tools: Return Artifact ID (UUID)
-    Tools--&gt;&gt;Agent: Return Summary + Artifact ID
-    Agent--&gt;&gt;User: &quot;I found the data. (Artifact ID: 123)&quot;
-
-    Note over User, Warehouse: Turn 2: Transformation
-    User-&gt;&gt;Agent: &quot;Now group that by region&quot;
-    Agent-&gt;&gt;Tools: Request Transformation (ID: 123)
-    Tools-&gt;&gt;Artifacts: Load Data (ID: 123)
-    Artifacts--&gt;&gt;Tools: JSON Data
-    Tools-&gt;&gt;Tools: In-Memory SQL Processing (DuckDB)
-    Tools-&gt;&gt;Artifacts: Save Grouped Data
-    Artifacts--&gt;&gt;Tools: New Artifact ID (UUID: 456)
-    Tools--&gt;&gt;Agent: New Summary + New ID
-    Agent--&gt;&gt;User: &quot;Grouped. Want to see a chart?&quot;
-
-    Note over User, Warehouse: Turn 3: Visualization
-    User-&gt;&gt;Agent: &quot;Yes, make it a bar chart&quot;
-    Agent-&gt;&gt;Tools: Generate Widget (ID: 456)
-    Tools-&gt;&gt;Artifacts: Read Data
-    Tools-&gt;&gt;Tools: Analyze Structure &amp; Create Config
-    Tools--&gt;&gt;Agent: Chart Configuration
-    Agent--&gt;&gt;User: Displays Bar Chart
-</pre><h2 id="wrapping-up">Wrapping Up<a class="zola-anchor" href="#wrapping-up" aria-label="Anchor link for: wrapping-up" style="visibility: hidden;"></a>
-</h2>
+<svg xmlns="http://www.w3.org/2000/svg" width="1279.4414" height="1379.2" viewBox="-50 -10 1279.4414 1379.2"><rect x="-50" y="-10" width="1279.4414" height="1379.2" fill="#FFFFFF"/><defs><marker id="arrow-0" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B" stroke="#64748B" stroke-width="1" stroke-dasharray="1,0"/></marker><marker id="arrow-start-0" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" fill="#64748B" stroke="#64748B" stroke-width="1" stroke-dasharray="1,0"/></marker><marker id="arrow-seq-0" viewBox="-1 0 12 10" refX="7.9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M -1 0 L 10 5 L 0 10 z" fill="#64748B" stroke="#64748B" stroke-width="1" stroke-dasharray="1,0"/></marker><marker id="arrow-start-seq-0" viewBox="-1 0 12 10" refX="2.1" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 11 0 L 0 5 L 11 10 z" fill="#64748B" stroke="#64748B" stroke-width="1" stroke-dasharray="1,0"/></marker></defs><line x1="76.66" y1="65.00" x2="76.66" y2="1293.20" stroke="#64748B" stroke-width="0.5"/><line x1="379.04" y1="65.00" x2="379.04" y2="1293.20" stroke="#64748B" stroke-width="0.5"/><line x1="653.41" y1="65.00" x2="653.41" y2="1293.20" stroke="#64748B" stroke-width="0.5"/><line x1="904.44" y1="65.00" x2="904.44" y2="1293.20" stroke="#64748B" stroke-width="0.5"/><line x1="1104.44" y1="65.00" x2="1104.44" y2="1293.20" stroke="#64748B" stroke-width="0.5"/><path d="M 51.66 75.00 L 1118.24 75.00 L 1129.44 86.20 L 1129.44 114.40 L 51.66 114.40 Z" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.1"/><polyline points="1118.24,75.00 1118.24,86.20 1129.44,86.20" fill="none" stroke="#FDBA74" stroke-width="1.0"/><text x="590.55" y="98.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="590.55" dy="0.00">Turn 1: Initial Query</tspan></text><path d="M 51.66 492.40 L 1118.24 492.40 L 1129.44 503.60 L 1129.44 531.80 L 51.66 531.80 Z" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.1"/><polyline points="1118.24,492.40 1118.24,503.60 1129.44,503.60" fill="none" stroke="#FDBA74" stroke-width="1.0"/><text x="590.55" y="515.60" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="590.55" dy="0.00">Turn 2: Transformation</tspan></text><path d="M 51.66 955.80 L 1118.24 955.80 L 1129.44 967.00 L 1129.44 995.20 L 51.66 995.20 Z" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.1"/><polyline points="1118.24,955.80 1118.24,967.00 1129.44,967.00" fill="none" stroke="#FDBA74" stroke-width="1.0"/><text x="590.55" y="979.00" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="590.55" dy="0.00">Turn 3: Visualization</tspan></text><path id="edge-0" class="edgePath" data-edge-id="edge-0" d="M 76.663,160.400 L 379.040,160.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-0" data-label-kind="center" x="83.82" y="163.20" width="288.07" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-0" data-label-kind="center"><text x="227.85" y="180.70" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="227.85" dy="0.00">&quot;Show me sales for last month&quot;</tspan></text></g><path id="edge-1" class="edgePath" data-edge-id="edge-1" d="M 379.040,206.400 L 653.410,206.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-1" data-label-kind="center" x="409.53" y="175.60" width="213.38" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-1" data-label-kind="center"><text x="516.23" y="193.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="516.23" dy="0.00">Request Data Retrieval</tspan></text></g><path id="edge-2" class="edgePath" data-edge-id="edge-2" d="M 653.410,252.400 L 1104.441,252.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-2" data-label-kind="center" x="795.57" y="221.60" width="166.71" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-2" data-label-kind="center"><text x="878.93" y="239.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="878.93" dy="0.00">Execute SQL Query</tspan></text></g><path id="edge-3" class="edgePath" data-edge-id="edge-3" d="M 1104.441,298.400 L 653.410,298.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-3" data-label-kind="center" x="786.24" y="267.60" width="185.38" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-3" data-label-kind="center"><text x="878.93" y="285.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="878.93" dy="0.00">Raw Data (10k rows)</tspan></text></g><path id="edge-4" class="edgePath" data-edge-id="edge-4" d="M 653.410,344.400 L 904.441,344.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-4" data-label-kind="center" x="695.57" y="313.60" width="166.71" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-4" data-label-kind="center"><text x="778.93" y="331.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="778.93" dy="0.00">Save Data as JSON</tspan></text></g><path id="edge-5" class="edgePath" data-edge-id="edge-5" d="M 904.441,390.400 L 653.410,390.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-5" data-label-kind="center" x="658.23" y="393.20" width="241.39" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-5" data-label-kind="center"><text x="778.93" y="410.70" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="778.93" dy="0.00">Return Artifact ID (UUID)</tspan></text></g><path id="edge-6" class="edgePath" data-edge-id="edge-6" d="M 653.410,436.400 L 379.040,436.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-6" data-label-kind="center" x="381.53" y="439.20" width="269.40" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-6" data-label-kind="center"><text x="516.23" y="456.70" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="516.23" dy="0.00">Return Summary + Artifact ID</tspan></text></g><path id="edge-7" class="edgePath" data-edge-id="edge-7" d="M 379.040,482.400 L 76.663,482.400" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-7" data-label-kind="center" x="-1.00" y="451.60" width="362.75" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-7" data-label-kind="center"><text x="180.38" y="469.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="180.38" dy="0.00">&quot;I found the data. (Artifact ID: 123)&quot;</tspan></text></g><path id="edge-8" class="edgePath" data-edge-id="edge-8" d="M 76.663,577.800 L 379.040,577.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-8" data-label-kind="center" x="102.49" y="547.00" width="250.73" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-8" data-label-kind="center"><text x="227.85" y="564.50" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="227.85" dy="0.00">&quot;Now group that by region&quot;</tspan></text></g><path id="edge-9" class="edgePath" data-edge-id="edge-9" d="M 379.040,623.800 L 653.410,623.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-9" data-label-kind="center" x="344.64" y="626.60" width="306.74" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-9" data-label-kind="center"><text x="498.01" y="644.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="498.01" dy="0.00">Request Transformation (ID: 123)</tspan></text></g><path id="edge-10" class="edgePath" data-edge-id="edge-10" d="M 653.410,669.800 L 904.441,669.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-10" data-label-kind="center" x="686.24" y="639.00" width="185.38" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-10" data-label-kind="center"><text x="778.93" y="656.50" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="778.93" dy="0.00">Load Data (ID: 123)</tspan></text></g><path id="edge-11" class="edgePath" data-edge-id="edge-11" d="M 904.441,715.800 L 653.410,715.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-11" data-label-kind="center" x="732.92" y="685.00" width="92.02" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-11" data-label-kind="center"><text x="778.93" y="702.50" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="778.93" dy="0.00">JSON Data</tspan></text></g><path id="edge-12" class="edgePath" data-edge-id="edge-12" d="M 653.410,761.800 L 688.410,761.800 L 688.410,796.800 L 653.410,796.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-12" data-label-kind="center" x="515.67" y="723.99" width="316.08" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-12" data-label-kind="center"><text x="673.71" y="741.49" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="673.71" dy="0.00">In-Memory SQL Processing (DuckDB)</tspan></text></g><path id="edge-13" class="edgePath" data-edge-id="edge-13" d="M 653.410,807.800 L 904.441,807.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-13" data-label-kind="center" x="695.57" y="777.00" width="166.71" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-13" data-label-kind="center"><text x="778.93" y="794.50" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="778.93" dy="0.00">Save Grouped Data</tspan></text></g><path id="edge-14" class="edgePath" data-edge-id="edge-14" d="M 904.441,853.800 L 653.410,853.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-14" data-label-kind="center" x="664.31" y="856.60" width="260.06" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-14" data-label-kind="center"><text x="794.34" y="874.10" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="794.34" dy="0.00">New Artifact ID (UUID: 456)</tspan></text></g><path id="edge-15" class="edgePath" data-edge-id="edge-15" d="M 653.410,899.800 L 379.040,899.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-15" data-label-kind="center" x="418.87" y="869.00" width="194.71" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-15" data-label-kind="center"><text x="516.23" y="886.50" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="516.23" dy="0.00">New Summary + New ID</tspan></text></g><path id="edge-16" class="edgePath" data-edge-id="edge-16" d="M 379.040,945.800 L 76.663,945.800" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-16" data-label-kind="center" x="61.49" y="915.00" width="297.40" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-16" data-label-kind="center"><text x="210.19" y="932.50" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="210.19" dy="0.00">&quot;Grouped. Want to see a chart?&quot;</tspan></text></g><path id="edge-17" class="edgePath" data-edge-id="edge-17" d="M 76.663,1041.200 L 379.040,1041.200" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-17" data-label-kind="center" x="102.49" y="1010.40" width="250.73" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-17" data-label-kind="center"><text x="227.85" y="1027.90" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="227.85" dy="0.00">&quot;Yes, make it a bar chart&quot;</tspan></text></g><path id="edge-18" class="edgePath" data-edge-id="edge-18" d="M 379.040,1087.200 L 653.410,1087.200" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-18" data-label-kind="center" x="409.83" y="1056.40" width="241.39" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-18" data-label-kind="center"><text x="530.52" y="1073.90" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="530.52" dy="0.00">Generate Widget (ID: 456)</tspan></text></g><path id="edge-19" class="edgePath" data-edge-id="edge-19" d="M 653.410,1133.200 L 904.441,1133.200" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-19" data-label-kind="center" x="732.92" y="1102.40" width="92.02" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-19" data-label-kind="center"><text x="778.93" y="1119.90" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="778.93" dy="0.00">Read Data</tspan></text></g><path id="edge-20" class="edgePath" data-edge-id="edge-20" d="M 653.410,1179.200 L 688.410,1179.200 L 688.410,1214.200 L 653.410,1214.200" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"   stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-20" data-label-kind="center" x="515.67" y="1141.39" width="316.08" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-20" data-label-kind="center"><text x="673.71" y="1158.89" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="673.71" dy="0.00">Analyze Structure &amp; Create Config</tspan></text></g><path id="edge-21" class="edgePath" data-edge-id="edge-21" d="M 653.410,1225.200 L 379.040,1225.200" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-21" data-label-kind="center" x="423.54" y="1194.40" width="185.38" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-21" data-label-kind="center"><text x="516.23" y="1211.90" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="516.23" dy="0.00">Chart Configuration</tspan></text></g><path id="edge-22" class="edgePath" data-edge-id="edge-22" d="M 379.040,1271.200 L 76.663,1271.200" fill="none" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-seq-0)"  stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" /><rect class="edgeLabel sequenceEdgeLabel" data-edge-id="edge-22" data-label-kind="center" x="139.83" y="1240.40" width="176.04" height="28.00" rx="2" ry="2" fill="#FFFFFF" fill-opacity="0.00" stroke="#94A3B8" stroke-opacity="0.00" stroke-width="0.8"/><g class="edgeLabel" data-edge-id="edge-22" data-label-kind="center"><text x="227.85" y="1257.90" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="227.85" dy="0.00">Displays Bar Chart</tspan></text></g><circle cx="92.66" cy="148.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="92.66" y="153.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">1</text><circle cx="395.04" cy="194.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="395.04" y="199.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">2</text><circle cx="669.41" cy="240.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="245.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">3</text><circle cx="1088.44" cy="286.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="1088.44" y="291.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">4</text><circle cx="669.41" cy="332.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="337.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">5</text><circle cx="888.44" cy="378.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="888.44" y="383.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">6</text><circle cx="637.41" cy="424.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="637.41" y="429.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">7</text><circle cx="363.04" cy="470.50" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="363.04" y="475.40" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">8</text><circle cx="92.66" cy="565.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="92.66" y="570.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">9</text><circle cx="395.04" cy="611.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="395.04" y="616.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">10</text><circle cx="669.41" cy="657.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="662.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">11</text><circle cx="888.44" cy="703.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="888.44" y="708.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">12</text><circle cx="669.41" cy="749.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="754.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">13</text><circle cx="669.41" cy="795.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="800.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">14</text><circle cx="888.44" cy="841.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="888.44" y="846.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">15</text><circle cx="637.41" cy="887.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="637.41" y="892.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">16</text><circle cx="363.04" cy="933.90" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="363.04" y="938.80" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">17</text><circle cx="92.66" cy="1029.30" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="92.66" y="1034.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">18</text><circle cx="395.04" cy="1075.30" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="395.04" y="1080.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">19</text><circle cx="669.41" cy="1121.30" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="1126.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">20</text><circle cx="669.41" cy="1167.30" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="669.41" y="1172.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">21</text><circle cx="637.41" cy="1213.30" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="637.41" y="1218.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">22</text><circle cx="363.04" cy="1259.30" r="6.30" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/><text x="363.04" y="1264.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A">23</text><rect x="304.04" y="0.00" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="379.04" y="36.00" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="379.04" dy="0.00">AI Orchestrator</tspan></text><rect x="829.44" y="0.00" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="904.44" y="36.00" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="904.44" dy="0.00">Artifact Database</tspan></text><rect x="578.41" y="0.00" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="653.41" y="36.00" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="653.41" dy="0.00">Processing Tools</tspan></text><rect x="1.66" y="0.00" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="76.66" y="36.00" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="76.66" dy="0.00">User</tspan></text><rect x="1029.44" y="0.00" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="1104.44" y="36.00" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="1104.44" dy="0.00">Data Warehouse</tspan></text><rect x="1.66" y="1293.20" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="76.66" y="1329.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="76.66" dy="0.00">User</tspan></text><rect x="304.04" y="1293.20" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="379.04" y="1329.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="379.04" dy="0.00">AI Orchestrator</tspan></text><rect x="578.41" y="1293.20" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="653.41" y="1329.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="653.41" dy="0.00">Processing Tools</tspan></text><rect x="829.44" y="1293.20" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="904.44" y="1329.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="904.44" dy="0.00">Artifact Database</tspan></text><rect x="1029.44" y="1293.20" width="150.00" height="65.00" rx="3" ry="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.0"/><text x="1104.44" y="1329.20" text-anchor="middle" font-family="Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="14" fill="#0F172A"><tspan x="1104.44" dy="0.00">Data Warehouse</tspan></text></svg>
+<h2>Wrapping Up</h2>
 <p>The artifacts pattern turned out to be simpler than I expected and more powerful than I hoped. The core idea is straightforward: store the full data externally, give the LLM a reference and a sample, let it request operations on demand.</p>
 <p>This solution reduced latency, saved us money, allowed our users to query for thousands of rows, and significantly reduced LLM hallucinations.</p>
 <p>This pattern isn't limited to data analysis. Anywhere you have large content that needs to persist across conversation turns, whether that's documents, code files, or query results, the same approach applies. Store big, sample small, query on demand.</p>
 
-      </article>
-
-      
-      
-
-      
-      
-    </div>
-
-    
-
-
-<footer>
-  <div class="left">
-    <div class="copyright">
-      
-      
-    </div>
-  </div>
-
-  <div class="right">
-    
-    
-      
-    
-    
-    <a id="rss-btn" href="https://orellazri.com/atom.xml">RSS</a>
-    
-    
-
-    
-  </div>
-</footer>
-
-
-
-
-<dialog id="rss-mask">
-  <div>
-    <a href="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml">https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml</a>
-    
-    
-    <button autofocus aria-label="copy" data-link="https:&#x2F;&#x2F;orellazri.com&#x2F;atom.xml" data-copy-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
-" data-check-icon="&lt;svg xmlns=&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2000&#x2F;svg&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z&quot; fill=&quot;currentColor&quot;&gt;&lt;&#x2F;path&gt;&lt;&#x2F;svg&gt;
-" >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z" fill="currentColor"></path></svg>
-
-    </button>
-  </div>
-</dialog>
-
-
-
-  </main>
+</article>
 </div>
+  </main>
 
-  
-<script src="/js/lightense.min.js"></script>
-
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: true });
-</script>
-
-
-  <script src="https://orellazri.com/js/main.js"></script>
+  <footer class="site-footer">
+    <div class="site-footer-content">
+      <div class="site-footer-content-block">
+        <div>
+          <a href="/atom.xml">Atom</a>
+        </div>
+        <div>
+          Site generated at 2026-06-05 (<a href="https://github.com/orellazri/website">Source</a>)
+        </div>
+      </div>
+      <div class="site-footer-content-block">
+        <div>
+          <a href="https://github.com/orellazri">GitHub</a>
+        </div>
+        <div>
+          <a href="mailto:hi@orellazri.com">Email</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 
 </html>
