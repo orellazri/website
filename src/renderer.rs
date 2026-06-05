@@ -4,6 +4,7 @@ use std::{
 };
 
 use anyhow::Result;
+use chrono::Local;
 use tera::{Context, Tera};
 
 use crate::models::PageContext;
@@ -23,8 +24,14 @@ impl Renderer {
         })
     }
 
+    fn base_context(&self) -> Context {
+        let mut ctx = Context::new();
+        ctx.insert("generated_at", &Local::now().format("%Y-%m-%d").to_string());
+        ctx
+    }
+
     pub fn render(&self, ctx: &PageContext) -> Result<()> {
-        let mut tera_ctx = Context::new();
+        let mut tera_ctx = self.base_context();
 
         match ctx {
             PageContext::Index { posts } => tera_ctx.insert("posts", posts),

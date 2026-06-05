@@ -62,6 +62,13 @@ code {
   width: min(calc(100% - var(--page-gutter) - var(--page-gutter)), var(--content-width));
   margin: 0 auto;
   padding: 2rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.site-footer-content-block {
+  display: flex;
+  flex-direction: column;
 }
 
 .site-content {
