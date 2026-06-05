@@ -71,6 +71,10 @@ code {
   flex-direction: column;
 }
 
+.site-footer-content-block:last-child {
+  text-align: end;
+}
+
 .site-content {
   margin-top: 2rem;
 }
