@@ -1,19 +1,8 @@
 This repository contains the source code for my personal website.
 
-Init:
+## Usage
 
 ```bash
-git submodule update --init --recursive
-```
-
-Run:
-
-```bash
-zola serve
-```
-
-Create post:
-
-```bash
-touch content/posts/(date +%Y-%m-%d)-TITLE.md
+cargo run -- serve
+cargo run -- build
 ```

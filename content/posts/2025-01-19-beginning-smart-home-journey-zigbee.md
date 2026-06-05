@@ -1,9 +1,7 @@
 +++
 title = "Beginning My Smart Home Journey with Zigbee"
 date = "2025-01-19"
-
-[taxonomies]
-tags=["smart-home", "self-hosting"]
+tags = ["smart-home", "self-hosting"]
 +++
 
 In the last few weeks, I've been wanting to make my home smarter, in an efficient and secure way.

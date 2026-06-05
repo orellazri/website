@@ -1,12 +1,7 @@
 +++
 title = "Building an Artifacts System for Our LLM Data Agents"
 date = "2026-01-03"
-
-[taxonomies]
-tags=["ai", "coding"]
-
-[extra]
-mermaid = true
+tags = ["ai", "coding"]
 +++
 
 At my day job, I've been working on an AI-powered data assistant that helps users query and analyze advertising campaign data through natural language. The initial version worked great for one-off questions, but I quickly discovered a fundamental challenge that was costing us both time and money. The AI had no memory of what data it had just fetched, unless it was stored in the context window.
@@ -156,14 +151,14 @@ User: "Compare that to the previous week"
 
 One database query, four analyses. The data stays consistent throughout. The user can keep drilling down, pivoting, and comparing without ever triggering another warehouse query.
 
-{% mermaid() %}
+```mermaid
 sequenceDiagram
-    autonumber
-    actor User
-    participant Agent as AI Orchestrator
-    participant Tools as Processing Tools
-    participant Artifacts as Artifact Database
-    participant Warehouse as Data Warehouse
+autonumber
+actor User
+participant Agent as AI Orchestrator
+participant Tools as Processing Tools
+participant Artifacts as Artifact Database
+participant Warehouse as Data Warehouse
 
     Note over User, Warehouse: Turn 1: Initial Query
     User->>Agent: "Show me sales for last month"
@@ -193,7 +188,7 @@ sequenceDiagram
     Tools->>Tools: Analyze Structure & Create Config
     Tools-->>Agent: Chart Configuration
     Agent-->>User: Displays Bar Chart
-{% end %}
+```
 
 ## Wrapping Up
 

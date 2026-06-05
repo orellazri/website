@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="/reset.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <script data-goatcounter="https://orellazri.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+
+<body>
+  <main class="site-main">
+    <header class="site-header">
+      <div class="site-header-block">
+        <a href="/">Home</a>
+        <a href="/posts">Posts</a>
+        <a href="/projects">Projects</a>
+      </div>
+      <div class="site-header-block">
+      </div>
+    </header>
+
+    <div class="site-content">{% block content %}{% endblock %}</div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-content">
+      <div class="site-footer-content-block">
+        <div>
+          <a href="/atom.xml">Atom</a>
+        </div>
+        <div>
+          Site generated at {{ generated_at }} (<a href="https://github.com/orellazri/website">Source</a>)
+        </div>
+      </div>
+      <div class="site-footer-content-block">
+        <div>
+          <a href="https://github.com/orellazri">GitHub</a>
+        </div>
+        <div>
+          <a href="mailto:hi@orellazri.com">Email</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

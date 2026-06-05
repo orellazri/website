@@ -1,9 +1,7 @@
 +++
 title = "Patching and Extending Helm Resources With Kustomize"
 date = "2024-05-24"
-
-[taxonomies]
-tags=["devops"]
+tags = ["devops"]
 +++
 
 Helm deployments are a great way to manage Kubernetes resources, but sometimes you need to customize or extend the resources that Helm generates. In this post, we'll look at how you can use Kustomize to patch and extend Helm resources.

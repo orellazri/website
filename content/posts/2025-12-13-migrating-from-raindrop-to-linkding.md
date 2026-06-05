@@ -1,9 +1,7 @@
 +++
 title = "Migrating My Bookmarks From Raindrop to Linkding"
 date = "2025-12-13"
-
-[taxonomies]
-tags=["self-hosting", "ai"]
+tags = ["self-hosting", "ai"]
 +++
 
 I recently decided to migrate my bookmarks from Raindrop.io to [Linkding](https://github.com/sissbruecker/linkding), a self-hosted bookmark manager. I rather own my bookmarks' data instead of using a third-party service for this simple use-case.

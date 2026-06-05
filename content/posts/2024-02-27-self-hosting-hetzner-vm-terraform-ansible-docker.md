@@ -1,9 +1,7 @@
 +++
 title = "Self Hosting On a Hetzner VM: Terraform, Ansible, Docker"
 date = "2024-02-27"
-
-[taxonomies]
-tags=["devops", "self-hosting"]
+tags = ["devops", "self-hosting"]
 +++
 
 I started my self-hosting journey a few years back with a single desktop machine serving as both my NAS and the host for all the services I was running.

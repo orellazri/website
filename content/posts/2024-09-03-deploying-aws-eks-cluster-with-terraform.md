@@ -1,9 +1,7 @@
 +++
 title = "Deploying an AWS EKS Cluster With Terraform"
 date = "2024-09-03"
-
-[taxonomies]
-tags=["devops"]
+tags = ["devops"]
 +++
 
 In this post, we'll walk through the process of deploying an Amazon EKS (Elastic Kubernetes Service) cluster using Terraform. We'll cover everything from setting up the basic infrastructure to configuring the cluster and its node groups. Let's dive in!

@@ -1,9 +1,7 @@
 +++
 title = "Deploying Ingress Nginx on EKS With an Internal Load Balancer and HTTPS"
 date = "2024-03-31"
-
-[taxonomies]
-tags=["devops"]
+tags = ["devops"]
 +++
 
 In this post, we will deploy Ingress Nginx on EKS with an internal load balancer and HTTPS. This setup is useful when you want to expose your services an internal network (e.g. your work VPN) and secure the communication with HTTPS.

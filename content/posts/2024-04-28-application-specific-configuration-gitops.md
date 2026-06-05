@@ -1,9 +1,7 @@
 +++
 title = "Application Specific Configuration with GitOps Deployments"
 date = "2024-04-28"
-
-[taxonomies]
-tags=["devops"]
+tags = ["devops"]
 +++
 
 In today's fast-paced software development landscape, staying agile and efficient is crucial. One area where efficiency matters greatly is in deploying application configurations. Developers often need to make changes to configuration values based on different environments, like production, staging, or development.

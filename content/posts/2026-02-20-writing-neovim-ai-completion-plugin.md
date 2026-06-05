@@ -1,9 +1,7 @@
 +++
 title = "Writing a Neovim AI Code Completion Plugin From Scratch"
 date = "2026-02-20"
-
-[taxonomies]
-tags=["coding", "ai"]
+tags = ["coding", "ai"]
 +++
 
 I've used AI code completion (Copilot and Cursor) long enough that I miss it when it's not there. But I never loved the "trust me" part: a closed service, running somewhere else. I wanted a version I could run locally, point at a model on my own machine, and understand end-to-end.

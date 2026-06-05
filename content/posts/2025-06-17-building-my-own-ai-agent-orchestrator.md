@@ -1,12 +1,7 @@
 +++
 title = "Building My Own AI Agent Orchestrator"
 date = "2025-06-17"
-
-[taxonomies]
-tags=["coding", "devops", "ai"]
-
-[extra]
-mermaid = true
+tags = ["coding", "devops", "ai"]
 +++
 
 AI assistants and AI-powered IDEs are great, but I wanted a solution that could handle complex tasks from start to finish, in the repositories across our organization, and that could run in the background. I wanted a tool that I could give a high-level goal to, like "refactor the auth service," and have it autonomously navigate my codebase, understand its nuances, and execute the task, seamlessly integrated with the company's self-hosted GitLab instance.
@@ -29,7 +24,7 @@ I decided to split the system into the following primary components:
 
 This separation of concerns keeps the architecture clean and scalable. The frontend is focused purely on user interaction, while the backend handles the heavy lifting of agent execution.
 
-{% mermaid() %}
+```mermaid
 sequenceDiagram
 participant Web App
 participant Kubernetes API
@@ -54,8 +49,7 @@ participant GitLab Repository
     Agent Runtime->>Kubernetes API: Notify completion
     Kubernetes API->>Kubernetes Job: Terminate job
     Kubernetes API->>Web App: Job terminated, execution complete
-
-{% end %}
+```
 
 ## The Implementation
 

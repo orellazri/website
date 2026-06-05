@@ -1,9 +1,7 @@
 +++
 title = "eBPF Development on Apple Silicon Macs using Lima"
 date = "2024-07-07"
-
-[taxonomies]
-tags=["coding"]
+tags = ["coding"]
 +++
 
 I've been working on a project that involves eBPF, and I've been doing all of my development on an Apple Silicon Mac. I wanted to share how I've set up my development environment.
