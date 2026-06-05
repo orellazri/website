@@ -36,7 +36,7 @@ One of the trickiest parts was intelligently chunking markdown content. Simply s
 3. **Handles edge cases** like content before the first header
 4. **Further splits large chunks** while respecting paragraph boundaries
 
-```rust
+```rs
 pub fn parse(contents: &str, filename: &str) -> Result<Vec<String>> {
     // Find the first header type used in the document
     let header_regex = Regex::new(r"^(#{1,6})\s")?;
@@ -58,7 +58,7 @@ Instead of using a dedicated vector database, I leveraged **sqlite-vec**, a SQLi
 
 This extension can be loaded with a short unsafe block:
 
-```rust
+```rs
 unsafe {
     sqlite3_auto_extension(Some(std::mem::transmute(sqlite3_vec_init as *const ())));
 }
@@ -66,7 +66,7 @@ unsafe {
 
 And then we can create a table with the following schema:
 
-```rust
+```rs
 pub fn new(conn: &'a Connection, ollama: &'a Ollama) -> Result<Self> {
     conn.execute(
         "CREATE VIRTUAL TABLE IF NOT EXISTS file_embeddings USING vec0(
@@ -89,7 +89,7 @@ In querying mode, a user enters a natural language query, and the system generat
 
 The interesting part where we fetch the similar vectors from SQLite is this:
 
-```rust
+```rs
 let mut stmt = self.conn.prepare(
     "SELECT contents
     FROM file_embeddings
@@ -109,7 +109,7 @@ I used the `embedding MATCH` clause to find the most similar vectors to the quer
 
 For the actual text generation, I integrated with **Ollama**, which provides a simple API for running various models locally. I chose `gemma3:1b` because I wanted an extremely lightweight model to test things quickly.
 
-```rust
+```rs
 // Embed the query
 let results = embedder.search(&query, 5).await?;
 
@@ -151,7 +151,6 @@ Let's walk through a typical interaction:
 1. **Initial Setup**: I run `mdrag embed ~/vault` to process all my markdown files. This creates embeddings for each chunk and stores them in the SQLite database.
 
 2. **Querying**: When I want to find something, I run `mdrag search "how to debug git ssh issues"`. The system:
-
    - Generates an embedding for my query
    - Finds the most similar chunks from my notes
    - Constructs a prompt with the query and context

@@ -31,7 +31,7 @@ The transcription module wraps Whisper's C++ implementation, handling the comple
 
 We first have to read the `wav` audio file (using `hound`) into a vector of 16-bit integers.
 
-```rust
+```rs
 let samples: Vec<i16> = WavReader::open(audio_path)
     .map_err(|e| Error::new(&format!("Failed to open wav file: {}", e)))?
     .into_samples::<i16>()
@@ -41,7 +41,7 @@ let samples: Vec<i16> = WavReader::open(audio_path)
 
 The Whisper model expects 16KHz mono f32 samples, meaning we have to do just a bit more work:
 
-```rust
+```rs
 let mut inter_samples = vec![Default::default(); samples.len()];
 whisper_rs::convert_integer_to_float_audio(&samples, &mut inter_samples)
     .map_err(|e| Error::new(&format!("Failed to convert audio data: {}", e)))?;
@@ -57,7 +57,7 @@ The summarization component interfaces with Ollama to run large language models 
 
 The prompt engineering focuses on extracting actionable information:
 
-```rust
+```rs
 fn get_prompt(&self, text: &str) -> String {
     format!(
         r#"
