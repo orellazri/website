@@ -47,8 +47,12 @@ where
                 code_buf.push_str(t);
             }
             Event::End(TagEnd::CodeBlock) if in_code_block => {
-                let highlighted = highlighter.highlight(&code_buf, &lang)?;
-                events.push(Event::Html(highlighted.into()));
+                let html = if lang == "mermaid" {
+                    mermaid_rs_renderer::render(&code_buf)?
+                } else {
+                    highlighter.highlight(&code_buf, &lang)?
+                };
+                events.push(Event::Html(html.into()));
                 in_code_block = false;
                 lang.clear();
                 code_buf.clear();

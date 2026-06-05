@@ -151,7 +151,7 @@ User: "Compare that to the previous week"
 
 One database query, four analyses. The data stays consistent throughout. The user can keep drilling down, pivoting, and comparing without ever triggering another warehouse query.
 
-{% mermaid() %}
+```mermaid
 sequenceDiagram
 autonumber
 actor User
@@ -188,8 +188,7 @@ participant Warehouse as Data Warehouse
     Tools->>Tools: Analyze Structure & Create Config
     Tools-->>Agent: Chart Configuration
     Agent-->>User: Displays Bar Chart
-
-{% end %}
+```
 
 ## Wrapping Up
 

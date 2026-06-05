@@ -24,7 +24,7 @@ I decided to split the system into the following primary components:
 
 This separation of concerns keeps the architecture clean and scalable. The frontend is focused purely on user interaction, while the backend handles the heavy lifting of agent execution.
 
-{% mermaid() %}
+```mermaid
 sequenceDiagram
 participant Web App
 participant Kubernetes API
@@ -49,8 +49,7 @@ participant GitLab Repository
     Agent Runtime->>Kubernetes API: Notify completion
     Kubernetes API->>Kubernetes Job: Terminate job
     Kubernetes API->>Web App: Job terminated, execution complete
-
-{% end %}
+```
 
 ## The Implementation
 
