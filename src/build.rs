@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use walkdir::WalkDir;
 
 use crate::{
+    feed::write_atom,
     minify::minify_css,
     models::{Page, PageContext, Post},
     parser::parse_file,
@@ -73,6 +74,14 @@ pub fn build() -> Result<()> {
             posts: tagged_posts,
         })?;
     }
+
+    write_atom(
+        &posts,
+        dist,
+        "https://orellazri.com",
+        "Orel Lazri",
+        "Orel Lazri",
+    )?;
 
     Ok(())
 }
