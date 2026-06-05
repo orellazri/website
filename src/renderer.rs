@@ -34,13 +34,26 @@ impl Renderer {
         let mut tera_ctx = self.base_context();
 
         match ctx {
-            PageContext::Index { posts } => tera_ctx.insert("posts", posts),
-            PageContext::PostList { posts } => tera_ctx.insert("posts", posts),
-            PageContext::Post { post } => tera_ctx.insert("post", post),
-            PageContext::Page { page } => tera_ctx.insert("page", page),
+            PageContext::Index { posts } => {
+                tera_ctx.insert("posts", posts);
+                tera_ctx.insert("page_title", "Orel Lazri");
+            }
+            PageContext::PostList { posts } => {
+                tera_ctx.insert("posts", posts);
+                tera_ctx.insert("page_title", "Posts");
+            }
+            PageContext::Post { post } => {
+                tera_ctx.insert("post", post);
+                tera_ctx.insert("page_title", &post.front.title);
+            }
+            PageContext::Page { page } => {
+                tera_ctx.insert("page", page);
+                tera_ctx.insert("page_title", &page.front.title);
+            }
             PageContext::Tag { tag, posts } => {
                 tera_ctx.insert("tag", tag);
                 tera_ctx.insert("posts", posts);
+                tera_ctx.insert("page_title", &format!("Posts tagged \"{}\"", tag));
             }
         }
 
