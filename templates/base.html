@@ -13,9 +13,13 @@
 <body>
   <main class="site-main">
     <header class="site-header">
-      <a href="/">Home</a>
-      <a href="/posts">Posts</a>
-      <a href="/projects">Projects</a>
+      <div class="site-header-block">
+        <a href="/">Home</a>
+        <a href="/posts">Posts</a>
+        <a href="/projects">Projects</a>
+      </div>
+      <div class="site-header-block">
+      </div>
     </header>
 
     <div class="site-content">{% block content %}{% endblock %}</div>
@@ -25,10 +29,10 @@
     <div class="site-footer-content">
       <div class="site-footer-content-block">
         <div>
-          Site generated at {{ generated_at }}.
+          <a href="/atom.xml">Atom</a>
         </div>
         <div>
-          <a href="https://github.com/orellazri/website">Source</a>
+          Site generated at {{ generated_at }} (<a href="https://github.com/orellazri/website">Source</a>)
         </div>
       </div>
       <div class="site-footer-content-block">
