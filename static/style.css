@@ -90,7 +90,7 @@ code {
 }
 
 .site-content li + li {
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
 }
 
 .site-content time {
@@ -116,13 +116,25 @@ code {
   align-items: baseline;
 }
 
-.post-list time {
-  flex-shrink: 0;
+.post-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .post-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  display: inline;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.post-tags li {
+  display: inline;
+}
+
+.post-tags li:not(:last-child)::after {
+  content: ", ";
 }

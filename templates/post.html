@@ -5,11 +5,13 @@
 {% block content %}
 <article>
   <h1>{{ post.front.title }}</h1>
-  <time>{{ post.front.date }}</time>
-  <div class="post-tags">
-    {% for tag in post.front.tags %}
-    <a href="/tags/{{ tag }}">{{ tag }}</a>
-    {% endfor %}
+  <div class="post-subtitle">
+    <time>{{ post.front.date }}</time>
+    <ul class="post-tags">
+      {% for tag in post.front.tags %}
+      <li><a href="/tags/{{ tag }}">{{ tag }}</a></li>
+      {% endfor %}
+    </ul>
   </div>
   {{ post.html | safe }}
 </article>
