@@ -10,13 +10,21 @@
 </head>
 
 <body>
-  <header>
-    <a href="/">Home</a>
-    <a href="/posts">Posts</a>
-    <a href="/projects">Projects</a>
-  </header>
+  <main class="site-main">
+    <header class="site-header">
+      <a href="/">Home</a>
+      <a href="/posts">Posts</a>
+      <a href="/projects">Projects</a>
+    </header>
 
-  <main>{% block content %}{% endblock %}</main>
+    <div class="site-content">{% block content %}{% endblock %}</div>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      Site generated at.
+    </div>
+  </footer>
 </body>
 
 </html>

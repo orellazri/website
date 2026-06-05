@@ -6,11 +6,11 @@
 <article>
   <h1>{{ post.front.title }}</h1>
   <time>{{ post.front.date }}</time>
-  <div class="tags">
+  <div class="post-tags">
     {% for tag in post.front.tags %}
     <a href="/tags/{{ tag }}">{{ tag }}</a>
     {% endfor %}
   </div>
-  <div class="content">{{ post.html | safe }}</div>
+  {{ post.html | safe }}
 </article>
 {% endblock %}

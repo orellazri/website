@@ -1,45 +1,128 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
 
+:root {
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+  --color-text: #ffffff;
+  --color-muted: #777777;
+  --color-link: #c480e4;
+  --content-width: 840px;
+  --page-gutter: 1.5rem;
+  --font-sans: "Bricolage Grotesque", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
 body {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: var(--font-sans);
   font-optical-sizing: auto;
   font-variation-settings: "wdth" 100;
-  background: #000000;
-  color: #ffffff;
+  background: var(--color-background);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.site-main {
+  width: min(calc(100% - var(--page-gutter) - var(--page-gutter)), var(--content-width));
+  margin: 1.5rem auto 3rem;
 }
 
 a {
-  color: #c480e4;
+  color: var(--color-link);
   text-decoration: none;
 }
 
-a:hover {
+a:hover,
+a:focus-visible {
   text-decoration: underline;
 }
 
 code {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-mono);
   font-optical-sizing: auto;
   font-size: 0.875rem;
 }
 
-header {
+.site-header {
   display: flex;
   gap: 1rem;
   align-items: center;
 }
 
-.index-main {
+.site-footer {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  height: 100%;
+  flex-grow: 1;
+}
+
+.site-footer > div {
+  width: min(calc(100% - var(--page-gutter) - var(--page-gutter)), var(--content-width));
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.site-content {
   margin-top: 2rem;
 }
 
-.index-subtitle {
+.site-content > :first-child {
+  margin-top: 0;
+}
+
+.site-content :where(h1, h2, h3, h4) {
+  line-height: 1.2;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  text-wrap: balance;
+}
+
+.site-content p {
+  margin-bottom: 1rem;
+  text-wrap: pretty;
+}
+
+.site-content :where(ul, ol) {
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.site-content li + li {
+  margin-top: 0.25rem;
+}
+
+.site-content time {
+  color: var(--color-muted);
+}
+
+.intro-subtitle {
   font-weight: 500;
   margin-top: 0.1rem;
+  margin-bottom: 1rem;
   font-size: 1.3rem;
 }
 
-.index-text {
-  margin-top: 1rem;
+.post-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.post-list li {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.post-list time {
+  flex-shrink: 0;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
