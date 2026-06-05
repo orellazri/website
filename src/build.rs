@@ -4,10 +4,38 @@ use anyhow::{Context, Result};
 use walkdir::WalkDir;
 
 use crate::{
+    minify::minify_css,
     models::{Page, PageContext, Post},
     parser::parse_file,
     renderer::Renderer,
 };
+
+fn copy_static(dist: &Path) -> Result<()> {
+    for entry in WalkDir::new("static")
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+    {
+        let relative = entry.path().strip_prefix("static")?;
+        let dest = dist.join(relative);
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent)?;
+        }
+
+        match entry.path().extension().and_then(|e| e.to_str()) {
+            Some("css") => {
+                let source = fs::read_to_string(entry.path())?;
+                let minified = minify_css(&source)?;
+                fs::write(&dest, minified)?;
+            }
+            _ => {
+                fs::copy(entry.path(), &dest)?;
+            }
+        }
+    }
+
+    Ok(())
+}
 
 pub fn build() -> Result<()> {
     let dist = Path::new("dist");
@@ -16,14 +44,7 @@ pub fn build() -> Result<()> {
     }
     fs::create_dir_all(dist)?;
 
-    fs_extra::dir::copy(
-        "static",
-        dist,
-        &fs_extra::dir::CopyOptions {
-            content_only: true,
-            ..Default::default()
-        },
-    )?;
+    copy_static(dist)?;
 
     let posts = collect_posts(Path::new("content/posts"))?;
     let pages = collect_pages(Path::new("content/pages"))?;
